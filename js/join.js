@@ -330,14 +330,12 @@ function initForm() {
     // ============================================
     // FORM SUBMISSION WITH LOADING SPINNER
     // ============================================
-    // DIRECT SUBMIT BUTTON EVENT - FIXED!
     const submitBtn = document.querySelector('.btn-submit');
     console.log('🔍 Submit button found:', submitBtn);
     
     if (submitBtn) {
         submitBtn.addEventListener('click', function(e) {
             console.log('✅ Submit button CLICKED!');
-            // Trigger form submission
             form.dispatchEvent(new Event('submit'));
         });
     } else {
@@ -351,25 +349,19 @@ function initForm() {
     });
 
     async function handleFormSubmit(e) {
-        // Get the submit button
         const submitBtn = document.querySelector('.btn-submit');
         const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
         
         console.log('📤 Processing form submission...');
         
-        // Show loading spinner
         if (submitBtn) {
-            submitBtn.innerHTML = `
-                <span class="spinner"></span> Submitting...
-            `;
+            submitBtn.innerHTML = `<span class="spinner"></span> Submitting...`;
             submitBtn.disabled = true;
         }
 
-        // Clear previous messages
         const msgDiv = document.getElementById('formMessage');
         if (msgDiv) msgDiv.innerHTML = '';
 
-        // Validate final step
         if (!validateStep(4)) {
             console.log('❌ Validation failed');
             if (submitBtn) {
@@ -379,7 +371,94 @@ function initForm() {
             return;
         }
 
-        // Get form values
+        // ============================================
+        // STEP 1: UPLOAD FILES TO PRIVATE STORAGE
+        // ============================================
+        const fileFields = ['passportPhoto', 'admissionLetter', 'studentId', 'paymentReceipt'];
+        const fileUrls = {
+            passportPhoto: '',
+            admissionLetter: '',
+            studentId: '',
+            paymentReceipt: ''
+        };
+        let uploadSuccess = true;
+
+        for (const field of fileFields) {
+            const fileInput = document.getElementById(field);
+            const file = fileInput?.files[0];
+            
+            if (file) {
+                try {
+                    console.log(`📤 Uploading ${field}...`);
+                    
+                    const timestamp = Date.now();
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${timestamp}_${file.name}`;
+                    
+                    let folderPath = '';
+                    switch(field) {
+                        case 'passportPhoto': folderPath = 'passports/'; break;
+                        case 'admissionLetter': folderPath = 'admissions/'; break;
+                        case 'studentId': folderPath = 'student-ids/'; break;
+                        case 'paymentReceipt': folderPath = 'receipts/'; break;
+                    }
+                    
+                    const filePath = `${folderPath}${fileName}`;
+                    console.log(`📁 Uploading to: ${filePath}`);
+                    
+                    const { data, error } = await supabase.storage
+                        .from('membership-documents')
+                        .upload(filePath, file);
+
+                    if (error) {
+                        console.error(`❌ Error uploading ${field}:`, error);
+                        uploadSuccess = false;
+                        throw error;
+                    }
+
+                    console.log(`✅ ${field} uploaded successfully!`, data);
+
+                    const { data: urlData } = supabase.storage
+                        .from('membership-documents')
+                        .getPublicUrl(filePath);
+                    
+                    const publicUrl = urlData?.publicUrl;
+                    fileUrls[field] = publicUrl;
+                    console.log(`🔗 ${field} URL:`, publicUrl);
+                    
+                } catch (error) {
+                    console.error(`❌ Failed to upload ${field}:`, error);
+                    uploadSuccess = false;
+                    if (msgDiv) {
+                        msgDiv.innerHTML = `
+                            <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
+                                <p>⚠️ Failed to upload ${field.replace(/([A-Z])/g, ' $1').trim()}. Please try again.</p>
+                            </div>
+                        `;
+                    }
+                    if (submitBtn) {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                    return;
+                }
+            }
+        }
+
+        if (!uploadSuccess) {
+            if (submitBtn) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+            return;
+        }
+
+        console.log('✅ All files uploaded successfully!');
+        console.log('📁 File URLs:', fileUrls);
+
+        // ============================================
+        // STEP 2: SAVE APPLICATION TO DATABASE
+        // ============================================
         const formData = {
             title: document.getElementById('title')?.value || '',
             surname: document.getElementById('surname')?.value || '',
@@ -402,10 +481,14 @@ function initForm() {
             phone: document.getElementById('phone')?.value || '',
             email: document.getElementById('email')?.value || '',
             home_address: document.getElementById('homeAddress')?.value || '',
+            passport_photo_url: fileUrls.passportPhoto || '',
+            admission_letter_url: fileUrls.admissionLetter || '',
+            student_id_url: fileUrls.studentId || '',
+            payment_receipt_url: fileUrls.paymentReceipt || '',
             status: 'pending'
         };
 
-        console.log('📋 Form data:', formData);
+        console.log('📋 Form data with file URLs:', formData);
 
         if (typeof supabase === 'undefined') {
             console.error('❌ Supabase not initialized!');
@@ -437,7 +520,6 @@ function initForm() {
                 throw error;
             }
 
-            // SHOW CONFIRMATION MESSAGE
             showConfirmation(formData);
             console.log('✅ Application submitted successfully');
 
@@ -451,7 +533,6 @@ function initForm() {
                     </div>
                 `;
             }
-            // Re-enable button
             if (submitBtn) {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -460,7 +541,6 @@ function initForm() {
     }
 
     function showConfirmation(data) {
-        // Hide the form
         const form = document.getElementById('membershipForm');
         if (form) form.style.display = 'none';
         
@@ -473,14 +553,12 @@ function initForm() {
         const intro = document.querySelector('.form-intro');
         if (intro) intro.style.display = 'none';
         
-        // Show confirmation
         const confirmDiv = document.getElementById('confirmationMessage');
         if (confirmDiv) {
             confirmDiv.style.display = 'block';
             confirmDiv.classList.add('show');
         }
         
-        // Fill in confirmation details
         const confirmName = document.getElementById('confirmName');
         if (confirmName) confirmName.textContent = data.first_name + ' ' + data.surname;
         
@@ -496,7 +574,6 @@ function initForm() {
         const confirmPhone = document.getElementById('confirmPhone');
         if (confirmPhone) confirmPhone.textContent = data.phone;
         
-        // Scroll to top
         if (confirmDiv) {
             confirmDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
