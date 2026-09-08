@@ -254,40 +254,40 @@
                         </div>
                     </div>
 
-                    <!-- STEP 4: UPLOAD DOCUMENTS -->
+                    <!-- STEP 4: UPLOAD DOCUMENTS (ALL COMPULSORY) -->
                     <div class="form-page" data-step="4">
                         <h3>Upload Documents</h3>
-                        <p class="section-desc">Please upload the required documents. You can upload multiple files.</p>
+                        <p class="section-desc">Please upload ALL required documents. All fields are compulsory. <span style="color: #e8491d;">*</span></p>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="passportPhoto">Passport Photograph</label>
-                                <input type="file" id="passportPhoto" name="passportPhoto" accept="image/*">
-                                <small class="file-hint">Upload a recent passport photo (JPG, PNG)</small>
+                                <label for="passportPhoto">Passport Photograph *</label>
+                                <input type="file" id="passportPhoto" name="passportPhoto" accept="image/*" required>
+                                <small class="file-hint">Upload a recent passport photo (JPG, PNG) - Required</small>
                             </div>
                             <div class="form-group">
-                                <label for="admissionLetter">Admission Letter</label>
-                                <input type="file" id="admissionLetter" name="admissionLetter" accept=".pdf,.jpg,.png">
-                                <small class="file-hint">Upload your admission letter (PDF, JPG, PNG)</small>
+                                <label for="admissionLetter">Admission Letter *</label>
+                                <input type="file" id="admissionLetter" name="admissionLetter" accept=".pdf,.jpg,.png" required>
+                                <small class="file-hint">Upload your admission letter (PDF, JPG, PNG) - Required</small>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="studentId">Student ID Card</label>
-                                <input type="file" id="studentId" name="studentId" accept="image/*,.pdf">
-                                <small class="file-hint">Upload your student ID card (JPG, PNG, PDF)</small>
+                                <label for="studentId">Student ID Card *</label>
+                                <input type="file" id="studentId" name="studentId" accept="image/*,.pdf" required>
+                                <small class="file-hint">Upload your student ID card (JPG, PNG, PDF) - Required</small>
                             </div>
                             <div class="form-group">
-                                <label for="paymentReceipt">AVMS Payment Receipt</label>
-                                <input type="file" id="paymentReceipt" name="paymentReceipt" accept="image/*,.pdf">
-                                <small class="file-hint">Upload your AVMS payment receipt (JPG, PNG, PDF)</small>
+                                <label for="paymentReceipt">AVMS Payment Receipt *</label>
+                                <input type="file" id="paymentReceipt" name="paymentReceipt" accept="image/*,.pdf" required>
+                                <small class="file-hint">Upload your AVMS payment receipt (JPG, PNG, PDF) - Required</small>
                             </div>
                         </div>
 
                         <!-- File Preview Area -->
                         <div id="filePreview" class="file-preview-area">
-                            <p><i class="fas fa-info-circle"></i> Uploaded files will appear here</p>
+                            <p><i class="fas fa-info-circle"></i> Please upload all 4 required documents</p>
                         </div>
 
                         <div class="form-navigation">
