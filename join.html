@@ -60,8 +60,8 @@
                 <h2>Membership Registration Form</h2>
                 <p class="form-intro">Welcome to AVMS, ABU Zaria. Please fill out the form below to register as a member.</p>
 
-                <!-- Progress Steps -->
-                <div class="steps-indicator">
+                <!-- Progress Steps - CLICKABLE -->
+                <div class="steps-indicator" id="stepIndicator">
                     <div class="step-item active" data-step="1">
                         <span class="step-circle">1</span>
                         <span class="step-text">Personal</span>
@@ -76,11 +76,15 @@
                     </div>
                     <div class="step-item" data-step="4">
                         <span class="step-circle">4</span>
+                        <span class="step-text">Upload</span>
+                    </div>
+                    <div class="step-item" data-step="5">
+                        <span class="step-circle">5</span>
                         <span class="step-text">Declaration</span>
                     </div>
                 </div>
 
-                <form id="membershipForm">
+                <form id="membershipForm" enctype="multipart/form-data">
 
                     <!-- STEP 1: PERSONAL INFORMATION -->
                     <div class="form-page active" data-step="1">
@@ -221,7 +225,7 @@
                         </div>
                     </div>
 
-                    <!-- STEP 3: CONTACT INFORMATION (FIXED - REMOVED required) -->
+                    <!-- STEP 3: CONTACT INFORMATION -->
                     <div class="form-page" data-step="3">
                         <h3>Contact Information</h3>
                         <p class="section-desc">How can we reach you?</p>
@@ -250,10 +254,58 @@
                         </div>
                     </div>
 
-                    <!-- STEP 4: DECLARATION -->
+                    <!-- STEP 4: UPLOAD DOCUMENTS -->
                     <div class="form-page" data-step="4">
-                        <h3>Declaration</h3>
-                        <p class="section-desc">Please confirm your details before submitting.</p>
+                        <h3>Upload Documents</h3>
+                        <p class="section-desc">Please upload the required documents. You can upload multiple files.</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="passportPhoto">Passport Photograph</label>
+                                <input type="file" id="passportPhoto" name="passportPhoto" accept="image/*">
+                                <small class="file-hint">Upload a recent passport photo (JPG, PNG)</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="admissionLetter">Admission Letter</label>
+                                <input type="file" id="admissionLetter" name="admissionLetter" accept=".pdf,.jpg,.png">
+                                <small class="file-hint">Upload your admission letter (PDF, JPG, PNG)</small>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="studentId">Student ID Card</label>
+                                <input type="file" id="studentId" name="studentId" accept="image/*,.pdf">
+                                <small class="file-hint">Upload your student ID card (JPG, PNG, PDF)</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentReceipt">AVMS Payment Receipt</label>
+                                <input type="file" id="paymentReceipt" name="paymentReceipt" accept="image/*,.pdf">
+                                <small class="file-hint">Upload your AVMS payment receipt (JPG, PNG, PDF)</small>
+                            </div>
+                        </div>
+
+                        <!-- File Preview Area -->
+                        <div id="filePreview" class="file-preview-area">
+                            <p><i class="fas fa-info-circle"></i> Uploaded files will appear here</p>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-prev">← Back</button>
+                            <button type="button" class="btn-next">Next Step →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 5: DECLARATION & CONFIRMATION -->
+                    <div class="form-page" data-step="5">
+                        <h3>Review & Declaration</h3>
+                        <p class="section-desc">Please review your information before submitting.</p>
+
+                        <!-- Summary Section -->
+                        <div id="summaryContainer" class="summary-box">
+                            <h4>📋 Review Your Information</h4>
+                            <div id="summaryContent"></div>
+                        </div>
 
                         <div class="declaration-box">
                             <p>
@@ -265,18 +317,37 @@
 
                         <div class="checkbox-group">
                             <input type="checkbox" id="declaration" name="declaration" required>
-                            <label for="declaration">I agree to the terms and conditions *</label>
+                            <label for="declaration">I confirm that all information is correct and I agree to the terms and conditions *</label>
                         </div>
 
                         <div class="form-navigation">
-                            <button type="button" class="btn-prev">← Back</button>
-                            <button type="submit" class="btn-submit">Submit Application</button>
+                            <button type="button" class="btn-prev">← Back to Edit</button>
+                            <button type="submit" class="btn-submit">✅ Submit Application</button>
                         </div>
 
                         <div id="formMessage"></div>
                     </div>
 
                 </form>
+
+                <!-- CONFIRMATION MESSAGE (hidden initially) -->
+                <div id="confirmationMessage" class="confirmation-box" style="display: none;">
+                    <div class="confirmation-content">
+                        <i class="fas fa-check-circle" style="font-size: 60px; color: #28a745;"></i>
+                        <h2>✅ Application Submitted!</h2>
+                        <p>Thank you for joining AVMS, ABU Zaria!</p>
+                        <div class="confirmation-details">
+                            <p><strong>Name:</strong> <span id="confirmName"></span></p>
+                            <p><strong>Registration Number:</strong> <span id="confirmReg"></span></p>
+                            <p><strong>Level:</strong> <span id="confirmLevel"></span></p>
+                            <p><strong>Email:</strong> <span id="confirmEmail"></span></p>
+                            <p><strong>Phone:</strong> <span id="confirmPhone"></span></p>
+                        </div>
+                        <p class="confirmation-note">We will contact you soon with further instructions.</p>
+                        <button onclick="window.location.href='index.html'" class="btn btn-primary">🏠 Return to Home</button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
