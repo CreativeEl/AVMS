@@ -1240,3 +1240,84 @@ body {
         grid-template-columns: 1fr;
     }
 }
+/* ============================================
+   SCHOLARSHIPS PAGE STYLES
+   ============================================ */
+
+.scholarships-page {
+    padding: 60px 0;
+    background: white;
+}
+
+.scholarships-list {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.scholarship-item {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 30px;
+    border-left: 4px solid #2a4a7a;
+    transition: transform 0.3s;
+}
+
+.scholarship-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+}
+
+.scholarship-item h3 {
+    color: #1a2a4a;
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.scholarship-provider {
+    color: #e8491d;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.scholarship-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.scholarship-meta span {
+    color: #666;
+    font-size: 14px;
+}
+
+.scholarship-meta i {
+    color: #e8491d;
+    margin-right: 5px;
+}
+
+.scholarship-description {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 12px;
+}
+
+.scholarship-eligibility,
+.scholarship-requirements {
+    color: #555;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.scholarship-eligibility strong,
+.scholarship-requirements strong {
+    color: #1a2a4a;
+}
+
+.scholarship-item .btn {
+    margin-top: 15px;
+}
