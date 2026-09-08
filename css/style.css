@@ -520,3 +520,280 @@ body {
         font-size: 28px;
     }
 }
+/* ============================================
+   ABOUT PAGE STYLES
+   ============================================ */
+
+/* Page Header */
+.page-header {
+    background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+}
+
+.page-header h1 {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.page-header p {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+/* About Section */
+.about-section {
+    padding: 60px 0;
+    background: white;
+}
+
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.about-content h2 {
+    color: #1a2a4a;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.about-content p {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+.about-image .placeholder-image {
+    background: #f0f4f8;
+    border-radius: 15px;
+    padding: 80px 40px;
+    text-align: center;
+    border: 2px dashed #2a4a7a;
+}
+
+.about-image .placeholder-image i {
+    font-size: 60px;
+    color: #2a4a7a;
+    margin-bottom: 15px;
+}
+
+.about-image .placeholder-image p {
+    color: #888;
+    font-size: 16px;
+}
+
+/* Mission & Vision */
+.mission-vision {
+    padding: 60px 0;
+    background: #f8f9fa;
+}
+
+.mv-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.mv-card {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    transition: transform 0.3s;
+}
+
+.mv-card:hover {
+    transform: translateY(-5px);
+}
+
+.mv-icon i {
+    font-size: 48px;
+    color: #e8491d;
+    margin-bottom: 15px;
+}
+
+.mv-card h3 {
+    color: #1a2a4a;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.mv-card p {
+    color: #555;
+    line-height: 1.8;
+}
+
+/* Objectives */
+.objectives {
+    padding: 60px 0;
+    background: white;
+}
+
+.objectives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.objective-item {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+    border-bottom: 3px solid #e8491d;
+}
+
+.objective-item:hover {
+    transform: translateY(-5px);
+}
+
+.objective-item i {
+    font-size: 36px;
+    color: #e8491d;
+    margin-bottom: 15px;
+}
+
+.objective-item h4 {
+    color: #1a2a4a;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.objective-item p {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* History */
+.history {
+    padding: 60px 0;
+    background: #f8f9fa;
+}
+
+.history-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.history-content p {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 15px;
+    font-size: 17px;
+}
+
+/* Achievements */
+.achievements {
+    padding: 60px 0;
+    background: white;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 30px;
+    text-align: center;
+}
+
+.achievement-item {
+    padding: 30px;
+}
+
+.achievement-number {
+    font-size: 42px;
+    font-weight: 800;
+    color: #e8491d;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.achievement-item p {
+    color: #555;
+    font-size: 16px;
+}
+
+/* Values */
+.values {
+    padding: 60px 0;
+    background: #f8f9fa;
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.value-item {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.value-item:hover {
+    transform: translateY(-5px);
+}
+
+.value-item i {
+    font-size: 36px;
+    color: #2a4a7a;
+    margin-bottom: 15px;
+}
+
+.value-item h4 {
+    color: #1a2a4a;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.value-item p {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mv-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .page-header h1 {
+        font-size: 32px;
+    }
+    
+    .achievements-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .objectives-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .values-grid {
+        grid-template-columns: 1fr;
+    }
+}
