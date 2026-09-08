@@ -1321,3 +1321,116 @@ body {
 .scholarship-item .btn {
     margin-top: 15px;
 }
+/* ============================================
+   DOWNLOADS PAGE STYLES
+   ============================================ */
+
+.downloads-page {
+    padding: 60px 0;
+    background: white;
+}
+
+.downloads-list {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.category-title {
+    font-size: 22px;
+    color: #1a2a4a;
+    margin: 40px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e8491d;
+}
+
+.category-title:first-of-type {
+    margin-top: 0;
+}
+
+.category-documents {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.download-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px 25px;
+    transition: transform 0.3s;
+}
+
+.download-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+}
+
+.download-icon {
+    font-size: 30px;
+    color: #2a4a7a;
+    flex-shrink: 0;
+    width: 50px;
+    text-align: center;
+}
+
+.download-info {
+    flex: 1;
+}
+
+.download-info h4 {
+    color: #1a2a4a;
+    font-size: 17px;
+    margin-bottom: 3px;
+}
+
+.download-info p {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.download-btn {
+    background: #1a2a4a;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.3s;
+    white-space: nowrap;
+}
+
+.download-btn:hover {
+    background: #e8491d;
+}
+
+.download-btn i {
+    margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .download-item {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 15px 20px;
+    }
+    
+    .download-info {
+        width: 100%;
+        order: 2;
+    }
+    
+    .download-btn {
+        width: 100%;
+        text-align: center;
+        order: 3;
+    }
+    
+    .download-icon {
+        order: 1;
+    }
+}
