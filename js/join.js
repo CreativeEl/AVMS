@@ -324,13 +324,31 @@ function initForm() {
         container.innerHTML = html;
     }
 
-    // FORM SUBMISSION
+    // ============================================
+    // FORM SUBMISSION WITH LOADING SPINNER
+    // ============================================
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         console.log('Form submitted!');
 
+        // Get the submit button
+        const submitBtn = this.querySelector('.btn-submit');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading spinner
+        submitBtn.innerHTML = `
+            <span class="spinner"></span> Submitting...
+        `;
+        submitBtn.disabled = true;
+
+        // Clear previous messages
+        const msgDiv = document.getElementById('formMessage');
+        msgDiv.innerHTML = '';
+
         if (!validateStep(4)) {
-            console.log('Validation failed');
+            // Re-enable button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
             return;
         }
 
@@ -364,12 +382,13 @@ function initForm() {
 
         if (typeof supabase === 'undefined') {
             console.error('Supabase not initialized!');
-            const msgDiv = document.getElementById('formMessage');
             msgDiv.innerHTML = `
                 <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
                     <p>⚠️ Database connection error. Please try again later.</p>
                 </div>
             `;
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
             return;
         }
 
@@ -389,18 +408,19 @@ function initForm() {
 
             // SHOW CONFIRMATION MESSAGE
             showConfirmation(formData);
-            
             console.log('Application submitted successfully');
 
         } catch (error) {
             console.error('Submission error:', error);
-            const msgDiv = document.getElementById('formMessage');
             msgDiv.innerHTML = `
                 <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
                     <i class="fas fa-exclamation-circle" style="font-size: 30px;"></i>
                     <p>⚠️ Could not submit application. Error: ${error.message}</p>
                 </div>
             `;
+            // Re-enable button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     });
 
