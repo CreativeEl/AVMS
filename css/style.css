@@ -891,3 +891,75 @@ body {
         font-size: 20px;
     }
 }
+/* ============================================
+   ANNOUNCEMENTS PAGE STYLES
+   ============================================ */
+
+.announcements-page {
+    padding: 60px 0;
+    background: white;
+}
+
+.announcements-list {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.announcement-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 30px;
+    border-left: 4px solid #2a4a7a;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.announcement-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+}
+
+.announcement-item.featured {
+    background: #e8f0fe;
+    border-left-color: #e8491d;
+}
+
+.featured-badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: #e8491d;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.announcement-item h3 {
+    color: #1a2a4a;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.announcement-date {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.announcement-category {
+    color: #2a4a7a;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.announcement-content {
+    color: #555;
+    line-height: 1.8;
+    font-size: 16px;
+}
