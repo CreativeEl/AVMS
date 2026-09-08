@@ -1628,16 +1628,38 @@ body {
     cursor: not-allowed;
 }
 
+/* ============================================
+   FILE UPLOAD - COMPULSORY
+   ============================================ */
+
 .form-group input[type="file"] {
-    padding: 10px;
-    border: 2px dashed #d0d7df;
+    padding: 12px;
+    border: 2px solid #e0e7ef;
+    border-radius: 8px;
     background: #fafafa;
     cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-size: 14px;
 }
 
 .form-group input[type="file"]:hover {
     border-color: #2a4a7a;
     background: #f0f4f8;
+}
+
+.form-group input[type="file"][required] {
+    border: 2px solid #e0e7ef;
+    transition: border-color 0.3s;
+}
+
+.form-group input[type="file"][required]:valid {
+    border-color: #28a745;
+    background: #f0fff4;
+}
+
+.form-group input[type="file"][required]:invalid {
+    border-color: #e0e7ef;
 }
 
 .file-hint {
@@ -1664,6 +1686,16 @@ body {
     color: #888;
     text-align: center;
     margin: 0;
+}
+
+.file-status-message {
+    margin-bottom: 10px;
+}
+
+.file-status-message div {
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
 .file-preview-area .file-item {
