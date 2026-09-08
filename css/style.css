@@ -1613,6 +1613,7 @@ body {
     font-size: 15px;
     transition: border-color 0.3s;
     background: white;
+    font-family: inherit;
 }
 
 .form-group input:focus,
@@ -1641,6 +1642,7 @@ body {
     transition: all 0.3s ease;
     width: 100%;
     font-size: 14px;
+    font-family: inherit;
 }
 
 .form-group input[type="file"]:hover {
@@ -1708,6 +1710,7 @@ body {
     margin-bottom: 8px;
     border: 1px solid #e0e7ef;
     transition: all 0.3s;
+    flex-wrap: wrap;
 }
 
 .file-preview-area .file-item:hover {
@@ -1753,6 +1756,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: inherit;
 }
 
 .form-navigation .btn-next:hover,
@@ -1777,6 +1781,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: inherit;
 }
 
 .form-navigation .btn-prev:hover {
@@ -1950,6 +1955,22 @@ body {
 .confirmation-content .btn {
     display: inline-block;
     padding: 12px 40px;
+    background: #e8491d;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.confirmation-content .btn:hover {
+    background: #c73d17;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(232, 73, 29, 0.3);
 }
 
 /* ============================================
@@ -1964,6 +1985,31 @@ body {
     padding: 15px 20px;
     border-radius: 8px;
     font-weight: 500;
+}
+
+/* ============================================
+   LOADING SPINNER
+   ============================================ */
+
+.spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s ease-in-out infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 /* ============================================
@@ -2064,28 +2110,4 @@ body {
         font-size: 14px;
         padding: 10px 15px;
     }
-}
-/* ============================================
-   LOADING SPINNER
-   ============================================ */
-
-.spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 0.8s ease-in-out infinite;
-    margin-right: 8px;
-    vertical-align: middle;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.btn-submit:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
 }
