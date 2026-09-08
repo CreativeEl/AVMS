@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join AVMS - ABU Zaria</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <a href="index.html">
+                        <span class="logo-text">🐾 AVMS ABU</span>
+                    </a>
+                </div>
+                
+                <button class="hamburger" id="hamburger">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="leadership.html">Leadership</a></li>
+                        <li><a href="announcements.html">Announcements</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="news.html">News</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="scholarships.html">Scholarships</a></li>
+                        <li><a href="downloads.html">Downloads</a></li>
+                        <li><a href="join.html">Join Us</a></li>
+                        <li><a href="give.html">Give</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+        <div class="container">
+            <h1>🤝 Join AVMS</h1>
+            <p>Become a member of the Association of Veterinary Medical Students, ABU Zaria</p>
+        </div>
+    </section>
+
+    <!-- MEMBERSHIP FORM SECTION -->
+    <section class="membership-section">
+        <div class="container">
+            <div class="membership-container">
+                <h2>Membership Registration Form</h2>
+                <p class="form-intro">Welcome to AVMS, ABU Zaria. Please fill out the form below to register as a member.</p>
+
+                <!-- Progress Steps -->
+                <div class="steps-indicator">
+                    <div class="step-item active" data-step="1">
+                        <span class="step-circle">1</span>
+                        <span class="step-text">Personal</span>
+                    </div>
+                    <div class="step-item" data-step="2">
+                        <span class="step-circle">2</span>
+                        <span class="step-text">Academic</span>
+                    </div>
+                    <div class="step-item" data-step="3">
+                        <span class="step-circle">3</span>
+                        <span class="step-text">Contact</span>
+                    </div>
+                    <div class="step-item" data-step="4">
+                        <span class="step-circle">4</span>
+                        <span class="step-text">Declaration</span>
+                    </div>
+                </div>
+
+                <form id="membershipForm">
+
+                    <!-- STEP 1: PERSONAL INFORMATION -->
+                    <div class="form-page active" data-step="1">
+                        <h3>Personal Information</h3>
+                        <p class="section-desc">Please fill out the details for this section. Required fields are marked with an asterisk (*).</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="title">Title</label>
+                                <select id="title" name="title">
+                                    <option value="">Select</option>
+                                    <option value="Mr.">Mr.</option>
+                                    <option value="Mrs.">Mrs.</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Dr.">Dr.</option>
+                                    <option value="Prof.">Prof.</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="surname">Surname *</label>
+                                <input type="text" id="surname" name="surname" required placeholder="Enter your surname">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">First Name *</label>
+                                <input type="text" id="firstName" name="firstName" required placeholder="Enter your first name">
+                            </div>
+                            <div class="form-group">
+                                <label for="middleName">Middle Name</label>
+                                <input type="text" id="middleName" name="middleName" placeholder="Enter your middle name">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dob">Date of Birth *</label>
+                                <input type="date" id="dob" name="dob" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender *</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="">Select</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="nationality">Nationality *</label>
+                                <input type="text" id="nationality" name="nationality" required placeholder="e.g., Nigerian">
+                            </div>
+                            <div class="form-group">
+                                <label for="stateOfOrigin">State of Origin *</label>
+                                <input type="text" id="stateOfOrigin" name="stateOfOrigin" required placeholder="Enter your state of origin">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="lga">Local Government Area</label>
+                                <input type="text" id="lga" name="lga" placeholder="Enter your LGA">
+                            </div>
+                            <div class="form-group">
+                                <label for="tribe">Tribe</label>
+                                <input type="text" id="tribe" name="tribe" placeholder="Enter your tribe">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="placeOfBirth">Place of Birth</label>
+                                <input type="text" id="placeOfBirth" name="placeOfBirth" placeholder="Enter your place of birth">
+                            </div>
+                            <div class="form-group">
+                                <label for="languages">Language(s) Spoken</label>
+                                <input type="text" id="languages" name="languages" placeholder="e.g., English, Hausa, Yoruba">
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-next">Next Step →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: ACADEMIC INFORMATION -->
+                    <div class="form-page" data-step="2">
+                        <h3>Academic Information</h3>
+                        <p class="section-desc">Please provide your academic details.</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="faculty">Faculty *</label>
+                                <input type="text" id="faculty" name="faculty" required value="Veterinary Medicine" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="department">Department *</label>
+                                <input type="text" id="department" name="department" required value="Veterinary Medicine" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="courseOfStudy">Course of Study *</label>
+                                <input type="text" id="courseOfStudy" name="courseOfStudy" required value="Doctor of Veterinary Medicine (DVM)" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="regNumber">Registration Number *</label>
+                                <input type="text" id="regNumber" name="regNumber" required placeholder="Enter your registration number">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="level">Level *</label>
+                                <select id="level" name="level" required>
+                                    <option value="">Select your level</option>
+                                    <option value="100">100 Level</option>
+                                    <option value="200">200 Level</option>
+                                    <option value="300">300 Level</option>
+                                    <option value="400">400 Level</option>
+                                    <option value="500">500 Level</option>
+                                    <option value="600">600 Level</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="yearOfGraduation">Year of Graduation</label>
+                                <input type="number" id="yearOfGraduation" name="yearOfGraduation" placeholder="e.g., 2026">
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-prev">← Back</button>
+                            <button type="button" class="btn-next">Next Step →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: CONTACT INFORMATION -->
+                    <div class="form-page" data-step="3">
+                        <h3>Contact Information</h3>
+                        <p class="section-desc">How can we reach you?</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Phone (WhatsApp) *</label>
+                                <input type="tel" id="phone" name="phone" required placeholder="e.g., 080XXXXXXXX">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address *</label>
+                                <input type="email" id="email" name="email" required placeholder="Enter your email address">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="homeAddress">Home Address *</label>
+                                <input type="text" id="homeAddress" name="homeAddress" required placeholder="Enter your home address">
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-prev">← Back</button>
+                            <button type="button" class="btn-next">Next Step →</button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: DECLARATION -->
+                    <div class="form-page" data-step="4">
+                        <h3>Declaration</h3>
+                        <p class="section-desc">Please confirm your details before submitting.</p>
+
+                        <div class="declaration-box">
+                            <p>
+                                <strong>Declaration:</strong> I hereby declare that all the information provided above 
+                                is true and correct to the best of my knowledge. I understand that any false information 
+                                may result in the rejection of my membership application.
+                            </p>
+                        </div>
+
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="declaration" name="declaration" required>
+                            <label for="declaration">I agree to the terms and conditions *</label>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-prev">← Back</button>
+                            <button type="submit" class="btn-submit">Submit Application</button>
+                        </div>
+
+                        <div id="formMessage"></div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>🐾 AVMS ABU Zaria</h4>
+                    <p>Advancing veterinary students through knowledge, leadership and service.</p>
+                    <br>
+                    <p><strong>Association of Veterinary Medical Students</strong></p>
+                    <p>Ahmadu Bello University, Zaria</p>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="about.html">About AVMS</a></li>
+                        <li><a href="leadership.html">Leadership</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="news.html">News</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="scholarships.html">Scholarships</a></li>
+                        <li><a href="downloads.html">Downloads</a></li>
+                        <li><a href="join.html">Join Us</a></li>
+                        <li><a href="give.html">Support Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> ABU Zaria, Nigeria</p>
+                    <p><i class="fas fa-envelope"></i> avms@abu.edu.ng</p>
+                    <p><i class="fas fa-phone"></i> +234 800 000 0000</p>
+                    <br>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; <span class="current-year">2024</span> AVMS ABU Zaria. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/join.js"></script>
+</body>
+</html>
