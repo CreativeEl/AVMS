@@ -1,68 +1,124 @@
-// ============================================
-// SCHOLARSHIPS PAGE JAVASCRIPT
-// ============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    debugLog('Scholarships page loaded');
-    loadScholarships();
-});
-
-// ============================================
-// LOAD SCHOLARSHIPS
-// ============================================
-async function loadScholarships() {
-    const container = document.getElementById('scholarshipsContainer');
-    if (!container) return;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholarships - AVMS ABU Zaria</title>
     
-    try {
-        debugLog('Loading scholarships...');
-        
-        const { data, error } = await supabase
-            .from('scholarships')
-            .select('*')
-            .eq('status', 'active')
-            .order('deadline', { ascending: true });
-            
-        if (error) throw error;
-        
-        if (!data || data.length === 0) {
-            container.innerHTML = `
-                <div class="scholarship-item">
-                    <p style="color: #888;">No scholarships available at this time. Check back later!</p>
-                </div>
-            `;
-            return;
-        }
-        
-        debugLog(`Found ${data.length} scholarships`);
-        renderScholarships(data, container);
-        
-    } catch (error) {
-        console.error('Error loading scholarships:', error);
-        container.innerHTML = `
-            <div class="scholarship-item">
-                <p style="color: #e8491d;">⚠️ Could not load scholarships. Please try again later.</p>
-            </div>
-        `;
-    }
-}
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
 
-// ============================================
-// RENDER SCHOLARSHIPS
-// ============================================
-function renderScholarships(scholarships, container) {
-    container.innerHTML = scholarships.map(scholar => `
-        <div class="scholarship-item">
-            <h3>${scholar.title || 'Untitled Scholarship'}</h3>
-            <p class="scholarship-provider"><i class="fas fa-building"></i> ${scholar.provider || 'Provider TBD'}</p>
-            <div class="scholarship-meta">
-                <span><i class="fas fa-calendar-alt"></i> Opens: ${formatDate(scholar.opening_date)}</span>
-                <span><i class="fas fa-calendar-times"></i> Deadline: ${formatDate(scholar.deadline)}</span>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <a href="index.html">
+                        <span class="logo-text">🐾 AVMS ABU</span>
+                    </a>
+                </div>
+                
+                <button class="hamburger" id="hamburger">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <nav class="nav-menu" id="navMenu">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="leadership.html">Leadership</a></li>
+                        <li><a href="announcements.html">Announcements</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="news.html">News</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="scholarships.html">Scholarships</a></li>
+                        <li><a href="downloads.html">Downloads</a></li>
+                        <li><a href="join.html">Join Us</a></li>
+                        <li><a href="give.html">Give</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </nav>
             </div>
-            <p class="scholarship-description">${scholar.description || 'No description available.'}</p>
-            <p class="scholarship-eligibility"><strong>Eligibility:</strong> ${scholar.eligibility || 'Contact for details.'}</p>
-            ${scholar.requirements ? `<p class="scholarship-requirements"><strong>Requirements:</strong> ${scholar.requirements}</p>` : ''}
-            ${scholar.application_link ? `<a href="${scholar.application_link}" target="_blank" class="btn btn-primary">Apply Now</a>` : ''}
         </div>
-    `).join('');
-}
+    </header>
+
+    <!-- PAGE HEADER -->
+    <section class="page-header">
+        <div class="container">
+            <h1>🎓 Scholarships</h1>
+            <p>Discover scholarship opportunities for veterinary students</p>
+        </div>
+    </section>
+
+    <!-- SCHOLARSHIPS SECTION -->
+    <section class="scholarships-page">
+        <div class="container">
+            <div id="scholarshipsContainer" class="scholarships-list">
+                <div class="loading">⏳ Loading scholarships...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>🐾 AVMS ABU Zaria</h4>
+                    <p>Advancing veterinary students through knowledge, leadership and service.</p>
+                    <br>
+                    <p><strong>Association of Veterinary Medical Students</strong></p>
+                    <p>Ahmadu Bello University, Zaria</p>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="about.html">About AVMS</a></li>
+                        <li><a href="leadership.html">Leadership</a></li>
+                        <li><a href="events.html">Events</a></li>
+                        <li><a href="news.html">News</a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="scholarships.html">Scholarships</a></li>
+                        <li><a href="downloads.html">Downloads</a></li>
+                        <li><a href="join.html">Join Us</a></li>
+                        <li><a href="give.html">Support Us</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> ABU Zaria, Nigeria</p>
+                    <p><i class="fas fa-envelope"></i> avms@abu.edu.ng</p>
+                    <p><i class="fas fa-phone"></i> +234 800 000 0000</p>
+                    <br>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; <span class="current-year">2024</span> AVMS ABU Zaria. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/scholarships.js"></script>
+</body>
+</html>
