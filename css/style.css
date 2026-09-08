@@ -1435,281 +1435,152 @@ body {
     }
 }
 /* ============================================
-   JOIN US PAGE - Multi-Step Form
+   FILE UPLOAD & CONFIRMATION STYLES
    ============================================ */
 
-.membership-section {
-    padding: 60px 0;
-    background: #f8f9fa;
-}
-
-.membership-container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: white;
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-}
-
-.membership-container h2 {
-    color: #1a2a4a;
-    font-size: 28px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.form-intro {
-    text-align: center;
-    color: #666;
-    margin-bottom: 30px;
-}
-
-/* Progress Steps */
-.steps-indicator {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 40px;
-    position: relative;
-}
-
-.steps-indicator::before {
-    content: '';
-    position: absolute;
-    top: 20px;
-    left: 40px;
-    right: 40px;
-    height: 2px;
-    background: #e0e7ef;
-    z-index: 0;
-}
-
+/* Step items clickable */
 .step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    z-index: 1;
+    cursor: pointer;
 }
 
-.step-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: #e0e7ef;
-    color: #888;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 16px;
-    transition: all 0.3s;
+.step-item:hover .step-circle {
+    transform: scale(1.1);
+    transition: transform 0.3s;
 }
 
-.step-item.active .step-circle {
-    background: #e8491d;
-    color: white;
-    box-shadow: 0 0 0 5px rgba(232, 73, 29, 0.2);
-}
-
-.step-item.completed .step-circle {
-    background: #2a4a7a;
-    color: white;
-}
-
-.step-text {
+/* File upload */
+.file-hint {
+    display: block;
     font-size: 12px;
-    margin-top: 8px;
     color: #888;
-    font-weight: 600;
+    margin-top: 5px;
 }
 
-.step-item.active .step-text {
-    color: #1a2a4a;
-}
-
-.step-item.completed .step-text {
-    color: #2a4a7a;
-}
-
-/* Form Pages */
-.form-page {
-    display: none;
-    animation: fadeIn 0.5s ease;
-}
-
-.form-page.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.form-page h3 {
-    color: #1a2a4a;
-    font-size: 22px;
-    margin-bottom: 5px;
-}
-
-.section-desc {
-    color: #888;
-    margin-bottom: 25px;
-}
-
-/* Form Row */
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.form-group {
-    margin-bottom: 18px;
-}
-
-.form-group label {
-    display: block;
-    font-weight: 600;
-    color: #1a2a4a;
-    margin-bottom: 5px;
-    font-size: 14px;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #e0e7ef;
-    border-radius: 8px;
-    font-size: 15px;
-    transition: border-color 0.3s;
-    background: white;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #2a4a7a;
-    outline: none;
-}
-
-.form-group input[readonly] {
-    background: #f0f4f8;
-    color: #555;
-}
-
-/* Form Navigation */
-.form-navigation {
-    display: flex;
-    gap: 15px;
-    margin-top: 25px;
-    justify-content: space-between;
-}
-
-.form-navigation .btn-next,
-.form-navigation .btn-submit {
-    background: #e8491d;
-    color: white;
-    padding: 12px 35px;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.form-navigation .btn-next:hover,
-.form-navigation .btn-submit:hover {
-    background: #c73d17;
-}
-
-.form-navigation .btn-prev {
-    background: #e0e7ef;
-    color: #333;
-    padding: 12px 35px;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.form-navigation .btn-prev:hover {
-    background: #d0d7df;
-}
-
-/* Declaration Box */
-.declaration-box {
+.file-preview-area {
     background: #f8f9fa;
-    padding: 20px;
+    border: 2px dashed #d0d7df;
     border-radius: 10px;
-    border-left: 4px solid #e8491d;
-    margin-bottom: 20px;
+    padding: 20px;
+    margin-top: 15px;
+    min-height: 80px;
 }
 
-.declaration-box p {
-    color: #555;
-    line-height: 1.8;
+.file-preview-area p {
+    color: #888;
+    text-align: center;
 }
 
-.checkbox-group {
+.file-item {
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #e0e7ef;
+}
+
+.file-item i {
+    color: #2a4a7a;
+    font-size: 20px;
+}
+
+.file-thumbnail {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid #e0e7ef;
+}
+
+/* Summary Box */
+.summary-box {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
     margin-bottom: 20px;
 }
 
-.checkbox-group input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #e8491d;
-    cursor: pointer;
+.summary-box h4 {
+    color: #1a2a4a;
+    margin-bottom: 15px;
 }
 
-.checkbox-group label {
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.summary-item {
+    background: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid #e0e7ef;
+    font-size: 14px;
+}
+
+.summary-item strong {
+    color: #1a2a4a;
+}
+
+/* Confirmation Box */
+.confirmation-box {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.confirmation-content {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.confirmation-content h2 {
+    color: #1a2a4a;
+    margin: 20px 0 10px;
+}
+
+.confirmation-content p {
     color: #555;
-    cursor: pointer;
+    font-size: 16px;
+}
+
+.confirmation-details {
+    text-align: left;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.confirmation-details p {
+    padding: 8px 0;
+    border-bottom: 1px solid #e0e7ef;
+    margin: 0;
+}
+
+.confirmation-details p:last-child {
+    border-bottom: none;
+}
+
+.confirmation-details strong {
+    color: #1a2a4a;
+}
+
+.confirmation-note {
+    color: #888;
+    font-size: 14px;
+    margin: 15px 0 25px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .membership-container {
-        padding: 20px;
-    }
-
-    .steps-indicator {
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-    }
-
-    .steps-indicator::before {
-        display: none;
-    }
-
-    .step-item {
-        flex: 1;
-        min-width: 60px;
-    }
-
-    .step-text {
-        font-size: 10px;
-    }
-
-    .form-row {
+    .summary-grid {
         grid-template-columns: 1fr;
     }
-
-    .form-navigation {
+    
+    .file-item {
         flex-wrap: wrap;
-    }
-
-    .form-navigation button {
-        flex: 1;
-        min-width: 120px;
-        text-align: center;
     }
 }
