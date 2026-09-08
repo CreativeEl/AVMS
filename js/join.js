@@ -28,15 +28,16 @@ function initForm() {
     // STEP INDICATORS - CLICK TO NAVIGATE
     steps.forEach((step, index) => {
         step.addEventListener('click', function() {
-            // Allow navigation to any completed or current step
             const isCompleted = this.classList.contains('completed');
             const isActive = this.classList.contains('active');
             
             if (isCompleted || isActive) {
                 currentStep = index;
                 showStep(currentStep);
+                if (currentStep === 4) {
+                    updateSummary();
+                }
             } else {
-                // Show message that they need to complete previous steps
                 const msgDiv = document.getElementById('formMessage');
                 if (msgDiv) {
                     msgDiv.innerHTML = `
@@ -59,7 +60,6 @@ function initForm() {
                 if (currentStep < totalSteps - 1) {
                     currentStep++;
                     showStep(currentStep);
-                    // Update summary on step 5
                     if (currentStep === 4) {
                         updateSummary();
                     }
@@ -78,7 +78,7 @@ function initForm() {
         });
     });
 
-    // File inputs - show preview
+    // FILE INPUTS - Show preview with status
     document.querySelectorAll('input[type="file"]').forEach(input => {
         input.addEventListener('change', function() {
             const fileName = this.files[0]?.name || 'No file chosen';
@@ -89,7 +89,15 @@ function initForm() {
             const fileType = this.id;
             uploadedFiles[fileType] = this.files[0];
             
-            let previewHtml = `<div class="file-item"><i class="fas fa-file"></i> <strong>${this.id}:</strong> ${fileName} (${fileSizeKB} KB)`;
+            const isUploaded = this.files && this.files.length > 0;
+            const statusColor = isUploaded ? '#28a745' : '#e8491d';
+            
+            let previewHtml = `
+                <div class="file-item" data-file="${input.id}">
+                    <i class="fas fa-file" style="color: ${statusColor};"></i>
+                    <span><strong>${input.id.replace(/([A-Z])/g, ' $1').trim()}:</strong> ${fileName} (${fileSizeKB} KB)</span>
+                    <span style="margin-left: auto; color: ${statusColor}; font-weight: bold;">${isUploaded ? '✅ Uploaded' : '❌ Required'}</span>
+            `;
             
             if (this.files[0] && this.files[0].type.startsWith('image/')) {
                 const reader = new FileReader();
@@ -104,6 +112,7 @@ function initForm() {
                     wrapper.dataset.file = input.id;
                     wrapper.innerHTML = previewHtml;
                     previewDiv.appendChild(wrapper);
+                    updateFileStatus();
                 };
                 reader.readAsDataURL(this.files[0]);
             } else {
@@ -116,6 +125,7 @@ function initForm() {
                 wrapper.dataset.file = input.id;
                 wrapper.innerHTML = previewHtml;
                 previewDiv.appendChild(wrapper);
+                updateFileStatus();
             }
             
             // Remove "no files" message
@@ -126,13 +136,45 @@ function initForm() {
         });
     });
 
+    // Update file status function
+    function updateFileStatus() {
+        const previewDiv = document.getElementById('filePreview');
+        const fileInputs = document.querySelectorAll('input[type="file"][required]');
+        let uploadedCount = 0;
+        const totalFiles = fileInputs.length;
+        
+        fileInputs.forEach(input => {
+            if (input.files && input.files.length > 0) {
+                uploadedCount++;
+            }
+        });
+        
+        let statusMsg = previewDiv.querySelector('.file-status-message');
+        if (!statusMsg) {
+            statusMsg = document.createElement('div');
+            statusMsg.className = 'file-status-message';
+            previewDiv.prepend(statusMsg);
+        }
+        
+        if (uploadedCount === totalFiles) {
+            statusMsg.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    ✅ All ${totalFiles} documents uploaded successfully!
+                </div>
+            `;
+        } else {
+            statusMsg.innerHTML = `
+                <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    ⚠️ ${uploadedCount} of ${totalFiles} documents uploaded. Please upload all required documents.
+                </div>
+            `;
+        }
+    }
+
     function showStep(index) {
-        // Hide all pages
         pages.forEach(p => p.classList.remove('active'));
-        // Show current page
         pages[index].classList.add('active');
 
-        // Update step indicators
         steps.forEach((step, i) => {
             step.classList.remove('active', 'completed');
             if (i === index) {
@@ -142,7 +184,6 @@ function initForm() {
             }
         });
 
-        // Scroll to top of form
         document.querySelector('.membership-container').scrollIntoView({ 
             behavior: 'smooth', 
             block: 'start' 
@@ -154,6 +195,7 @@ function initForm() {
         const inputs = currentPage.querySelectorAll('input[required], select[required]');
         let valid = true;
 
+        // Check regular required fields
         inputs.forEach(input => {
             if (input.offsetParent === null) {
                 return;
@@ -170,6 +212,43 @@ function initForm() {
             }
         });
 
+        // CHECK FILE UPLOADS ON STEP 4 (index 3)
+        if (index === 3) {
+            const fileInputs = currentPage.querySelectorAll('input[type="file"][required]');
+            let allFilesUploaded = true;
+            
+            fileInputs.forEach(input => {
+                if (!input.files || input.files.length === 0) {
+                    allFilesUploaded = false;
+                    input.style.borderColor = '#e8491d';
+                    input.style.borderWidth = '3px';
+                    setTimeout(() => {
+                        input.style.borderColor = '';
+                        input.style.borderWidth = '2px';
+                    }, 3000);
+                } else {
+                    input.style.borderColor = '#28a745';
+                    input.style.borderWidth = '2px';
+                }
+            });
+
+            if (!allFilesUploaded) {
+                valid = false;
+                const msgDiv = document.getElementById('formMessage');
+                if (msgDiv) {
+                    msgDiv.innerHTML = `
+                        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px;">
+                            ⚠️ Please upload ALL 4 required documents before proceeding.
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        msgDiv.innerHTML = '';
+                    }, 5000);
+                }
+            }
+        }
+
+        // Check checkbox on final step (index 4)
         if (index === 4) {
             const checkbox = document.getElementById('declaration');
             if (checkbox && !checkbox.checked) {
@@ -183,7 +262,7 @@ function initForm() {
 
         if (!valid) {
             const msgDiv = document.getElementById('formMessage');
-            if (msgDiv) {
+            if (msgDiv && !msgDiv.innerHTML) {
                 msgDiv.innerHTML = `
                     <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px;">
                         ⚠️ Please fill in all required fields before proceeding.
@@ -329,12 +408,15 @@ function initForm() {
         // Hide the form
         document.getElementById('membershipForm').style.display = 'none';
         document.querySelector('.steps-indicator').style.display = 'none';
-        document.querySelector('.membership-container h2').style.display = 'none';
-        document.querySelector('.form-intro').style.display = 'none';
+        const heading = document.querySelector('.membership-container h2');
+        if (heading) heading.style.display = 'none';
+        const intro = document.querySelector('.form-intro');
+        if (intro) intro.style.display = 'none';
         
         // Show confirmation
         const confirmDiv = document.getElementById('confirmationMessage');
         confirmDiv.style.display = 'block';
+        confirmDiv.classList.add('show');
         
         // Fill in confirmation details
         document.getElementById('confirmName').textContent = data.first_name + ' ' + data.surname;
