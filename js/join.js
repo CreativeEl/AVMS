@@ -3,7 +3,7 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    debugLog('Join Us page loaded');
+    console.log('🔍 Join Us page loaded');
     initForm();
 });
 
@@ -13,9 +13,10 @@ const uploadedFiles = {};
 function initForm() {
     const form = document.getElementById('membershipForm');
     if (!form) {
-        console.error('Form not found!');
+        console.error('❌ Form not found!');
         return;
     }
+    console.log('✅ Form found!');
 
     const pages = document.querySelectorAll('.form-page');
     const steps = document.querySelectorAll('.step-item');
@@ -56,6 +57,7 @@ function initForm() {
     // Next buttons
     document.querySelectorAll('.btn-next').forEach(btn => {
         btn.addEventListener('click', function() {
+            console.log('➡️ Next button clicked');
             if (validateStep(currentStep)) {
                 if (currentStep < totalSteps - 1) {
                     currentStep++;
@@ -71,6 +73,7 @@ function initForm() {
     // Previous buttons
     document.querySelectorAll('.btn-prev').forEach(btn => {
         btn.addEventListener('click', function() {
+            console.log('⬅️ Back button clicked');
             if (currentStep > 0) {
                 currentStep--;
                 showStep(currentStep);
@@ -327,28 +330,52 @@ function initForm() {
     // ============================================
     // FORM SUBMISSION WITH LOADING SPINNER
     // ============================================
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        console.log('Form submitted!');
+    // DIRECT SUBMIT BUTTON EVENT - FIXED!
+    const submitBtn = document.querySelector('.btn-submit');
+    console.log('🔍 Submit button found:', submitBtn);
+    
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            console.log('✅ Submit button CLICKED!');
+            // Trigger form submission
+            form.dispatchEvent(new Event('submit'));
+        });
+    } else {
+        console.error('❌ Submit button NOT found!');
+    }
 
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('✅ Form SUBMIT event fired!');
+        handleFormSubmit(e);
+    });
+
+    async function handleFormSubmit(e) {
         // Get the submit button
-        const submitBtn = this.querySelector('.btn-submit');
-        const originalText = submitBtn.innerHTML;
+        const submitBtn = document.querySelector('.btn-submit');
+        const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
+        
+        console.log('📤 Processing form submission...');
         
         // Show loading spinner
-        submitBtn.innerHTML = `
-            <span class="spinner"></span> Submitting...
-        `;
-        submitBtn.disabled = true;
+        if (submitBtn) {
+            submitBtn.innerHTML = `
+                <span class="spinner"></span> Submitting...
+            `;
+            submitBtn.disabled = true;
+        }
 
         // Clear previous messages
         const msgDiv = document.getElementById('formMessage');
-        msgDiv.innerHTML = '';
+        if (msgDiv) msgDiv.innerHTML = '';
 
+        // Validate final step
         if (!validateStep(4)) {
-            // Re-enable button
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            console.log('❌ Validation failed');
+            if (submitBtn) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
             return;
         }
 
@@ -378,74 +405,100 @@ function initForm() {
             status: 'pending'
         };
 
-        console.log('Form data:', formData);
+        console.log('📋 Form data:', formData);
 
         if (typeof supabase === 'undefined') {
-            console.error('Supabase not initialized!');
-            msgDiv.innerHTML = `
-                <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                    <p>⚠️ Database connection error. Please try again later.</p>
-                </div>
-            `;
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            console.error('❌ Supabase not initialized!');
+            if (msgDiv) {
+                msgDiv.innerHTML = `
+                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
+                        <p>⚠️ Database connection error. Please try again later.</p>
+                    </div>
+                `;
+            }
+            if (submitBtn) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
             return;
         }
 
         try {
-            console.log('Sending to Supabase...');
+            console.log('📤 Sending to Supabase...');
             
             const { data, error } = await supabase
                 .from('membership_applications')
                 .insert([formData]);
 
-            console.log('Supabase response:', { data, error });
+            console.log('📥 Supabase response:', { data, error });
 
             if (error) {
-                console.error('Supabase error:', error);
+                console.error('❌ Supabase error:', error);
                 throw error;
             }
 
             // SHOW CONFIRMATION MESSAGE
             showConfirmation(formData);
-            console.log('Application submitted successfully');
+            console.log('✅ Application submitted successfully');
 
         } catch (error) {
-            console.error('Submission error:', error);
-            msgDiv.innerHTML = `
-                <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                    <i class="fas fa-exclamation-circle" style="font-size: 30px;"></i>
-                    <p>⚠️ Could not submit application. Error: ${error.message}</p>
-                </div>
-            `;
+            console.error('❌ Submission error:', error);
+            if (msgDiv) {
+                msgDiv.innerHTML = `
+                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
+                        <i class="fas fa-exclamation-circle" style="font-size: 30px;"></i>
+                        <p>⚠️ Could not submit application. Error: ${error.message}</p>
+                    </div>
+                `;
+            }
             // Re-enable button
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
+            if (submitBtn) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         }
-    });
+    }
 
     function showConfirmation(data) {
         // Hide the form
-        document.getElementById('membershipForm').style.display = 'none';
-        document.querySelector('.steps-indicator').style.display = 'none';
+        const form = document.getElementById('membershipForm');
+        if (form) form.style.display = 'none';
+        
+        const indicator = document.querySelector('.steps-indicator');
+        if (indicator) indicator.style.display = 'none';
+        
         const heading = document.querySelector('.membership-container h2');
         if (heading) heading.style.display = 'none';
+        
         const intro = document.querySelector('.form-intro');
         if (intro) intro.style.display = 'none';
         
         // Show confirmation
         const confirmDiv = document.getElementById('confirmationMessage');
-        confirmDiv.style.display = 'block';
-        confirmDiv.classList.add('show');
+        if (confirmDiv) {
+            confirmDiv.style.display = 'block';
+            confirmDiv.classList.add('show');
+        }
         
         // Fill in confirmation details
-        document.getElementById('confirmName').textContent = data.first_name + ' ' + data.surname;
-        document.getElementById('confirmReg').textContent = data.reg_number;
-        document.getElementById('confirmLevel').textContent = data.level;
-        document.getElementById('confirmEmail').textContent = data.email;
-        document.getElementById('confirmPhone').textContent = data.phone;
+        const confirmName = document.getElementById('confirmName');
+        if (confirmName) confirmName.textContent = data.first_name + ' ' + data.surname;
+        
+        const confirmReg = document.getElementById('confirmReg');
+        if (confirmReg) confirmReg.textContent = data.reg_number;
+        
+        const confirmLevel = document.getElementById('confirmLevel');
+        if (confirmLevel) confirmLevel.textContent = data.level;
+        
+        const confirmEmail = document.getElementById('confirmEmail');
+        if (confirmEmail) confirmEmail.textContent = data.email;
+        
+        const confirmPhone = document.getElementById('confirmPhone');
+        if (confirmPhone) confirmPhone.textContent = data.phone;
         
         // Scroll to top
-        confirmDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (confirmDiv) {
+            confirmDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 }
