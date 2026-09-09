@@ -2559,3 +2559,36 @@ body {
         padding: 20px;
     }
 }
+/* ============================================
+   ADMIN LOGIN BUTTON IN FOOTER
+   ============================================ */
+
+.admin-link-item {
+    margin-top: 8px;
+    list-style: none !important;
+}
+
+.admin-login-btn {
+    display: inline-block;
+    background: #e8491d;
+    color: white !important;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+    box-shadow: 0 2px 10px rgba(232, 73, 29, 0.3);
+}
+
+.admin-login-btn:hover {
+    background: #c73d17;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(232, 73, 29, 0.5);
+    color: white !important;
+}
+
+.admin-login-btn i {
+    margin-right: 8px;
+}
