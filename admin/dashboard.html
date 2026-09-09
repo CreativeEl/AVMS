@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AVMS ABU Zaria</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>🐾 AVMS Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="leaders.html"><i class="fas fa-users"></i> Leaders</a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
+                <a href="events.html"><i class="fas fa-calendar"></i> Events</a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> News</a>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> Applications</a>
+                <a href="donations.html"><i class="fas fa-hand-holding-heart"></i> Donations</a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> Messages</a>
+                <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Dashboard</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statLeaders">0</h3>
+                        <p>Leaders</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-bullhorn"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statAnnouncements">0</h3>
+                        <p>Announcements</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statEvents">0</h3>
+                        <p>Events</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-file-signature"></i></div>
+                    <div class="stat-info">
+                        <h3 id="statApplications">0</h3>
+                        <p>Applications</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="quick-grid">
+                    <a href="leaders.html" class="quick-card"><i class="fas fa-user-plus"></i> Add Leader</a>
+                    <a href="announcements.html" class="quick-card"><i class="fas fa-plus-circle"></i> New Announcement</a>
+                    <a href="events.html" class="quick-card"><i class="fas fa-plus-circle"></i> New Event</a>
+                    <a href="applications.html" class="quick-card"><i class="fas fa-check-circle"></i> Review Applications</a>
+                </div>
+            </div>
+
+            <div class="dashboard-recent">
+                <h2>Recent Activity</h2>
+                <div id="recentActivity" class="activity-list">
+                    <p style="color: #888; text-align: center; padding: 20px;">Loading recent activity...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>
