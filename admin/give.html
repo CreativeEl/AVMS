@@ -135,31 +135,6 @@
             cursor: not-allowed;
             transform: none;
         }
-        .btn-add-small {
-            background: #17a2b8;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            margin-bottom: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .btn-add-small:hover { background: #138496; }
-        .btn-remove {
-            background: #dc3545;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .btn-remove:hover { background: #c82333; }
         
         .save-message {
             margin-top: 15px;
@@ -191,7 +166,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* Dynamic items */
         .dynamic-item {
             background: #f8f9fa;
             padding: 15px;
@@ -219,37 +193,6 @@
             font-weight: 600;
         }
         
-        /* Image upload */
-        .image-upload-area {
-            border: 3px dashed #d0d7df;
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-            background: #fafbfc;
-        }
-        .image-upload-area:hover { border-color: #2a4a7a; background: #f0f4f8; }
-        .image-upload-area i { font-size: 40px; color: #2a4a7a; margin-bottom: 10px; display: block; }
-        .image-upload-area p { color: #666; margin-bottom: 5px; font-size: 14px; }
-        .image-upload-area small { color: #888; font-size: 12px; }
-        .image-upload-area input[type="file"] { display: none; }
-        
-        .image-preview-box {
-            margin-bottom: 15px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid #e0e7ef;
-            background: #f8f9fa;
-            text-align: center;
-            padding: 15px;
-        }
-        .image-preview-box img {
-            max-width: 100%;
-            max-height: 200px;
-            border-radius: 8px;
-        }
-        
         @media (max-width: 768px) {
             .settings-card { padding: 20px; }
             .section-tabs { overflow-x: auto; flex-wrap: nowrap; }
@@ -270,6 +213,7 @@
                 <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
                 <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
                 <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="highlights.html"><i class="fas fa-star"></i> <span>Event Highlights</span></a>
                 <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html" class="active"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
@@ -298,7 +242,6 @@
                 Edit all content on your Give/Support page. Manage projects, bank details, and support information.
             </div>
 
-            <!-- Section Tabs -->
             <div class="section-tabs">
                 <button class="section-tab active" onclick="switchSection('why', this)"><i class="fas fa-heart"></i> Why Support</button>
                 <button class="section-tab" onclick="switchSection('projects', this)"><i class="fas fa-tasks"></i> Projects</button>
@@ -306,9 +249,7 @@
                 <button class="section-tab" onclick="switchSection('form', this)"><i class="fas fa-edit"></i> Donation Form</button>
             </div>
 
-            <!-- ============================================
-                 SECTION: WHY SUPPORT
-                 ============================================ -->
+            <!-- WHY SUPPORT -->
             <div class="section-content active" id="section-why">
                 <div class="settings-card">
                     <h2><i class="fas fa-heart"></i> Why Your Support Matters</h2>
@@ -325,11 +266,8 @@
 
                         <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Impact Items (4 items)</h3>
 
-                        <!-- Impact 1 -->
                         <div class="dynamic-item">
-                            <div class="item-header">
-                                <span class="item-number">1</span>
-                            </div>
+                            <div class="item-header"><span class="item-number">1</span></div>
                             <div class="form-row">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon (FontAwesome)</label>
@@ -346,11 +284,8 @@
                             </div>
                         </div>
 
-                        <!-- Impact 2 -->
                         <div class="dynamic-item">
-                            <div class="item-header">
-                                <span class="item-number">2</span>
-                            </div>
+                            <div class="item-header"><span class="item-number">2</span></div>
                             <div class="form-row">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -367,11 +302,8 @@
                             </div>
                         </div>
 
-                        <!-- Impact 3 -->
                         <div class="dynamic-item">
-                            <div class="item-header">
-                                <span class="item-number">3</span>
-                            </div>
+                            <div class="item-header"><span class="item-number">3</span></div>
                             <div class="form-row">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -388,11 +320,8 @@
                             </div>
                         </div>
 
-                        <!-- Impact 4 -->
                         <div class="dynamic-item">
-                            <div class="item-header">
-                                <span class="item-number">4</span>
-                            </div>
+                            <div class="item-header"><span class="item-number">4</span></div>
                             <div class="form-row">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -419,9 +348,7 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 SECTION: PROJECTS
-                 ============================================ -->
+            <!-- PROJECTS -->
             <div class="section-content" id="section-projects">
                 <div class="settings-card">
                     <h2><i class="fas fa-tasks"></i> Current Projects & Campaigns</h2>
@@ -433,11 +360,8 @@
 
                         <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Projects (3 projects)</h3>
 
-                        <!-- Project 1 -->
                         <div class="dynamic-item">
-                            <div class="item-header">
-                                <span class="item-number">1</span>
-                            </div>
+                            <div class="item-header"><span class="item-number">1</span></div>
                             <div class="form-row">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -464,11 +388,8 @@
                             </div>
                         </div>
 
-                        <!-- Project 2 -->
                         <div class="dynamic-item">
-                            <div class="item-header">
-                                <span class="item-number">2</span>
-                            </div>
+                            <div class="item-header"><span class="item-number">2</span></div>
                             <div class="form-row">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -495,11 +416,8 @@
                             </div>
                         </div>
 
-                        <!-- Project 3 -->
                         <div class="dynamic-item">
-                            <div class="item-header">
-                                <span class="item-number">3</span>
-                            </div>
+                            <div class="item-header"><span class="item-number">3</span></div>
                             <div class="form-row">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -536,9 +454,7 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 SECTION: PAYMENT METHODS
-                 ============================================ -->
+            <!-- PAYMENT METHODS -->
             <div class="section-content" id="section-methods">
                 <div class="settings-card">
                     <h2><i class="fas fa-university"></i> Payment Methods</h2>
@@ -550,7 +466,6 @@
 
                         <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Payment Methods (3 methods)</h3>
 
-                        <!-- Bank Transfer -->
                         <div class="dynamic-item">
                             <div class="item-header">
                                 <span class="item-number">1</span>
@@ -578,7 +493,6 @@
                             </div>
                         </div>
 
-                        <!-- Mobile Transfer -->
                         <div class="dynamic-item">
                             <div class="item-header">
                                 <span class="item-number">2</span>
@@ -606,7 +520,6 @@
                             </div>
                         </div>
 
-                        <!-- Partner With Us -->
                         <div class="dynamic-item">
                             <div class="item-header">
                                 <span class="item-number">3</span>
@@ -633,9 +546,7 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 SECTION: DONATION FORM
-                 ============================================ -->
+            <!-- DONATION FORM -->
             <div class="section-content" id="section-form">
                 <div class="settings-card">
                     <h2><i class="fas fa-edit"></i> Donation Form Settings</h2>
@@ -667,9 +578,6 @@
 
     <script src="../js/config.js"></script>
     <script>
-        // ============================================
-        // AUTH CHECK
-        // ============================================
         const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
         const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
         
@@ -679,9 +587,6 @@
             document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
         }
 
-        // ============================================
-        // LOGOUT
-        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('adminLoggedIn');
@@ -691,9 +596,6 @@
             window.location.href = 'index.html';
         });
 
-        // ============================================
-        // SECTION SWITCHING
-        // ============================================
         function switchSection(section, btn) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
@@ -702,9 +604,6 @@
             btn.classList.add('active');
         }
 
-        // ============================================
-        // HELPERS
-        // ============================================
         async function saveSetting(key, value) {
             const { error } = await supabase
                 .from('site_settings')
@@ -737,9 +636,7 @@
             btn.innerHTML = original;
         }
 
-        // ============================================
-        // SAVE: WHY SUPPORT
-        // ============================================
+        // WHY SUPPORT
         document.getElementById('whyForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveWhyBtn');
@@ -749,7 +646,6 @@
                 await saveSetting('give_why_title', document.getElementById('whyTitle').value);
                 await saveSetting('give_why_content', document.getElementById('whyContent').value);
 
-                // Impact items
                 for (let i = 1; i <= 4; i++) {
                     await saveSetting(`give_impact${i}_icon`, document.getElementById(`impact${i}Icon`).value);
                     await saveSetting(`give_impact${i}_title`, document.getElementById(`impact${i}Title`).value);
@@ -764,9 +660,7 @@
             }
         });
 
-        // ============================================
-        // SAVE: PROJECTS
-        // ============================================
+        // PROJECTS
         document.getElementById('projectsForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveProjectsBtn');
@@ -791,9 +685,7 @@
             }
         });
 
-        // ============================================
-        // SAVE: PAYMENT METHODS
-        // ============================================
+        // PAYMENT METHODS
         document.getElementById('methodsForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveMethodsBtn');
@@ -802,19 +694,16 @@
             try {
                 await saveSetting('give_methods_title', document.getElementById('methodsTitle').value);
 
-                // Bank 1
                 await saveSetting('give_bank1_name', document.getElementById('bank1Name').value);
                 await saveSetting('give_bank1_account_name', document.getElementById('bank1AccountName').value);
                 await saveSetting('give_bank1_account_number', document.getElementById('bank1AccountNumber').value);
                 await saveSetting('give_bank1_sort_code', document.getElementById('bank1SortCode').value);
 
-                // Bank 2
                 await saveSetting('give_bank2_name', document.getElementById('bank2Name').value);
                 await saveSetting('give_bank2_account_name', document.getElementById('bank2AccountName').value);
                 await saveSetting('give_bank2_account_number', document.getElementById('bank2AccountNumber').value);
                 await saveSetting('give_bank2_sort_code', document.getElementById('bank2SortCode').value);
 
-                // Partner
                 await saveSetting('give_partner_desc', document.getElementById('partnerDesc').value);
                 await saveSetting('give_partner_options', document.getElementById('partnerOptions').value);
 
@@ -826,9 +715,7 @@
             }
         });
 
-        // ============================================
-        // SAVE: FORM SETTINGS
-        // ============================================
+        // FORM SETTINGS
         document.getElementById('formSettings').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveFormBtn');
@@ -846,9 +733,7 @@
             }
         });
 
-        // ============================================
         // LOAD SETTINGS
-        // ============================================
         async function loadSettings() {
             try {
                 const { data, error } = await supabase
@@ -860,7 +745,6 @@
                 const settings = {};
                 (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
 
-                // Why Support
                 if (settings.give_why_title) document.getElementById('whyTitle').value = settings.give_why_title;
                 if (settings.give_why_content) document.getElementById('whyContent').value = settings.give_why_content;
                 for (let i = 1; i <= 4; i++) {
@@ -869,7 +753,6 @@
                     if (settings[`give_impact${i}_desc`]) document.getElementById(`impact${i}Desc`).value = settings[`give_impact${i}_desc`];
                 }
 
-                // Projects
                 if (settings.give_projects_title) document.getElementById('projectsTitle').value = settings.give_projects_title;
                 for (let i = 1; i <= 3; i++) {
                     if (settings[`give_proj${i}_icon`]) document.getElementById(`proj${i}Icon`).value = settings[`give_proj${i}_icon`];
@@ -879,7 +762,6 @@
                     if (settings[`give_proj${i}_target`]) document.getElementById(`proj${i}Target`).value = settings[`give_proj${i}_target`];
                 }
 
-                // Methods
                 if (settings.give_methods_title) document.getElementById('methodsTitle').value = settings.give_methods_title;
                 if (settings.give_bank1_name) document.getElementById('bank1Name').value = settings.give_bank1_name;
                 if (settings.give_bank1_account_name) document.getElementById('bank1AccountName').value = settings.give_bank1_account_name;
@@ -892,7 +774,6 @@
                 if (settings.give_partner_desc) document.getElementById('partnerDesc').value = settings.give_partner_desc;
                 if (settings.give_partner_options) document.getElementById('partnerOptions').value = settings.give_partner_options;
 
-                // Form settings
                 if (settings.give_form_title) document.getElementById('formTitle').value = settings.give_form_title;
                 if (settings.give_form_description) document.getElementById('formDescription').value = settings.give_form_description;
                 if (settings.give_form_button) document.getElementById('formButtonText').value = settings.give_form_button;
