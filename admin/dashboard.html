@@ -4,34 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - AVMS ABU Zaria</title>
-    <link rel="stylesheet" href="../css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; }
+        .admin-wrapper { display: flex; min-height: 100vh; }
+        .admin-sidebar {
+            width: 250px; background: #1a2a4a; color: white;
+            display: flex; flex-direction: column;
+            position: fixed; height: 100vh; overflow-y: auto;
+        }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h2 { font-size: 20px; text-align: center; }
+        .sidebar-nav { flex: 1; padding: 15px 0; }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 20px; color: rgba(255,255,255,0.7);
+            text-decoration: none; transition: all 0.3s; font-size: 14px;
+        }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-nav a.active { background: rgba(255,255,255,0.15); color: white; border-left: 3px solid #e8491d; }
+        .sidebar-nav a i { width: 20px; text-align: center; }
+        .sidebar-footer { padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer a { color: rgba(255,255,255,0.7); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .sidebar-footer a:hover { color: white; }
+        .admin-main { margin-left: 250px; flex: 1; padding: 20px; }
+        .admin-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid #e0e7ef; margin-bottom: 25px;
+        }
+        .admin-header h1 { color: #1a2a4a; font-size: 24px; }
+        .admin-user { display: flex; align-items: center; gap: 10px; color: #333; }
+        .admin-user i { font-size: 30px; color: #2a4a7a; }
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: white; padding: 20px; border-radius: 12px;
+            display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .stat-icon i { font-size: 30px; color: #e8491d; }
+        .stat-info h3 { font-size: 28px; color: #1a2a4a; }
+        .stat-info p { color: #888; font-size: 14px; }
+        .dashboard-quick-actions {
+            background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;
+        }
+        .dashboard-quick-actions h2 { color: #1a2a4a; font-size: 18px; margin-bottom: 15px; }
+        .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; }
+        .quick-card {
+            background: #f8f9fa; padding: 15px; border-radius: 10px;
+            text-align: center; text-decoration: none; color: #1a2a4a;
+            transition: all 0.3s; border: 2px solid transparent; cursor: pointer;
+            display: block;
+        }
+        .quick-card:hover { border-color: #e8491d; background: #fff; }
+        .quick-card i { font-size: 24px; color: #e8491d; display: block; margin-bottom: 8px; }
+        .dashboard-recent { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .dashboard-recent h2 { color: #1a2a4a; font-size: 18px; margin-bottom: 15px; }
+        .activity-item {
+            display: flex; align-items: center; gap: 15px; padding: 12px 15px;
+            background: #f8f9fa; border-radius: 8px; justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .activity-status { padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .activity-status.pending { background: #fff3cd; color: #856404; }
+        .activity-status.approved { background: #d4edda; color: #155724; }
+        .activity-status.rejected { background: #f8d7da; color: #721c24; }
+        .activity-time { color: #888; font-size: 12px; }
+        @media (max-width: 768px) {
+            .admin-sidebar { width: 60px; }
+            .admin-sidebar .sidebar-header h2 { display: none; }
+            .admin-sidebar .sidebar-nav a span { display: none; }
+            .admin-sidebar .sidebar-footer a span { display: none; }
+            .admin-main { margin-left: 60px; }
+            .dashboard-stats { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-wrapper">
-        <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="sidebar-header">
-                <h2>🐾 AVMS Admin</h2>
-            </div>
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a>
-                <a href="leaders.html"><i class="fas fa-users"></i> Leaders</a>
-                <a href="announcements.html"><i class="fas fa-bullhorn"></i> Announcements</a>
-                <a href="events.html"><i class="fas fa-calendar"></i> Events</a>
-                <a href="news.html"><i class="fas fa-newspaper"></i> News</a>
-                <a href="applications.html"><i class="fas fa-file-signature"></i> Applications</a>
-                <a href="donations.html"><i class="fas fa-hand-holding-heart"></i> Donations</a>
-                <a href="messages.html"><i class="fas fa-envelope"></i> Messages</a>
-                <a href="settings.html"><i class="fas fa-cog"></i> Settings</a>
+                <a href="dashboard.html" class="active"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-hand-holding-heart"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
             <div class="sidebar-footer">
-                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="admin-main">
             <header class="admin-header">
                 <h1>Dashboard</h1>
@@ -78,13 +148,13 @@
                     <a href="leaders.html" class="quick-card"><i class="fas fa-user-plus"></i> Add Leader</a>
                     <a href="announcements.html" class="quick-card"><i class="fas fa-plus-circle"></i> New Announcement</a>
                     <a href="events.html" class="quick-card"><i class="fas fa-plus-circle"></i> New Event</a>
-                    <a href="applications.html" class="quick-card"><i class="fas fa-check-circle"></i> Review Applications</a>
+                    <a href="applications.html" class="quick-card"><i class="fas fa-check-circle"></i> Review Apps</a>
                 </div>
             </div>
 
             <div class="dashboard-recent">
                 <h2>Recent Activity</h2>
-                <div id="recentActivity" class="activity-list">
+                <div id="recentActivity">
                     <p style="color: #888; text-align: center; padding: 20px;">Loading recent activity...</p>
                 </div>
             </div>
@@ -92,6 +162,90 @@
     </div>
 
     <script src="../js/config.js"></script>
-    <script src="js/admin-dashboard.js"></script>
+    <script>
+        // ============================================
+        // AUTH CHECK - CHECK BOTH STORAGES
+        // ============================================
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        console.log('🔐 Auth check - Logged in:', adminLoggedIn);
+        
+        if (!adminLoggedIn) {
+            console.log('❌ Not logged in, redirecting to login...');
+            window.location.href = 'index.html';
+        } else {
+            console.log('✅ Logged in as:', adminEmail);
+            const adminNameEl = document.getElementById('adminName');
+            if (adminNameEl) adminNameEl.textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // LOAD STATS
+        // ============================================
+        async function loadStats() {
+            try {
+                const { count: leaders } = await supabase.from('leaders').select('*', { count: 'exact', head: true });
+                document.getElementById('statLeaders').textContent = leaders || 0;
+
+                const { count: announcements } = await supabase.from('announcements').select('*', { count: 'exact', head: true });
+                document.getElementById('statAnnouncements').textContent = announcements || 0;
+
+                const { count: events } = await supabase.from('events').select('*', { count: 'exact', head: true });
+                document.getElementById('statEvents').textContent = events || 0;
+
+                const { count: applications } = await supabase
+                    .from('membership_applications')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'pending');
+                document.getElementById('statApplications').textContent = applications || 0;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // ============================================
+        // LOAD RECENT ACTIVITY
+        // ============================================
+        async function loadActivity() {
+            const container = document.getElementById('recentActivity');
+            try {
+                const { data } = await supabase
+                    .from('membership_applications')
+                    .select('*')
+                    .order('applied_at', { ascending: false })
+                    .limit(5);
+
+                if (data && data.length > 0) {
+                    container.innerHTML = data.map(app => `
+                        <div class="activity-item">
+                            <span><strong>${app.first_name} ${app.surname}</strong> applied for membership</span>
+                            <span class="activity-status ${app.status}">${app.status}</span>
+                            <span class="activity-time">${new Date(app.applied_at).toLocaleDateString()}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">No recent activity</p>';
+                }
+            } catch (error) {
+                container.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">Could not load activity</p>';
+            }
+        }
+
+        loadStats();
+        loadActivity();
+    </script>
 </body>
 </html>
