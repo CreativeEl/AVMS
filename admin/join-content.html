@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Join Us Page - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .info-box {
+            background: #e8f0fe;
+            color: #1a3a5a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a4a7a;
+            font-size: 14px;
+        }
+        .info-box i { margin-right: 8px; }
+        
+        .section-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .section-tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .section-tab:hover { background: #f0f2f5; color: #1a2a4a; }
+        .section-tab.active { background: #1a2a4a; color: white; }
+        
+        .section-content { display: none; }
+        .section-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .settings-card h2 {
+            color: #1a2a4a;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8491d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .settings-card h2 i { color: #e8491d; }
+        
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a2a4a;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e7ef;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a4a7a;
+            box-shadow: 0 0 0 3px rgba(42, 74, 122, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+        .form-group small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .save-message {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        .save-message.show { display: block; animation: fadeIn 0.3s ease; }
+        .save-message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .save-message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .save-message.info { background: #cce5ff; color: #004085; border-left: 4px solid #007bff; }
+        
+        .settings-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .dynamic-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            position: relative;
+            border-left: 4px solid #2a4a7a;
+        }
+        .dynamic-item .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .dynamic-item .item-number {
+            background: #2a4a7a;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .settings-card { padding: 20px; }
+            .section-tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .section-tab { white-space: nowrap; font-size: 13px; padding: 10px 15px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html" class="active"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Manage Join Us Page</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Edit all content on your Join Us page. This is the text students see before filling the membership form.
+            </div>
+
+            <!-- Section Tabs -->
+            <div class="section-tabs">
+                <button class="section-tab active" onclick="switchSection('header', this)"><i class="fas fa-heading"></i> Page Header</button>
+                <button class="section-tab" onclick="switchSection('why', this)"><i class="fas fa-question-circle"></i> Why Join</button>
+                <button class="section-tab" onclick="switchSection('benefits', this)"><i class="fas fa-star"></i> Benefits</button>
+                <button class="section-tab" onclick="switchSection('eligibility', this)"><i class="fas fa-check-circle"></i> Eligibility</button>
+                <button class="section-tab" onclick="switchSection('requirements', this)"><i class="fas fa-list"></i> Requirements</button>
+                <button class="section-tab" onclick="switchSection('faq', this)"><i class="fas fa-question"></i> FAQ</button>
+            </div>
+
+            <!-- ============================================
+                 SECTION: PAGE HEADER
+                 ============================================ -->
+            <div class="section-content active" id="section-header">
+                <div class="settings-card">
+                    <h2><i class="fas fa-heading"></i> Page Header</h2>
+                    <form id="headerForm">
+                        <div class="form-group">
+                            <label for="joinPageTitle">Page Title</label>
+                            <input type="text" id="joinPageTitle" placeholder="e.g., 🤝 Join AVMS">
+                        </div>
+                        <div class="form-group">
+                            <label for="joinPageSubtitle">Page Subtitle</label>
+                            <input type="text" id="joinPageSubtitle" placeholder="e.g., Become a member of the Association of Veterinary Medical Students, ABU Zaria">
+                        </div>
+                        <div class="form-group">
+                            <label for="joinFormIntro">Form Introduction Text</label>
+                            <textarea id="joinFormIntro" placeholder="e.g., Welcome to AVMS, ABU Zaria. Please fill out the form below to register as a member."></textarea>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveHeaderBtn">
+                                <i class="fas fa-save"></i> Save Header
+                            </button>
+                        </div>
+                        <div class="save-message" id="headerMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: WHY JOIN
+                 ============================================ -->
+            <div class="section-content" id="section-why">
+                <div class="settings-card">
+                    <h2><i class="fas fa-question-circle"></i> Why Join AVMS?</h2>
+                    <form id="whyForm">
+                        <div class="form-group">
+                            <label for="whyJoinTitle">Section Title</label>
+                            <input type="text" id="whyJoinTitle" placeholder="e.g., Why Join AVMS?">
+                        </div>
+                        <div class="form-group">
+                            <label for="whyJoinContent">Description</label>
+                            <textarea id="whyJoinContent" placeholder="Explain why students should join AVMS..."></textarea>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveWhyBtn">
+                                <i class="fas fa-save"></i> Save Why Join
+                            </button>
+                        </div>
+                        <div class="save-message" id="whyMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: BENEFITS
+                 ============================================ -->
+            <div class="section-content" id="section-benefits">
+                <div class="settings-card">
+                    <h2><i class="fas fa-star"></i> Membership Benefits</h2>
+                    <form id="benefitsForm">
+                        <div class="form-group">
+                            <label for="benefitsTitle">Section Title</label>
+                            <input type="text" id="benefitsTitle" placeholder="e.g., Membership Benefits">
+                        </div>
+
+                        <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Benefits (6 items)</h3>
+
+                        <!-- Benefit 1 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">1</span></div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="benefit1Icon" placeholder="fa-users">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="benefit1Title" placeholder="Community">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="benefit1Desc" placeholder="Connect with fellow veterinary students...">
+                            </div>
+                        </div>
+
+                        <!-- Benefit 2 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">2</span></div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="benefit2Icon" placeholder="fa-graduation-cap">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="benefit2Title" placeholder="Academic Support">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="benefit2Desc" placeholder="Access academic resources...">
+                            </div>
+                        </div>
+
+                        <!-- Benefit 3 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">3</span></div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="benefit3Icon" placeholder="fa-handshake">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="benefit3Title" placeholder="Networking">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="benefit3Desc" placeholder="Build connections with professionals...">
+                            </div>
+                        </div>
+
+                        <!-- Benefit 4 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">4</span></div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="benefit4Icon" placeholder="fa-trophy">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="benefit4Title" placeholder="Leadership">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="benefit4Desc" placeholder="Develop leadership skills...">
+                            </div>
+                        </div>
+
+                        <!-- Benefit 5 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">5</span></div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="benefit5Icon" placeholder="fa-heart">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="benefit5Title" placeholder="Welfare">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="benefit5Desc" placeholder="Access student welfare services...">
+                            </div>
+                        </div>
+
+                        <!-- Benefit 6 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">6</span></div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="benefit6Icon" placeholder="fa-calendar-alt">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="benefit6Title" placeholder="Events">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="benefit6Desc" placeholder="Participate in exciting events...">
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveBenefitsBtn">
+                                <i class="fas fa-save"></i> Save Benefits
+                            </button>
+                        </div>
+                        <div class="save-message" id="benefitsMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: ELIGIBILITY
+                 ============================================ -->
+            <div class="section-content" id="section-eligibility">
+                <div class="settings-card">
+                    <h2><i class="fas fa-check-circle"></i> Eligibility</h2>
+                    <form id="eligibilityForm">
+                        <div class="form-group">
+                            <label for="eligibilityTitle">Section Title</label>
+                            <input type="text" id="eligibilityTitle" placeholder="e.g., Eligibility">
+                        </div>
+                        <div class="form-group">
+                            <label for="eligibilityContent">Eligibility Criteria (one per line)</label>
+                            <textarea id="eligibilityContent" placeholder="Registered veterinary student at ABU Zaria&#10;Active student of the university&#10;Willing to participate in AVMS activities" style="min-height: 150px;"></textarea>
+                            <small>Enter each criterion on a new line</small>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveEligibilityBtn">
+                                <i class="fas fa-save"></i> Save Eligibility
+                            </button>
+                        </div>
+                        <div class="save-message" id="eligibilityMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: REQUIREMENTS
+                 ============================================ -->
+            <div class="section-content" id="section-requirements">
+                <div class="settings-card">
+                    <h2><i class="fas fa-list"></i> Requirements</h2>
+                    <form id="requirementsForm">
+                        <div class="form-group">
+                            <label for="requirementsTitle">Section Title</label>
+                            <input type="text" id="requirementsTitle" placeholder="e.g., Requirements">
+                        </div>
+                        <div class="form-group">
+                            <label for="requirementsContent">Requirements (one per line)</label>
+                            <textarea id="requirementsContent" placeholder="Complete membership form&#10;Pay membership dues (if applicable)&#10;Attend orientation program" style="min-height: 150px;"></textarea>
+                            <small>Enter each requirement on a new line</small>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveRequirementsBtn">
+                                <i class="fas fa-save"></i> Save Requirements
+                            </button>
+                        </div>
+                        <div class="save-message" id="requirementsMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: FAQ
+                 ============================================ -->
+            <div class="section-content" id="section-faq">
+                <div class="settings-card">
+                    <h2><i class="fas fa-question"></i> Frequently Asked Questions</h2>
+                    <form id="faqForm">
+                        <div class="form-group">
+                            <label for="faqTitle">Section Title</label>
+                            <input type="text" id="faqTitle" placeholder="e.g., Frequently Asked Questions">
+                        </div>
+
+                        <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">FAQ Items (5 questions)</h3>
+
+                        <!-- FAQ 1 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">1</span></div>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label>Question</label>
+                                <input type="text" id="faq1Question" placeholder="Who can join AVMS?">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Answer</label>
+                                <textarea id="faq1Answer" placeholder="All registered veterinary students at ABU Zaria can join AVMS..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 2 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">2</span></div>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label>Question</label>
+                                <input type="text" id="faq2Question" placeholder="How much is the membership fee?">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Answer</label>
+                                <textarea id="faq2Answer" placeholder="Membership fees are announced at the beginning of each session..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 3 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">3</span></div>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label>Question</label>
+                                <input type="text" id="faq3Question" placeholder="How long does it take to process my application?">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Answer</label>
+                                <textarea id="faq3Answer" placeholder="Applications are typically processed within 5-7 working days..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 4 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">4</span></div>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label>Question</label>
+                                <input type="text" id="faq4Question" placeholder="What documents do I need to submit?">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Answer</label>
+                                <textarea id="faq4Answer" placeholder="You will need your passport photograph, admission letter, student ID, and payment receipt..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 5 -->
+                        <div class="dynamic-item">
+                            <div class="item-header"><span class="item-number">5</span></div>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label>Question</label>
+                                <input type="text" id="faq5Question" placeholder="Can I join if I'm in my final year?">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Answer</label>
+                                <textarea id="faq5Answer" placeholder="Yes, all veterinary students regardless of level can join..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveFaqBtn">
+                                <i class="fas fa-save"></i> Save FAQ
+                            </button>
+                        </div>
+                        <div class="save-message" id="faqMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // SECTION SWITCHING
+        // ============================================
+        function switchSection(section, btn) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('section-' + section).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        async function saveSetting(key, value) {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert(
+                    { setting_key: key, setting_value: value, updated_at: new Date().toISOString() },
+                    { onConflict: 'setting_key' }
+                );
+            if (error) throw error;
+        }
+
+        function showMessage(elementId, type, text) {
+            const el = document.getElementById(elementId);
+            el.className = 'save-message show ' + type;
+            el.innerHTML = text;
+            setTimeout(() => { 
+                el.className = 'save-message'; 
+                el.innerHTML = '';
+            }, 5000);
+        }
+
+        function showLoading(btn, text = 'Saving...') {
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span> ${text}`;
+            return original;
+        }
+
+        function hideLoading(btn, original) {
+            btn.disabled = false;
+            btn.innerHTML = original;
+        }
+
+        // ============================================
+        // SAVE: HEADER
+        // ============================================
+        document.getElementById('headerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveHeaderBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('join_page_title', document.getElementById('joinPageTitle').value);
+                await saveSetting('join_page_subtitle', document.getElementById('joinPageSubtitle').value);
+                await saveSetting('join_form_intro', document.getElementById('joinFormIntro').value);
+                showMessage('headerMessage', 'success', '✅ Page header saved successfully!');
+            } catch (error) {
+                showMessage('headerMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: WHY JOIN
+        // ============================================
+        document.getElementById('whyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveWhyBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('join_why_title', document.getElementById('whyJoinTitle').value);
+                await saveSetting('join_why_content', document.getElementById('whyJoinContent').value);
+                showMessage('whyMessage', 'success', '✅ Why Join section saved successfully!');
+            } catch (error) {
+                showMessage('whyMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: BENEFITS
+        // ============================================
+        document.getElementById('benefitsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveBenefitsBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('join_benefits_title', document.getElementById('benefitsTitle').value);
+                for (let i = 1; i <= 6; i++) {
+                    await saveSetting(`join_benefit${i}_icon`, document.getElementById(`benefit${i}Icon`).value);
+                    await saveSetting(`join_benefit${i}_title`, document.getElementById(`benefit${i}Title`).value);
+                    await saveSetting(`join_benefit${i}_desc`, document.getElementById(`benefit${i}Desc`).value);
+                }
+                showMessage('benefitsMessage', 'success', '✅ Benefits saved successfully!');
+            } catch (error) {
+                showMessage('benefitsMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: ELIGIBILITY
+        // ============================================
+        document.getElementById('eligibilityForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveEligibilityBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('join_eligibility_title', document.getElementById('eligibilityTitle').value);
+                await saveSetting('join_eligibility_content', document.getElementById('eligibilityContent').value);
+                showMessage('eligibilityMessage', 'success', '✅ Eligibility saved successfully!');
+            } catch (error) {
+                showMessage('eligibilityMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: REQUIREMENTS
+        // ============================================
+        document.getElementById('requirementsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveRequirementsBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('join_requirements_title', document.getElementById('requirementsTitle').value);
+                await saveSetting('join_requirements_content', document.getElementById('requirementsContent').value);
+                showMessage('requirementsMessage', 'success', '✅ Requirements saved successfully!');
+            } catch (error) {
+                showMessage('requirementsMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: FAQ
+        // ============================================
+        document.getElementById('faqForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveFaqBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('join_faq_title', document.getElementById('faqTitle').value);
+                for (let i = 1; i <= 5; i++) {
+                    await saveSetting(`join_faq${i}_question`, document.getElementById(`faq${i}Question`).value);
+                    await saveSetting(`join_faq${i}_answer`, document.getElementById(`faq${i}Answer`).value);
+                }
+                showMessage('faqMessage', 'success', '✅ FAQ saved successfully!');
+            } catch (error) {
+                showMessage('faqMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // LOAD SETTINGS
+        // ============================================
+        async function loadSettings() {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('*');
+
+                if (error) throw error;
+
+                const settings = {};
+                (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
+
+                // Header
+                if (settings.join_page_title) document.getElementById('joinPageTitle').value = settings.join_page_title;
+                if (settings.join_page_subtitle) document.getElementById('joinPageSubtitle').value = settings.join_page_subtitle;
+                if (settings.join_form_intro) document.getElementById('joinFormIntro').value = settings.join_form_intro;
+
+                // Why
+                if (settings.join_why_title) document.getElementById('whyJoinTitle').value = settings.join_why_title;
+                if (settings.join_why_content) document.getElementById('whyJoinContent').value = settings.join_why_content;
+
+                // Benefits
+                if (settings.join_benefits_title) document.getElementById('benefitsTitle').value = settings.join_benefits_title;
+                for (let i = 1; i <= 6; i++) {
+                    if (settings[`join_benefit${i}_icon`]) document.getElementById(`benefit${i}Icon`).value = settings[`join_benefit${i}_icon`];
+                    if (settings[`join_benefit${i}_title`]) document.getElementById(`benefit${i}Title`).value = settings[`join_benefit${i}_title`];
+                    if (settings[`join_benefit${i}_desc`]) document.getElementById(`benefit${i}Desc`).value = settings[`join_benefit${i}_desc`];
+                }
+
+                // Eligibility
+                if (settings.join_eligibility_title) document.getElementById('eligibilityTitle').value = settings.join_eligibility_title;
+                if (settings.join_eligibility_content) document.getElementById('eligibilityContent').value = settings.join_eligibility_content;
+
+                // Requirements
+                if (settings.join_requirements_title) document.getElementById('requirementsTitle').value = settings.join_requirements_title;
+                if (settings.join_requirements_content) document.getElementById('requirementsContent').value = settings.join_requirements_content;
+
+                // FAQ
+                if (settings.join_faq_title) document.getElementById('faqTitle').value = settings.join_faq_title;
+                for (let i = 1; i <= 5; i++) {
+                    if (settings[`join_faq${i}_question`]) document.getElementById(`faq${i}Question`).value = settings[`join_faq${i}_question`];
+                    if (settings[`join_faq${i}_answer`]) document.getElementById(`faq${i}Answer`).value = settings[`join_faq${i}_answer`];
+                }
+
+                console.log('✅ Join page settings loaded');
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>
