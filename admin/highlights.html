@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Highlights - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .info-box {
+            background: #e8f0fe;
+            color: #1a3a5a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a4a7a;
+            font-size: 14px;
+        }
+        .info-box i { margin-right: 8px; }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-add:hover { background: #218838; }
+        
+        /* Highlights Grid */
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .highlight-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+        }
+        .highlight-cover {
+            height: 180px;
+            background: linear-gradient(135deg, #e0e7ef 0%, #d0d7df 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: #2a4a7a;
+            overflow: hidden;
+            position: relative;
+        }
+        .highlight-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .highlight-cover .photo-count {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .highlight-info {
+            padding: 20px;
+        }
+        .highlight-info h3 {
+            color: #1a2a4a;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .highlight-info p {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .highlight-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+        .highlight-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-published { background: #d4edda; color: #155724; }
+        .badge-draft { background: #fff3cd; color: #856404; }
+        
+        .highlight-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-photos { background: #e8491d; color: white; }
+        .btn-photos:hover { background: #c73d17; }
+        .btn-edit { background: #2a4a7a; color: white; }
+        .btn-edit:hover { background: #1a3a5a; }
+        .btn-delete { background: #dc3545; color: white; }
+        .btn-delete:hover { background: #c82333; }
+        
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-content.large { max-width: 900px; }
+        .modal-content h2 { margin-bottom: 20px; color: #1a2a4a; }
+        .modal-content .form-group { margin-bottom: 15px; }
+        .modal-content label { display: block; font-weight: 600; margin-bottom: 5px; color: #1a2a4a; font-size: 14px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .modal-content textarea { resize: vertical; min-height: 100px; }
+        .modal-content input:focus, .modal-content textarea:focus { outline: none; border-color: #2a4a7a; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-save { background: #28a745; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-cancel { background: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-save:hover { background: #218838; }
+        .btn-cancel:hover { background: #5a6268; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #888; grid-column: 1 / -1; }
+        .empty-state i { font-size: 60px; color: #d0d7df; margin-bottom: 15px; display: block; }
+        
+        /* Photo upload */
+        .image-upload-area {
+            border: 3px dashed #d0d7df;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+        .image-upload-area:hover { border-color: #2a4a7a; background: #f0f4f8; }
+        .image-upload-area i { font-size: 48px; color: #2a4a7a; margin-bottom: 15px; display: block; }
+        .image-upload-area p { color: #666; margin-bottom: 5px; font-size: 15px; }
+        .image-upload-area small { color: #888; font-size: 12px; }
+        .image-upload-area input[type="file"] { display: none; }
+        
+        /* Photo grid */
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .highlight-photo {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f0f2f5;
+        }
+        .highlight-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .highlight-photo .photo-delete {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .highlight-photo:hover .photo-delete { opacity: 1; }
+        .highlight-photo .photo-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 20px 10px 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Upload progress */
+        .upload-progress {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .upload-progress.show { display: block; }
+        .progress-bar {
+            height: 10px;
+            background: #e0e7ef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            border-radius: 5px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+        
+        @media (max-width: 768px) {
+            .highlights-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .modal-content { padding: 20px; }
+            .photos-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="highlights.html" class="active"><i class="fas fa-star"></i> <span>Event Highlights</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Event Highlights</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Document AVMS events with photo albums and descriptions. Create a highlight after each major event.
+            </div>
+
+            <div class="page-header">
+                <p style="color: #666;">Total Highlights: <strong id="highlightCount">0</strong></p>
+                <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> New Highlight</button>
+            </div>
+
+            <div class="highlights-grid" id="highlightsGrid">
+                <div class="empty-state">
+                    <i class="fas fa-star"></i>
+                    <p>Loading highlights...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="highlightModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">New Event Highlight</h2>
+            <form id="highlightForm">
+                <input type="hidden" id="editId" value="">
+                <div class="form-group">
+                    <label for="hlTitle">Highlight Title *</label>
+                    <input type="text" id="hlTitle" required placeholder="e.g., Veterinary Week 2024 Highlights">
+                </div>
+                <div class="form-group">
+                    <label for="hlDescription">Description *</label>
+                    <textarea id="hlDescription" required placeholder="Describe the event highlights..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hlEventDate">Event Date *</label>
+                        <input type="date" id="hlEventDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hlVenue">Venue</label>
+                        <input type="text" id="hlVenue" placeholder="e.g., Faculty Auditorium">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="hlStatus">Status</label>
+                    <select id="hlStatus">
+                        <option value="published">Published (visible)</option>
+                        <option value="draft">Draft (not visible)</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Highlight</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Photos Modal -->
+    <div class="modal" id="photosModal">
+        <div class="modal-content large">
+            <h2 id="photosModalTitle">Highlight Photos</h2>
+            <div id="photosModalInfo" style="color: #666; margin-bottom: 15px;"></div>
+
+            <!-- Upload Photos -->
+            <div class="image-upload-area" onclick="document.getElementById('photoInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Click to upload photos</p>
+                <small>JPG, PNG (max 5MB each) — You can select multiple</small>
+                <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotosUpload(event)">
+            </div>
+
+            <div class="upload-progress" id="uploadProgress">
+                <p><strong>Uploading...</strong> <span id="uploadStatus">0 of 0</span></p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <h3 style="margin-top: 25px; color: #1a2a4a; font-size: 16px;">Photos in this highlight</h3>
+            <div class="photos-grid" id="photosGrid">
+                <p style="color: #888; grid-column: 1 / -1; text-align: center;">Loading photos...</p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closePhotosModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        // ============================================
+        // STATE
+        // ============================================
+        let allHighlights = [];
+        let currentHighlightId = null;
+        let currentHighlightPhotos = [];
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // LOAD HIGHLIGHTS
+        // ============================================
+        async function loadHighlights() {
+            const grid = document.getElementById('highlightsGrid');
+            try {
+                const { data, error } = await supabase
+                    .from('event_highlights')
+                    .select('*')
+                    .order('highlight_date', { ascending: false });
+
+                if (error) throw error;
+
+                allHighlights = data || [];
+                document.getElementById('highlightCount').textContent = allHighlights.length;
+
+                if (allHighlights.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-star"></i>
+                            <p>No event highlights yet. Click "New Highlight" to create one.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Get photo counts
+                for (const hl of allHighlights) {
+                    const { count } = await supabase
+                        .from('highlight_images')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('highlight_id', hl.id);
+                    hl.photo_count = count || 0;
+                }
+
+                displayHighlights();
+            } catch (error) {
+                console.error('Error loading highlights:', error);
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error: ${error.message}</p>
+                        <p style="font-size: 13px; margin-top: 10px;">Make sure the <code>event_highlights</code> and <code>highlight_images</code> tables exist in Supabase.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayHighlights() {
+            const grid = document.getElementById('highlightsGrid');
+            
+            grid.innerHTML = allHighlights.map(hl => `
+                <div class="highlight-card">
+                    <div class="highlight-cover" onclick="openPhotosModal(${hl.id})">
+                        ${hl.cover_image ? 
+                            `<img src="${hl.cover_image}" alt="${hl.title}">` : 
+                            `<i class="fas fa-star"></i>`
+                        }
+                        <span class="photo-count">${hl.photo_count || 0} photos</span>
+                    </div>
+                    <div class="highlight-info">
+                        <h3>${hl.title}</h3>
+                        <p>${hl.description ? hl.description.substring(0, 100) + (hl.description.length > 100 ? '...' : '') : 'No description'}</p>
+                        <div class="highlight-meta">
+                            <span><i class="fas fa-calendar"></i> ${hl.highlight_date ? new Date(hl.highlight_date).toLocaleDateString() : 'No date'}</span>
+                            ${hl.venue ? `<span><i class="fas fa-map-marker-alt"></i> ${hl.venue}</span>` : ''}
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <span class="badge badge-${hl.status}">${hl.status || 'draft'}</span>
+                        </div>
+                        <div class="highlight-actions">
+                            <button class="btn-sm btn-photos" onclick="openPhotosModal(${hl.id})">
+                                <i class="fas fa-camera"></i> Photos
+                            </button>
+                            <button class="btn-sm btn-edit" onclick="editHighlight(${hl.id})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn-sm btn-delete" onclick="deleteHighlight(${hl.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ============================================
+        // HIGHLIGHT CRUD
+        // ============================================
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'New Event Highlight';
+            document.getElementById('editId').value = '';
+            document.getElementById('highlightForm').reset();
+            document.getElementById('hlStatus').value = 'published';
+            document.getElementById('hlEventDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('highlightModal').classList.add('show');
+        }
+
+        function editHighlight(id) {
+            const hl = allHighlights.find(h => h.id === id);
+            if (!hl) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Event Highlight';
+            document.getElementById('editId').value = id;
+            document.getElementById('hlTitle').value = hl.title || '';
+            document.getElementById('hlDescription').value = hl.description || '';
+            document.getElementById('hlEventDate').value = hl.highlight_date || '';
+            document.getElementById('hlVenue').value = hl.venue || '';
+            document.getElementById('hlStatus').value = hl.status || 'published';
+            document.getElementById('highlightModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('highlightModal').classList.remove('show');
+        }
+
+        document.getElementById('highlightForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = {
+                title: document.getElementById('hlTitle').value,
+                description: document.getElementById('hlDescription').value,
+                highlight_date: document.getElementById('hlEventDate').value,
+                venue: document.getElementById('hlVenue').value || null,
+                status: document.getElementById('hlStatus').value,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                let result;
+                if (id) {
+                    result = await supabase.from('event_highlights').update(data).eq('id', parseInt(id));
+                } else {
+                    result = await supabase.from('event_highlights').insert([data]);
+                }
+                if (result.error) throw result.error;
+                closeModal();
+                loadHighlights();
+                alert(id ? '✅ Highlight updated successfully!' : '✅ Highlight created successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        });
+
+        async function deleteHighlight(id) {
+            if (!confirm('Are you sure you want to delete this highlight? All photos will also be deleted.')) return;
+            try {
+                await supabase.from('highlight_images').delete().eq('highlight_id', id);
+                const { error } = await supabase.from('event_highlights').delete().eq('id', id);
+                if (error) throw error;
+                loadHighlights();
+                alert('✅ Highlight deleted successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // PHOTOS MANAGEMENT
+        // ============================================
+        async function openPhotosModal(highlightId) {
+            currentHighlightId = highlightId;
+            const hl = allHighlights.find(h => h.id === highlightId);
+            if (!hl) return;
+
+            document.getElementById('photosModalTitle').textContent = `⭐ ${hl.title}`;
+            document.getElementById('photosModalInfo').innerHTML = 
+                `${hl.description || 'No description'} • ${hl.photo_count || 0} photos`;
+            document.getElementById('photosModal').classList.add('show');
+
+            await loadPhotos(highlightId);
+        }
+
+        async function loadPhotos(highlightId) {
+            const grid = document.getElementById('photosGrid');
+            try {
+                const { data, error } = await supabase
+                    .from('highlight_images')
+                    .select('*')
+                    .eq('highlight_id', highlightId)
+                    .order('display_order', { ascending: true });
+
+                if (error) throw error;
+
+                currentHighlightPhotos = data || [];
+
+                if (currentHighlightPhotos.length === 0) {
+                    grid.innerHTML = `
+                        <p style="color: #888; grid-column: 1 / -1; text-align: center; padding: 30px;">
+                            No photos in this highlight yet. Upload some above!
+                        </p>
+                    `;
+                    return;
+                }
+
+                grid.innerHTML = currentHighlightPhotos.map(photo => `
+                    <div class="highlight-photo">
+                        <img src="${photo.image_url}" alt="${photo.caption || 'Photo'}" 
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23e0e7ef%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2240%22 text-anchor=%22middle%22 dy=%22.3em%22%3E📷%3C/text%3E%3C/svg%3E'">
+                        ${photo.caption ? `<div class="photo-caption">${photo.caption}</div>` : ''}
+                        <button class="photo-delete" onclick="deletePhoto(${photo.id})" title="Delete photo">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+
+                // Auto-set cover image
+                if (currentHighlightPhotos.length > 0 && !hl.cover_image) {
+                    await supabase
+                        .from('event_highlights')
+                        .update({ cover_image: currentHighlightPhotos[0].image_url })
+                        .eq('id', highlightId);
+                }
+            } catch (error) {
+                console.error('Error loading photos:', error);
+                grid.innerHTML = `<p style="color: #dc3545; grid-column: 1 / -1;">Error loading photos: ${error.message}</p>`;
+            }
+        }
+
+        function closePhotosModal() {
+            document.getElementById('photosModal').classList.remove('show');
+            currentHighlightId = null;
+            currentHighlightPhotos = [];
+            loadHighlights();
+        }
+
+        // ============================================
+        // PHOTO UPLOAD
+        // ============================================
+        async function handlePhotosUpload(event) {
+            const files = Array.from(event.target.files);
+            if (files.length === 0) return;
+
+            const progressDiv = document.getElementById('uploadProgress');
+            const progressFill = document.getElementById('progressFill');
+            const uploadStatus = document.getElementById('uploadStatus');
+
+            progressDiv.classList.add('show');
+            progressFill.style.width = '0%';
+            uploadStatus.textContent = `0 of ${files.length}`;
+
+            let uploaded = 0;
+            let errors = 0;
+
+            for (const file of files) {
+                if (file.size > 5 * 1024 * 1024) {
+                    errors++;
+                    uploaded++;
+                    uploadStatus.textContent = `${uploaded} of ${files.length}`;
+                    progressFill.style.width = `${(uploaded / files.length) * 100}%`;
+                    continue;
+                }
+
+                try {
+                    const timestamp = Date.now() + Math.random().toString(36).substring(7);
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${timestamp}.${fileExt}`;
+                    const filePath = `highlights/${currentHighlightId}/${fileName}`;
+
+                    let bucketUsed = 'site-assets';
+                    let uploadResult = await supabase.storage
+                        .from('site-assets')
+                        .upload(filePath, file, { upsert: false });
+
+                    if (uploadResult.error) {
+                        bucketUsed = 'membership-documents';
+                        uploadResult = await supabase.storage
+                            .from('membership-documents')
+                            .upload(filePath, file, { upsert: false });
+                    }
+
+                    if (uploadResult.error) {
+                        errors++;
+                        uploaded++;
+                        uploadStatus.textContent = `${uploaded} of ${files.length}`;
+                        progressFill.style.width = `${(uploaded / files.length) * 100}%`;
+                        continue;
+                    }
+
+                    const { data: urlData } = supabase.storage
+                        .from(bucketUsed)
+                        .getPublicUrl(filePath);
+
+                    await supabase.from('highlight_images').insert([{
+                        highlight_id: currentHighlightId,
+                        image_url: urlData.publicUrl,
+                        caption: file.name.replace(/\.[^/.]+$/, ''),
+                        display_order: currentHighlightPhotos.length + uploaded
+                    }]);
+
+                    uploaded++;
+                    uploadStatus.textContent = `${uploaded} of ${files.length}`;
+                    progressFill.style.width = `${(uploaded / files.length) * 100}%`;
+                } catch (error) {
+                    console.error('Error uploading:', error);
+                    errors++;
+                    uploaded++;
+                    uploadStatus.textContent = `${uploaded} of ${files.length}`;
+                    progressFill.style.width = `${(uploaded / files.length) * 100}%`;
+                }
+            }
+
+            event.target.value = '';
+
+            setTimeout(() => {
+                progressDiv.classList.remove('show');
+                progressFill.style.width = '0%';
+                
+                if (errors === 0) {
+                    alert(`✅ All ${uploaded} photos uploaded successfully!`);
+                } else {
+                    alert(`⚠️ ${uploaded - errors} uploaded, ${errors} failed.`);
+                }
+                
+                loadPhotos(currentHighlightId);
+                loadHighlights();
+            }, 1000);
+        }
+
+        // ============================================
+        // DELETE PHOTO
+        // ============================================
+        async function deletePhoto(photoId) {
+            if (!confirm('Delete this photo?')) return;
+            try {
+                const { error } = await supabase
+                    .from('highlight_images')
+                    .delete()
+                    .eq('id', photoId);
+                if (error) throw error;
+                await loadPhotos(currentHighlightId);
+                alert('✅ Photo deleted!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        loadHighlights();
+
+        document.getElementById('highlightModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        document.getElementById('photosModal').addEventListener('click', function(e) {
+            if (e.target === this) closePhotosModal();
+        });
+    </script>
+</body>
+</html>
