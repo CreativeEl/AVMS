@@ -91,6 +91,12 @@ function renderEvents(events) {
     return events.map(event => `
         <div class="event-card-full ${event.featured ? 'featured' : ''}">
             ${event.featured ? '<span class="featured-badge">⭐ Featured</span>' : ''}
+            ${event.image_url ? 
+                `<div class="event-card-image">
+                    <img src="${event.image_url}" alt="${event.title || 'Event'}" 
+                         onerror="this.parentElement.style.display='none'">
+                </div>` : ''
+            }
             <div class="event-details-full">
                 <h3>${event.title || 'Untitled Event'}</h3>
                 <div class="event-meta">
