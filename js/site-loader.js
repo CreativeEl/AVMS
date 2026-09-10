@@ -133,7 +133,8 @@ function applyContactInfo(settings) {
 }
 
 // ============================================
-// APPLY SOCIAL LINKS
+// APPLY SOCIAL LINKS - FIXED
+// Always shows icons, no underline, consistent size
 // ============================================
 function applySocialLinks(settings) {
     const socialMap = {
@@ -149,15 +150,18 @@ function applySocialLinks(settings) {
         const icon = link.querySelector('i');
         if (!icon) return;
 
+        // FIX: Remove underline and force consistent display
+        link.style.textDecoration = 'none';
+        link.style.display = 'inline-block';
+        link.style.lineHeight = '1';
+
         const iconClass = icon.className;
         for (const [key, platform] of Object.entries(socialMap)) {
             if (iconClass.includes(platform)) {
                 if (settings[key]) {
                     link.href = settings[key];
-                    link.style.display = 'inline-flex';
-                } else {
-                    link.style.display = 'none';
                 }
+                // FIX: Always keep icon visible (never hide)
                 break;
             }
         }
