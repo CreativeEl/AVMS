@@ -1083,7 +1083,6 @@ body {
     border-left-color: #e8491d;
 }
 
-/* ← NEW: Event Card Image */
 .event-card-image {
     width: 250px;
     height: 180px;
@@ -1152,7 +1151,6 @@ body {
         flex-direction: column;
     }
     
-    /* ← NEW: Full-width image on mobile */
     .event-card-image {
         width: 100%;
         height: 200px;
