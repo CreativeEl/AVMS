@@ -60,7 +60,7 @@ async function loadAnnouncements() {
 }
 
 // ============================================
-// 2. LOAD EVENTS
+// 2. LOAD EVENTS (WITH IMAGE SUPPORT)
 // ============================================
 async function loadEvents() {
     const container = document.getElementById('eventsContainer');
@@ -96,7 +96,12 @@ async function loadEvents() {
         
         container.innerHTML = data.map(event => `
             <div class="event-card">
-                <div class="event-image">🎉</div>
+                <div class="event-image" 
+                     ${event.image_url ? 
+                        `style="background-image: url('${event.image_url}'); background-size: cover; background-position: center; color: transparent;"` : 
+                        `style="color: white;"`}>
+                    ${event.image_url ? '' : '🎉'}
+                </div>
                 <div class="event-details">
                     <h3>${event.title || 'Untitled Event'}</h3>
                     <p class="event-info"><i class="fas fa-calendar"></i> ${formatDate(event.event_date)}</p>
