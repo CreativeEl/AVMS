@@ -4,15 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AVMS - ABU Zaria</title>
-    
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Font Awesome (icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
 </head>
 <body>
 
@@ -24,7 +19,10 @@
             <div class="nav-wrapper">
                 <div class="logo">
                     <a href="index.html">
-                        <span class="logo-text">🐾 AVMS ABU</span>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232a4a7a'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='white' stroke-width='2'/%3E%3Ctext x='50' y='62' font-size='36' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
+                             alt="AVMS Logo" 
+                             class="logo-img">
+                        <span class="logo-text" data-footer="site-short-name">AVMS ABU</span>
                     </a>
                 </div>
                 
@@ -55,17 +53,21 @@
     <!-- ==========================================
     HERO SECTION
     ========================================== -->
-    <section class="hero">
+    <section class="hero" data-home="hero-image">
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title">Association of Veterinary Medical Students</h1>
-                <p class="hero-subtitle">Ahmadu Bello University, Zaria</p>
-                <p class="hero-description" id="heroDescription">
+                <h1 class="hero-title" data-home="hero-title">Association of Veterinary Medical Students</h1>
+                <p class="hero-subtitle" data-home="hero-subtitle">Ahmadu Bello University, Zaria</p>
+                <p class="hero-description" data-home="hero-description">
                     Advancing Veterinary Students Through Knowledge, Leadership and Service
                 </p>
                 <div class="hero-buttons">
-                    <a href="about.html" class="btn btn-primary">Learn More</a>
-                    <a href="join.html" class="btn btn-secondary">Join AVMS</a>
+                    <a href="about.html" class="btn btn-primary" data-home="hero-btn1">
+                        <span data-home="hero-btn1-text">Learn More</span>
+                    </a>
+                    <a href="join.html" class="btn btn-secondary" data-home="hero-btn2">
+                        <span data-home="hero-btn2-text">Join AVMS</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -76,17 +78,12 @@
     ========================================== -->
     <section class="welcome-section">
         <div class="container">
-            <h2 class="section-title">Welcome to AVMS</h2>
-            <div class="welcome-content" id="welcomeContent">
-                <p>
+            <h2 class="section-title" data-home="welcome-title">Welcome to AVMS</h2>
+            <div class="welcome-content">
+                <p data-home="welcome-message">
                     Welcome to the official website of the Association of Veterinary Medical Students (AVMS) 
                     at Ahmadu Bello University, Zaria. We are a community of passionate veterinary students 
                     dedicated to academic excellence, professional development, and service to society.
-                </p>
-                <br>
-                <p>
-                    This is a placeholder welcome message. You can change this text through the admin dashboard
-                    once we build it. For now, we're building the foundation of your website!
                 </p>
             </div>
         </div>
@@ -98,7 +95,7 @@
     <section class="announcements-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">📢 Latest Announcements</h2>
+                <h2 class="section-title">Latest Announcements</h2>
                 <a href="announcements.html" class="view-all">View All →</a>
             </div>
             <div id="announcementsContainer" class="announcements-grid">
@@ -113,7 +110,7 @@
     <section class="events-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">🎯 Upcoming Events</h2>
+                <h2 class="section-title">Upcoming Events</h2>
                 <a href="events.html" class="view-all">View All →</a>
             </div>
             <div id="eventsContainer" class="events-grid">
@@ -128,7 +125,7 @@
     <section class="leadership-preview">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">👤 Our Leadership</h2>
+                <h2 class="section-title">Our Leadership</h2>
                 <a href="leadership.html" class="view-all">View All →</a>
             </div>
             <div id="leadersContainer" class="leaders-grid">
@@ -143,8 +140,8 @@
     <section class="join-preview">
         <div class="container">
             <div class="join-content">
-                <h2>🐾 Join AVMS Today</h2>
-                <p>Become part of the largest veterinary student community in Northern Nigeria.</p>
+                <h2 data-home="join-title">Join AVMS Today</h2>
+                <p data-home="join-text">Become part of the largest veterinary student community in Northern Nigeria.</p>
                 <a href="join.html" class="btn btn-primary">Apply Now</a>
             </div>
         </div>
@@ -157,8 +154,8 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h4>🐾 AVMS ABU Zaria</h4>
-                    <p>Advancing veterinary students through knowledge, leadership and service.</p>
+                    <h4><span data-footer="site-name">AVMS ABU Zaria</span></h4>
+                    <p data-footer="tagline">Advancing veterinary students through knowledge, leadership and service.</p>
                     <br>
                     <p><strong>Association of Veterinary Medical Students</strong></p>
                     <p>Ahmadu Bello University, Zaria</p>
@@ -175,7 +172,7 @@
                         <li><a href="contact.html">Contact</a></li>
                         <li class="admin-link-item">
                             <a href="admin/index.html" target="_blank" class="admin-login-btn">
-                                <i class="fas fa-lock"></i>  Admin Login
+                                <i class="fas fa-lock"></i> Admin Login
                             </a>
                         </li>
                     </ul>
@@ -193,21 +190,23 @@
                 
                 <div class="footer-col">
                     <h4>Contact</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> ABU Zaria, Nigeria</p>
-                    <p><i class="fas fa-envelope"></i> avms@abu.edu.ng</p>
-                    <p><i class="fas fa-phone"></i> +234 800 000 0000</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <span data-contact="address" class="contact-address">ABU Zaria, Nigeria</span></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:avms@abu.edu.ng" class="contact-email" data-contact="email">avms@abu.edu.ng</a></p>
+                    <p><i class="fas fa-phone"></i> <a href="tel:+2348000000000" class="contact-phone" data-contact="phone">+234 800 000 0000</a></p>
                     <br>
                     <div class="social-links">
                         <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
                         <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; <span class="current-year">2024</span> AVMS ABU Zaria. All rights reserved.</p>
+                <p>&copy; <span class="current-year">2024</span> <span data-footer="copyright">AVMS ABU Zaria. All rights reserved.</span></p>
             </div>
         </div>
     </footer>
@@ -215,8 +214,8 @@
     <!-- ==========================================
     JAVASCRIPT
     ========================================== -->
-    <script src="js/config.js"></script>
     <script src="js/main.js"></script>
     <script src="js/home.js"></script>
+    <script src="js/site-loader.js"></script>
 </body>
 </html>
