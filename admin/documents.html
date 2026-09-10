@@ -55,7 +55,6 @@
         .search-box { padding: 10px 15px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; width: 250px; }
         .search-box:focus { outline: none; border-color: #2a4a7a; }
         
-        /* File Upload */
         .file-upload-area {
             border: 3px dashed #d0d7df;
             border-radius: 12px;
@@ -106,7 +105,6 @@
         }
         .info-box i { margin-right: 8px; }
         
-        /* Upload progress */
         .upload-progress {
             display: none;
             padding: 15px;
@@ -149,9 +147,13 @@
                 <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
                 <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
                 <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="highlights.html"><i class="fas fa-star"></i> <span>Event Highlights</span></a>
                 <a href="documents.html" class="active"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
-                <a href="donations.html"><i class="fas fa-hand-holding-heart"></i> <span>Donations</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
                 <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -457,7 +459,6 @@
             existingFileUrl = doc.file_url;
             selectedFile = null;
 
-            // Show existing file info
             if (doc.file_url) {
                 const fileInfo = getFileIcon(doc.file_url);
                 const ext = doc.file_url.split('.').pop().toUpperCase();
@@ -487,7 +488,6 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            // Check size (10MB)
             if (file.size > 10 * 1024 * 1024) {
                 alert('❌ File is too large. Maximum size is 10MB.');
                 event.target.value = '';
@@ -533,7 +533,6 @@
             const btn = document.getElementById('saveDocBtn');
             const originalText = btn.innerHTML;
 
-            // Validation
             if (!id && !selectedFile) {
                 alert('❌ Please select a file to upload.');
                 return;
@@ -545,7 +544,6 @@
             let fileUrl = existingFileUrl;
 
             try {
-                // Upload new file if selected
                 if (selectedFile) {
                     const progressDiv = document.getElementById('uploadProgress');
                     progressDiv.classList.add('show');
@@ -558,7 +556,6 @@
                     const fileName = `${timestamp}_${safeName}`;
                     const filePath = `documents/${fileName}`;
 
-                    // Try site-assets bucket first
                     let uploadResult = await supabase.storage
                         .from('site-assets')
                         .upload(filePath, selectedFile, { upsert: false });
@@ -566,7 +563,6 @@
                     let bucketUsed = 'site-assets';
 
                     if (uploadResult.error) {
-                        // Try fallback bucket
                         uploadResult = await supabase.storage
                             .from('membership-documents')
                             .upload(filePath, selectedFile, { upsert: false });
@@ -579,7 +575,6 @@
 
                     document.getElementById('progressFill').style.width = '80%';
 
-                    // Get public URL
                     const { data: urlData } = supabase.storage
                         .from(bucketUsed)
                         .getPublicUrl(filePath);
@@ -590,7 +585,6 @@
                     document.getElementById('uploadStatus').textContent = 'File uploaded!';
                 }
 
-                // Save/Update database record
                 const docData = {
                     title: document.getElementById('docTitle').value,
                     description: document.getElementById('docDescription').value || null,
@@ -609,7 +603,6 @@
 
                 if (result.error) throw result.error;
 
-                // Success
                 setTimeout(() => {
                     document.getElementById('uploadProgress').classList.remove('show');
                     document.getElementById('progressFill').style.width = '0%';
