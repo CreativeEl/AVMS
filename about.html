@@ -4,27 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About AVMS - ABU Zaria</title>
-    
-    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
 </head>
 <body>
 
-    <!-- ==========================================
-    HEADER / NAVIGATION
-    ========================================== -->
+    <!-- HEADER / NAVIGATION -->
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
                 <div class="logo">
                     <a href="index.html">
-                        <span class="logo-text">🐾 AVMS ABU</span>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232a4a7a'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='white' stroke-width='2'/%3E%3Ctext x='50' y='62' font-size='36' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
+                             alt="AVMS Logo" 
+                             class="logo-img">
+                        <span class="logo-text" data-footer="site-short-name">AVMS ABU</span>
                     </a>
                 </div>
                 
@@ -52,9 +48,7 @@
         </div>
     </header>
 
-    <!-- ==========================================
-    PAGE HEADER
-    ========================================== -->
+    <!-- PAGE HEADER -->
     <section class="page-header">
         <div class="container">
             <h1>About AVMS</h1>
@@ -62,15 +56,13 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    ABOUT SECTION
-    ========================================== -->
+    <!-- ABOUT SECTION -->
     <section class="about-section">
         <div class="container">
             <div class="about-grid">
                 <div class="about-content">
-                    <h2>Who We Are</h2>
-                    <p>
+                    <h2 data-about="who-title">Who We Are</h2>
+                    <p data-about="who-content">
                         The Association of Veterinary Medical Students (AVMS) is the official student body 
                         representing all veterinary students at Ahmadu Bello University, Zaria. 
                         We are a community of passionate individuals dedicated to the advancement of 
@@ -84,7 +76,7 @@
                     </p>
                 </div>
                 <div class="about-image">
-                    <div class="placeholder-image">
+                    <div class="placeholder-image" data-about="image">
                         <i class="fas fa-graduation-cap"></i>
                         <p>AVMS Community</p>
                     </div>
@@ -93,24 +85,22 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    MISSION & VISION
-    ========================================== -->
+    <!-- MISSION & VISION -->
     <section class="mission-vision">
         <div class="container">
             <div class="mv-grid">
                 <div class="mv-card">
                     <div class="mv-icon"><i class="fas fa-bullseye"></i></div>
-                    <h3>Our Mission</h3>
-                    <p>
+                    <h3 data-about="mission-title">Our Mission</h3>
+                    <p data-about="mission-content">
                         To foster academic excellence, professional growth, and leadership development 
                         among veterinary students through quality programs, advocacy, and community engagement.
                     </p>
                 </div>
                 <div class="mv-card">
                     <div class="mv-icon"><i class="fas fa-eye"></i></div>
-                    <h3>Our Vision</h3>
-                    <p>
+                    <h3 data-about="vision-title">Our Vision</h3>
+                    <p data-about="vision-content">
                         To be the premier veterinary student association in Africa, producing globally 
                         competent veterinarians who are leaders in animal health, food security, 
                         and public health.
@@ -120,9 +110,7 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    OBJECTIVES
-    ========================================== -->
+    <!-- OBJECTIVES -->
     <section class="objectives">
         <div class="container">
             <h2 class="section-title">Our Objectives</h2>
@@ -161,14 +149,12 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    HISTORY
-    ========================================== -->
+    <!-- HISTORY -->
     <section class="history">
         <div class="container">
-            <h2 class="section-title">Our History</h2>
+            <h2 class="section-title" data-about="history-title">Our History</h2>
             <div class="history-content">
-                <p>
+                <p data-about="history-content">
                     The Association of Veterinary Medical Students (AVMS) at Ahmadu Bello University, 
                     Zaria was established to serve as the voice of veterinary students and to promote 
                     excellence in veterinary education.
@@ -188,9 +174,7 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    ACHIEVEMENTS
-    ========================================== -->
+    <!-- ACHIEVEMENTS -->
     <section class="achievements">
         <div class="container">
             <h2 class="section-title">Our Achievements</h2>
@@ -215,56 +199,52 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    VALUES
-    ========================================== -->
+    <!-- VALUES -->
     <section class="values">
         <div class="container">
             <h2 class="section-title">Our Core Values</h2>
             <div class="values-grid">
                 <div class="value-item">
-                    <i class="fas fa-star"></i>
-                    <h4>Excellence</h4>
-                    <p>Striving for the highest standards in everything we do.</p>
+                    <i class="fas fa-star" data-about="value1-icon"></i>
+                    <h4 data-about="value1-title">Excellence</h4>
+                    <p data-about="value1-desc">Striving for the highest standards in everything we do.</p>
                 </div>
                 <div class="value-item">
-                    <i class="fas fa-hand-holding-heart"></i>
-                    <h4>Integrity</h4>
-                    <p>Upholding honesty, transparency, and ethical conduct.</p>
+                    <i class="fas fa-hand-holding-heart" data-about="value2-icon"></i>
+                    <h4 data-about="value2-title">Integrity</h4>
+                    <p data-about="value2-desc">Upholding honesty, transparency, and ethical conduct.</p>
                 </div>
                 <div class="value-item">
-                    <i class="fas fa-users"></i>
-                    <h4>Unity</h4>
-                    <p>Fostering a spirit of togetherness and collaboration.</p>
+                    <i class="fas fa-users" data-about="value3-icon"></i>
+                    <h4 data-about="value3-title">Unity</h4>
+                    <p data-about="value3-desc">Fostering a spirit of togetherness and collaboration.</p>
                 </div>
                 <div class="value-item">
-                    <i class="fas fa-lightbulb"></i>
-                    <h4>Innovation</h4>
-                    <p>Embracing creativity and forward-thinking solutions.</p>
+                    <i class="fas fa-lightbulb" data-about="value4-icon"></i>
+                    <h4 data-about="value4-title">Innovation</h4>
+                    <p data-about="value4-desc">Embracing creativity and forward-thinking solutions.</p>
                 </div>
                 <div class="value-item">
-                    <i class="fas fa-handshake"></i>
-                    <h4>Service</h4>
-                    <p>Dedicating ourselves to serving others and our community.</p>
+                    <i class="fas fa-handshake" data-about="value5-icon"></i>
+                    <h4 data-about="value5-title">Service</h4>
+                    <p data-about="value5-desc">Dedicating ourselves to serving others and our community.</p>
                 </div>
                 <div class="value-item">
-                    <i class="fas fa-heart"></i>
-                    <h4>Passion</h4>
-                    <p>Approaching veterinary medicine with enthusiasm and dedication.</p>
+                    <i class="fas fa-heart" data-about="value6-icon"></i>
+                    <h4 data-about="value6-title">Passion</h4>
+                    <p data-about="value6-desc">Approaching veterinary medicine with enthusiasm and dedication.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ==========================================
-    FOOTER WITH ADMIN LOGIN BUTTON
-    ========================================== -->
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h4>🐾 AVMS ABU Zaria</h4>
-                    <p>Advancing veterinary students through knowledge, leadership and service.</p>
+                    <h4><span data-footer="site-name">AVMS ABU Zaria</span></h4>
+                    <p data-footer="tagline">Advancing veterinary students through knowledge, leadership and service.</p>
                     <br>
                     <p><strong>Association of Veterinary Medical Students</strong></p>
                     <p>Ahmadu Bello University, Zaria</p>
@@ -281,7 +261,7 @@
                         <li><a href="contact.html">Contact</a></li>
                         <li class="admin-link-item">
                             <a href="admin/index.html" target="_blank" class="admin-login-btn">
-                                <i class="fas fa-lock"></i>  Admin Login
+                                <i class="fas fa-lock"></i> Admin Login
                             </a>
                         </li>
                     </ul>
@@ -299,27 +279,29 @@
                 
                 <div class="footer-col">
                     <h4>Contact</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> ABU Zaria, Nigeria</p>
-                    <p><i class="fas fa-envelope"></i> avms@abu.edu.ng</p>
-                    <p><i class="fas fa-phone"></i> +234 800 000 0000</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <span data-contact="address" class="contact-address">ABU Zaria, Nigeria</span></p>
+                    <p><i class="fas fa-envelope"></i> <a href="mailto:avms@abu.edu.ng" class="contact-email" data-contact="email">avms@abu.edu.ng</a></p>
+                    <p><i class="fas fa-phone"></i> <a href="tel:+2348000000000" class="contact-phone" data-contact="phone">+234 800 000 0000</a></p>
                     <br>
                     <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; <span class="current-year">2024</span> AVMS ABU Zaria. All rights reserved.</p>
+                <p>&copy; <span class="current-year">2024</span> <span data-footer="copyright">AVMS ABU Zaria. All rights reserved.</span></p>
             </div>
         </div>
     </footer>
 
-    <!-- JavaScript -->
-    <script src="js/config.js"></script>
+    <!-- JAVASCRIPT -->
     <script src="js/main.js"></script>
+    <script src="js/site-loader.js"></script>
 </body>
 </html>
