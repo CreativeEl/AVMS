@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Give Page - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .info-box {
+            background: #e8f0fe;
+            color: #1a3a5a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a4a7a;
+            font-size: 14px;
+        }
+        .info-box i { margin-right: 8px; }
+        
+        .section-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .section-tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .section-tab:hover { background: #f0f2f5; color: #1a2a4a; }
+        .section-tab.active { background: #1a2a4a; color: white; }
+        
+        .section-content { display: none; }
+        .section-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .settings-card h2 {
+            color: #1a2a4a;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8491d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .settings-card h2 i { color: #e8491d; }
+        
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a2a4a;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e7ef;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a4a7a;
+            box-shadow: 0 0 0 3px rgba(42, 74, 122, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.6;
+        }
+        .form-group small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-add-small {
+            background: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-add-small:hover { background: #138496; }
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-remove:hover { background: #c82333; }
+        
+        .save-message {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        .save-message.show { display: block; animation: fadeIn 0.3s ease; }
+        .save-message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .save-message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .save-message.info { background: #cce5ff; color: #004085; border-left: 4px solid #007bff; }
+        
+        .settings-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Dynamic items */
+        .dynamic-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            position: relative;
+            border-left: 4px solid #2a4a7a;
+        }
+        .dynamic-item .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .dynamic-item .item-number {
+            background: #2a4a7a;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        /* Image upload */
+        .image-upload-area {
+            border: 3px dashed #d0d7df;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+        .image-upload-area:hover { border-color: #2a4a7a; background: #f0f4f8; }
+        .image-upload-area i { font-size: 40px; color: #2a4a7a; margin-bottom: 10px; display: block; }
+        .image-upload-area p { color: #666; margin-bottom: 5px; font-size: 14px; }
+        .image-upload-area small { color: #888; font-size: 12px; }
+        .image-upload-area input[type="file"] { display: none; }
+        
+        .image-preview-box {
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e0e7ef;
+            background: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+        }
+        .image-preview-box img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .settings-card { padding: 20px; }
+            .section-tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .section-tab { white-space: nowrap; font-size: 13px; padding: 10px 15px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html" class="active"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Manage Give Page</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Edit all content on your Give/Support page. Manage projects, bank details, and support information.
+            </div>
+
+            <!-- Section Tabs -->
+            <div class="section-tabs">
+                <button class="section-tab active" onclick="switchSection('why', this)"><i class="fas fa-heart"></i> Why Support</button>
+                <button class="section-tab" onclick="switchSection('projects', this)"><i class="fas fa-tasks"></i> Projects</button>
+                <button class="section-tab" onclick="switchSection('methods', this)"><i class="fas fa-university"></i> Payment Methods</button>
+                <button class="section-tab" onclick="switchSection('form', this)"><i class="fas fa-edit"></i> Donation Form</button>
+            </div>
+
+            <!-- ============================================
+                 SECTION: WHY SUPPORT
+                 ============================================ -->
+            <div class="section-content active" id="section-why">
+                <div class="settings-card">
+                    <h2><i class="fas fa-heart"></i> Why Your Support Matters</h2>
+                    <form id="whyForm">
+                        <div class="form-group">
+                            <label for="whyTitle">Section Title</label>
+                            <input type="text" id="whyTitle" placeholder="e.g., Why Your Support Matters">
+                        </div>
+                        <div class="form-group">
+                            <label for="whyContent">Description</label>
+                            <textarea id="whyContent" placeholder="Explain why support matters..." style="min-height: 120px;"></textarea>
+                            <small>Use double line breaks for paragraphs.</small>
+                        </div>
+
+                        <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Impact Items (4 items)</h3>
+
+                        <!-- Impact 1 -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">1</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon (FontAwesome)</label>
+                                    <input type="text" id="impact1Icon" placeholder="fa-graduation-cap">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="impact1Title" placeholder="Academic Excellence">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="impact1Desc" placeholder="Fund educational resources, workshops...">
+                            </div>
+                        </div>
+
+                        <!-- Impact 2 -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">2</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="impact2Icon" placeholder="fa-heart">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="impact2Title" placeholder="Student Welfare">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="impact2Desc" placeholder="Support student welfare programs...">
+                            </div>
+                        </div>
+
+                        <!-- Impact 3 -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">3</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="impact3Icon" placeholder="fa-hand-holding-heart">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="impact3Title" placeholder="Community Service">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="impact3Desc" placeholder="Fund community outreach programs...">
+                            </div>
+                        </div>
+
+                        <!-- Impact 4 -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">4</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="impact4Icon" placeholder="fa-users">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="impact4Title" placeholder="Leadership Development">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px; margin-bottom: 0;">
+                                <label>Description</label>
+                                <input type="text" id="impact4Desc" placeholder="Support leadership training...">
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveWhyBtn">
+                                <i class="fas fa-save"></i> Save Why Support
+                            </button>
+                        </div>
+                        <div class="save-message" id="whyMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: PROJECTS
+                 ============================================ -->
+            <div class="section-content" id="section-projects">
+                <div class="settings-card">
+                    <h2><i class="fas fa-tasks"></i> Current Projects & Campaigns</h2>
+                    <form id="projectsForm">
+                        <div class="form-group">
+                            <label for="projectsTitle">Section Title</label>
+                            <input type="text" id="projectsTitle" placeholder="e.g., Current Projects & Campaigns">
+                        </div>
+
+                        <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Projects (3 projects)</h3>
+
+                        <!-- Project 1 -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">1</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="proj1Icon" placeholder="fa-book">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="proj1Title" placeholder="Veterinary Library Fund">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px;">
+                                <label>Description</label>
+                                <input type="text" id="proj1Desc" placeholder="Help us expand our veterinary reference library...">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Progress (%)</label>
+                                    <input type="number" id="proj1Progress" min="0" max="100" placeholder="65">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Target Amount</label>
+                                    <input type="text" id="proj1Target" placeholder="₦2,000,000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project 2 -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">2</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="proj2Icon" placeholder="fa-stethoscope">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="proj2Title" placeholder="Community Outreach Program">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px;">
+                                <label>Description</label>
+                                <input type="text" id="proj2Desc" placeholder="Fund free veterinary services...">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Progress (%)</label>
+                                    <input type="number" id="proj2Progress" min="0" max="100" placeholder="40">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Target Amount</label>
+                                    <input type="text" id="proj2Target" placeholder="₦1,500,000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project 3 -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">3</span>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="proj3Icon" placeholder="fa-laptop">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="proj3Title" placeholder="Student Tech Fund">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top: 10px;">
+                                <label>Description</label>
+                                <input type="text" id="proj3Desc" placeholder="Provide laptops and digital resources...">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Progress (%)</label>
+                                    <input type="number" id="proj3Progress" min="0" max="100" placeholder="25">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Target Amount</label>
+                                    <input type="text" id="proj3Target" placeholder="₦3,000,000">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveProjectsBtn">
+                                <i class="fas fa-save"></i> Save Projects
+                            </button>
+                        </div>
+                        <div class="save-message" id="projectsMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: PAYMENT METHODS
+                 ============================================ -->
+            <div class="section-content" id="section-methods">
+                <div class="settings-card">
+                    <h2><i class="fas fa-university"></i> Payment Methods</h2>
+                    <form id="methodsForm">
+                        <div class="form-group">
+                            <label for="methodsTitle">Section Title</label>
+                            <input type="text" id="methodsTitle" placeholder="e.g., Ways to Support">
+                        </div>
+
+                        <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Payment Methods (3 methods)</h3>
+
+                        <!-- Bank Transfer -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">1</span>
+                                <strong style="color: #1a2a4a;">🏦 Bank Transfer</strong>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Bank Name</label>
+                                    <input type="text" id="bank1Name" placeholder="e.g., Zenith Bank">
+                                </div>
+                                <div class="form-group">
+                                    <label>Account Name</label>
+                                    <input type="text" id="bank1AccountName" placeholder="AVMS ABU Zaria">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Account Number</label>
+                                    <input type="text" id="bank1AccountNumber" placeholder="1234567890">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sort Code</label>
+                                    <input type="text" id="bank1SortCode" placeholder="057-123-456">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Transfer -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">2</span>
+                                <strong style="color: #1a2a4a;">📱 Mobile Transfer</strong>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Bank Name</label>
+                                    <input type="text" id="bank2Name" placeholder="e.g., GTBank">
+                                </div>
+                                <div class="form-group">
+                                    <label>Account Name</label>
+                                    <input type="text" id="bank2AccountName" placeholder="AVMS ABU Zaria">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Account Number</label>
+                                    <input type="text" id="bank2AccountNumber" placeholder="0987654321">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sort Code</label>
+                                    <input type="text" id="bank2SortCode" placeholder="058-456-789">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Partner With Us -->
+                        <div class="dynamic-item">
+                            <div class="item-header">
+                                <span class="item-number">3</span>
+                                <strong style="color: #1a2a4a;">🤝 Partner With Us</strong>
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <input type="text" id="partnerDesc" placeholder="Partner with AVMS through:">
+                            </div>
+                            <div class="form-group">
+                                <label>Partner Options (one per line)</label>
+                                <textarea id="partnerOptions" placeholder="Sponsorships&#10;Scholarships&#10;Equipment Donations&#10;Volunteer Opportunities" style="min-height: 100px;"></textarea>
+                                <small>Enter each option on a new line</small>
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveMethodsBtn">
+                                <i class="fas fa-save"></i> Save Payment Methods
+                            </button>
+                        </div>
+                        <div class="save-message" id="methodsMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: DONATION FORM
+                 ============================================ -->
+            <div class="section-content" id="section-form">
+                <div class="settings-card">
+                    <h2><i class="fas fa-edit"></i> Donation Form Settings</h2>
+                    <form id="formSettings">
+                        <div class="form-group">
+                            <label for="formTitle">Form Title</label>
+                            <input type="text" id="formTitle" placeholder="e.g., Make a Donation">
+                        </div>
+                        <div class="form-group">
+                            <label for="formDescription">Form Description</label>
+                            <textarea id="formDescription" placeholder="Every contribution makes a difference..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="formButtonText">Submit Button Text</label>
+                            <input type="text" id="formButtonText" placeholder="e.g., 💖 Make a Donation">
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveFormBtn">
+                                <i class="fas fa-save"></i> Save Form Settings
+                            </button>
+                        </div>
+                        <div class="save-message" id="formMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // SECTION SWITCHING
+        // ============================================
+        function switchSection(section, btn) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('section-' + section).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        async function saveSetting(key, value) {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert(
+                    { setting_key: key, setting_value: value, updated_at: new Date().toISOString() },
+                    { onConflict: 'setting_key' }
+                );
+            if (error) throw error;
+        }
+
+        function showMessage(elementId, type, text) {
+            const el = document.getElementById(elementId);
+            el.className = 'save-message show ' + type;
+            el.innerHTML = text;
+            setTimeout(() => { 
+                el.className = 'save-message'; 
+                el.innerHTML = '';
+            }, 5000);
+        }
+
+        function showLoading(btn, text = 'Saving...') {
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span> ${text}`;
+            return original;
+        }
+
+        function hideLoading(btn, original) {
+            btn.disabled = false;
+            btn.innerHTML = original;
+        }
+
+        // ============================================
+        // SAVE: WHY SUPPORT
+        // ============================================
+        document.getElementById('whyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveWhyBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('give_why_title', document.getElementById('whyTitle').value);
+                await saveSetting('give_why_content', document.getElementById('whyContent').value);
+
+                // Impact items
+                for (let i = 1; i <= 4; i++) {
+                    await saveSetting(`give_impact${i}_icon`, document.getElementById(`impact${i}Icon`).value);
+                    await saveSetting(`give_impact${i}_title`, document.getElementById(`impact${i}Title`).value);
+                    await saveSetting(`give_impact${i}_desc`, document.getElementById(`impact${i}Desc`).value);
+                }
+
+                showMessage('whyMessage', 'success', '✅ Why Support section saved successfully!');
+            } catch (error) {
+                showMessage('whyMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: PROJECTS
+        // ============================================
+        document.getElementById('projectsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveProjectsBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('give_projects_title', document.getElementById('projectsTitle').value);
+
+                for (let i = 1; i <= 3; i++) {
+                    await saveSetting(`give_proj${i}_icon`, document.getElementById(`proj${i}Icon`).value);
+                    await saveSetting(`give_proj${i}_title`, document.getElementById(`proj${i}Title`).value);
+                    await saveSetting(`give_proj${i}_desc`, document.getElementById(`proj${i}Desc`).value);
+                    await saveSetting(`give_proj${i}_progress`, document.getElementById(`proj${i}Progress`).value);
+                    await saveSetting(`give_proj${i}_target`, document.getElementById(`proj${i}Target`).value);
+                }
+
+                showMessage('projectsMessage', 'success', '✅ Projects saved successfully!');
+            } catch (error) {
+                showMessage('projectsMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: PAYMENT METHODS
+        // ============================================
+        document.getElementById('methodsForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveMethodsBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('give_methods_title', document.getElementById('methodsTitle').value);
+
+                // Bank 1
+                await saveSetting('give_bank1_name', document.getElementById('bank1Name').value);
+                await saveSetting('give_bank1_account_name', document.getElementById('bank1AccountName').value);
+                await saveSetting('give_bank1_account_number', document.getElementById('bank1AccountNumber').value);
+                await saveSetting('give_bank1_sort_code', document.getElementById('bank1SortCode').value);
+
+                // Bank 2
+                await saveSetting('give_bank2_name', document.getElementById('bank2Name').value);
+                await saveSetting('give_bank2_account_name', document.getElementById('bank2AccountName').value);
+                await saveSetting('give_bank2_account_number', document.getElementById('bank2AccountNumber').value);
+                await saveSetting('give_bank2_sort_code', document.getElementById('bank2SortCode').value);
+
+                // Partner
+                await saveSetting('give_partner_desc', document.getElementById('partnerDesc').value);
+                await saveSetting('give_partner_options', document.getElementById('partnerOptions').value);
+
+                showMessage('methodsMessage', 'success', '✅ Payment methods saved successfully!');
+            } catch (error) {
+                showMessage('methodsMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: FORM SETTINGS
+        // ============================================
+        document.getElementById('formSettings').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveFormBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('give_form_title', document.getElementById('formTitle').value);
+                await saveSetting('give_form_description', document.getElementById('formDescription').value);
+                await saveSetting('give_form_button', document.getElementById('formButtonText').value);
+                showMessage('formMessage', 'success', '✅ Form settings saved successfully!');
+            } catch (error) {
+                showMessage('formMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // LOAD SETTINGS
+        // ============================================
+        async function loadSettings() {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('*');
+
+                if (error) throw error;
+
+                const settings = {};
+                (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
+
+                // Why Support
+                if (settings.give_why_title) document.getElementById('whyTitle').value = settings.give_why_title;
+                if (settings.give_why_content) document.getElementById('whyContent').value = settings.give_why_content;
+                for (let i = 1; i <= 4; i++) {
+                    if (settings[`give_impact${i}_icon`]) document.getElementById(`impact${i}Icon`).value = settings[`give_impact${i}_icon`];
+                    if (settings[`give_impact${i}_title`]) document.getElementById(`impact${i}Title`).value = settings[`give_impact${i}_title`];
+                    if (settings[`give_impact${i}_desc`]) document.getElementById(`impact${i}Desc`).value = settings[`give_impact${i}_desc`];
+                }
+
+                // Projects
+                if (settings.give_projects_title) document.getElementById('projectsTitle').value = settings.give_projects_title;
+                for (let i = 1; i <= 3; i++) {
+                    if (settings[`give_proj${i}_icon`]) document.getElementById(`proj${i}Icon`).value = settings[`give_proj${i}_icon`];
+                    if (settings[`give_proj${i}_title`]) document.getElementById(`proj${i}Title`).value = settings[`give_proj${i}_title`];
+                    if (settings[`give_proj${i}_desc`]) document.getElementById(`proj${i}Desc`).value = settings[`give_proj${i}_desc`];
+                    if (settings[`give_proj${i}_progress`]) document.getElementById(`proj${i}Progress`).value = settings[`give_proj${i}_progress`];
+                    if (settings[`give_proj${i}_target`]) document.getElementById(`proj${i}Target`).value = settings[`give_proj${i}_target`];
+                }
+
+                // Methods
+                if (settings.give_methods_title) document.getElementById('methodsTitle').value = settings.give_methods_title;
+                if (settings.give_bank1_name) document.getElementById('bank1Name').value = settings.give_bank1_name;
+                if (settings.give_bank1_account_name) document.getElementById('bank1AccountName').value = settings.give_bank1_account_name;
+                if (settings.give_bank1_account_number) document.getElementById('bank1AccountNumber').value = settings.give_bank1_account_number;
+                if (settings.give_bank1_sort_code) document.getElementById('bank1SortCode').value = settings.give_bank1_sort_code;
+                if (settings.give_bank2_name) document.getElementById('bank2Name').value = settings.give_bank2_name;
+                if (settings.give_bank2_account_name) document.getElementById('bank2AccountName').value = settings.give_bank2_account_name;
+                if (settings.give_bank2_account_number) document.getElementById('bank2AccountNumber').value = settings.give_bank2_account_number;
+                if (settings.give_bank2_sort_code) document.getElementById('bank2SortCode').value = settings.give_bank2_sort_code;
+                if (settings.give_partner_desc) document.getElementById('partnerDesc').value = settings.give_partner_desc;
+                if (settings.give_partner_options) document.getElementById('partnerOptions').value = settings.give_partner_options;
+
+                // Form settings
+                if (settings.give_form_title) document.getElementById('formTitle').value = settings.give_form_title;
+                if (settings.give_form_description) document.getElementById('formDescription').value = settings.give_form_description;
+                if (settings.give_form_button) document.getElementById('formButtonText').value = settings.give_form_button;
+
+                console.log('✅ Give page settings loaded');
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>
