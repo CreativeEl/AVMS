@@ -839,4 +839,561 @@ const admins = [
                     <h2><i class="fas fa-database"></i> System Information</h2>
                     <div style="line-height: 2; color: #555; font-size: 14px;">
                         <p><strong>Supabase URL:</strong> <span id="supabaseUrlDisplay" style="color: #2a4a7a;"></span></p>
-                        <p><strong>Website URL
+                        <p><strong>Website URL:</strong> <a href="https://avms-abu.vercel.app" target="_blank" style="color: #2a4a7a;">https://avms-abu.vercel.app</a></p>
+                        <p><strong>Admin Panel URL:</strong> <a href="https://avms-abu.vercel.app/admin/index.html" target="_blank" style="color: #2a4a7a;">/admin/index.html</a></p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+            document.getElementById('currentAdminEmail').value = adminEmail || 'Unknown';
+            document.getElementById('adminLoginTime').value = new Date().toLocaleString();
+            document.getElementById('supabaseUrlDisplay').textContent = SUPABASE_URL;
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ============================================
+        // HELPER FUNCTIONS
+        // ============================================
+        
+        async function saveSetting(key, value) {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert(
+                    { setting_key: key, setting_value: value, updated_at: new Date().toISOString() },
+                    { onConflict: 'setting_key' }
+                );
+            if (error) throw error;
+        }
+
+        function showMessage(elementId, type, text) {
+            const el = document.getElementById(elementId);
+            el.className = 'save-message show ' + type;
+            el.innerHTML = text;
+            setTimeout(() => { 
+                el.className = 'save-message'; 
+                el.innerHTML = '';
+            }, 5000);
+        }
+
+        function showLoading(btn, loadingText = 'Saving...') {
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span> ${loadingText}`;
+            return original;
+        }
+
+        function hideLoading(btn, original) {
+            btn.disabled = false;
+            btn.innerHTML = original;
+        }
+
+        // ============================================
+        // FILE UPLOAD TO SUPABASE STORAGE
+        // ============================================
+        async function uploadImage(file, folder) {
+            const timestamp = Date.now();
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+            const filePath = `${folder}/${fileName}`;
+
+            // Ensure bucket exists or use existing 'membership-documents' bucket
+            const { data, error } = await supabase.storage
+                .from('site-assets')
+                .upload(filePath, file, { upsert: true });
+
+            if (error) {
+                // Try fallback bucket
+                const { data: fallbackData, error: fallbackError } = await supabase.storage
+                    .from('membership-documents')
+                    .upload(filePath, file, { upsert: true });
+                
+                if (fallbackError) throw fallbackError;
+                
+                const { data: urlData } = supabase.storage
+                    .from('membership-documents')
+                    .getPublicUrl(filePath);
+                
+                return urlData.publicUrl;
+            }
+
+            const { data: urlData } = supabase.storage
+                .from('site-assets')
+                .getPublicUrl(filePath);
+
+            return urlData.publicUrl;
+        }
+
+        // ============================================
+        // GENERAL INFORMATION
+        // ============================================
+        document.getElementById('generalForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveGeneralBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('site_name', document.getElementById('siteName').value);
+                await saveSetting('site_short_name', document.getElementById('siteShortName').value);
+                await saveSetting('site_tagline', document.getElementById('siteTagline').value);
+                await saveSetting('site_description', document.getElementById('siteDescription').value);
+                showMessage('generalMessage', 'success', '✅ General information saved successfully!');
+            } catch (error) {
+                showMessage('generalMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // LOGO UPLOAD
+        // ============================================
+        let pendingLogoFile = null;
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage('logoMessage', 'error', '❌ File is too large. Max 2MB allowed.');
+                return;
+            }
+
+            pendingLogoFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('logoDisplay').innerHTML = `<img src="${e.target.result}" alt="Logo preview">`;
+                document.getElementById('logoStatus').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                
+                document.getElementById('logoPreview').style.display = 'block';
+                document.getElementById('logoPreview').innerHTML = `
+                    <div class="image-preview">
+                        <img src="${e.target.result}" alt="Preview">
+                        <div class="preview-info">
+                            <p><strong>${file.name}</strong></p>
+                            <small>${(file.size / 1024).toFixed(1)} KB — Ready to upload</small>
+                        </div>
+                        <button class="remove-btn" onclick="cancelLogoUpload()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function cancelLogoUpload() {
+            pendingLogoFile = null;
+            document.getElementById('logoInput').value = '';
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('logoDisplay').innerHTML = '<i class="fas fa-paw"></i>';
+            document.getElementById('logoStatus').textContent = 'Using default paw icon';
+        }
+
+        async function saveLogo() {
+            if (!pendingLogoFile) {
+                showMessage('logoMessage', 'error', '❌ Please select a logo file first.');
+                return;
+            }
+
+            const btn = document.getElementById('saveLogoBtn');
+            const original = showLoading(btn, 'Uploading...');
+
+            try {
+                const url = await uploadImage(pendingLogoFile, 'logos');
+                await saveSetting('site_logo', url);
+                
+                document.getElementById('logoStatus').textContent = `Uploaded: ${pendingLogoFile.name}`;
+                showMessage('logoMessage', 'success', '✅ Logo uploaded and saved successfully!');
+                
+                pendingLogoFile = null;
+                document.getElementById('logoInput').value = '';
+                document.getElementById('logoPreview').style.display = 'none';
+            } catch (error) {
+                showMessage('logoMessage', 'error', '❌ Error uploading logo: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        }
+
+        // ============================================
+        // FAVICON UPLOAD
+        // ============================================
+        let pendingFaviconFile = null;
+
+        function handleFaviconUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 500 * 1024) {
+                showMessage('faviconMessage', 'error', '❌ File is too large. Max 500KB allowed.');
+                return;
+            }
+
+            pendingFaviconFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('faviconDisplay').innerHTML = `<img src="${e.target.result}" alt="Favicon preview" style="width: 100%; height: 100%; object-fit: contain;">`;
+                document.getElementById('faviconStatus').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+                document.getElementById('faviconPreview').style.display = 'block';
+                document.getElementById('faviconPreview').innerHTML = `
+                    <div class="image-preview">
+                        <img src="${e.target.result}" alt="Preview" style="max-width: 64px;">
+                        <div class="preview-info">
+                            <p><strong>${file.name}</strong></p>
+                            <small>${(file.size / 1024).toFixed(1)} KB — Ready to upload</small>
+                        </div>
+                        <button class="remove-btn" onclick="cancelFaviconUpload()">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function cancelFaviconUpload() {
+            pendingFaviconFile = null;
+            document.getElementById('faviconInput').value = '';
+            document.getElementById('faviconPreview').style.display = 'none';
+            document.getElementById('faviconDisplay').innerHTML = '<i class="fas fa-globe" style="color: #2a4a7a;"></i>';
+            document.getElementById('faviconStatus').textContent = 'Using default globe icon';
+        }
+
+        async function saveFavicon() {
+            if (!pendingFaviconFile) {
+                showMessage('faviconMessage', 'error', '❌ Please select a favicon file first.');
+                return;
+            }
+
+            const btn = document.getElementById('saveFaviconBtn');
+            const original = showLoading(btn, 'Uploading...');
+
+            try {
+                const url = await uploadImage(pendingFaviconFile, 'favicons');
+                await saveSetting('site_favicon', url);
+                
+                document.getElementById('faviconStatus').textContent = `Uploaded: ${pendingFaviconFile.name}`;
+                showMessage('faviconMessage', 'success', '✅ Favicon uploaded and saved successfully!');
+                
+                pendingFaviconFile = null;
+                document.getElementById('faviconInput').value = '';
+                document.getElementById('faviconPreview').style.display = 'none';
+            } catch (error) {
+                showMessage('faviconMessage', 'error', '❌ Error uploading favicon: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        }
+
+        // ============================================
+        // HERO IMAGE UPLOAD
+        // ============================================
+        let pendingHeroImageFile = null;
+
+        function handleHeroImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showMessage('heroImageMessage', 'error', '❌ File is too large. Max 5MB allowed.');
+                return;
+            }
+
+            pendingHeroImageFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('heroImagePreviewContainer').style.display = 'block';
+                document.getElementById('heroImagePreview').src = e.target.result;
+                showMessage('heroImageMessage', 'info', `📷 Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB). Click "Save Hero Image" to upload.`);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveHeroImage() {
+            if (!pendingHeroImageFile) {
+                showMessage('heroImageMessage', 'error', '❌ Please select an image first.');
+                return;
+            }
+
+            const btn = document.getElementById('saveHeroImageBtn');
+            const original = showLoading(btn, 'Uploading...');
+
+            try {
+                const url = await uploadImage(pendingHeroImageFile, 'hero');
+                await saveSetting('hero_image', url);
+                showMessage('heroImageMessage', 'success', '✅ Hero image uploaded and saved successfully!');
+                pendingHeroImageFile = null;
+            } catch (error) {
+                showMessage('heroImageMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        }
+
+        // ============================================
+        // ABOUT IMAGE UPLOAD
+        // ============================================
+        let pendingAboutImageFile = null;
+
+        function handleAboutImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 3 * 1024 * 1024) {
+                showMessage('aboutImageMessage', 'error', '❌ File is too large. Max 3MB allowed.');
+                return;
+            }
+
+            pendingAboutImageFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('aboutImagePreviewContainer').style.display = 'block';
+                document.getElementById('aboutImagePreview').src = e.target.result;
+                showMessage('aboutImageMessage', 'info', `📷 Selected: ${file.name}. Click "Save About Image" to upload.`);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveAboutImage() {
+            if (!pendingAboutImageFile) {
+                showMessage('aboutImageMessage', 'error', '❌ Please select an image first.');
+                return;
+            }
+
+            const btn = document.getElementById('saveAboutImageBtn');
+            const original = showLoading(btn, 'Uploading...');
+
+            try {
+                const url = await uploadImage(pendingAboutImageFile, 'about');
+                await saveSetting('about_image', url);
+                showMessage('aboutImageMessage', 'success', '✅ About image uploaded and saved successfully!');
+                pendingAboutImageFile = null;
+            } catch (error) {
+                showMessage('aboutImageMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        }
+
+        // ============================================
+        // CONTACT FORM
+        // ============================================
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveContactBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('contact_email', document.getElementById('contactEmail').value);
+                await saveSetting('contact_email_2', document.getElementById('contactEmail2').value);
+                await saveSetting('contact_phone', document.getElementById('contactPhone').value);
+                await saveSetting('contact_phone_2', document.getElementById('contactPhone2').value);
+                await saveSetting('contact_address', document.getElementById('contactAddress').value);
+                await saveSetting('office_hours', document.getElementById('officeHours').value);
+                await saveSetting('office_hours_weekend', document.getElementById('officeHoursWeekend').value);
+                showMessage('contactMessage', 'success', '✅ Contact information saved successfully!');
+            } catch (error) {
+                showMessage('contactMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SOCIAL MEDIA
+        // ============================================
+        document.getElementById('socialForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveSocialBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('facebook_url', document.getElementById('facebookUrl').value);
+                await saveSetting('twitter_url', document.getElementById('twitterUrl').value);
+                await saveSetting('instagram_url', document.getElementById('instagramUrl').value);
+                await saveSetting('youtube_url', document.getElementById('youtubeUrl').value);
+                await saveSetting('linkedin_url', document.getElementById('linkedinUrl').value);
+                await saveSetting('whatsapp_url', document.getElementById('whatsappUrl').value);
+                showMessage('socialMessage', 'success', '✅ Social media links saved successfully!');
+            } catch (error) {
+                showMessage('socialMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // HOMEPAGE
+        // ============================================
+        document.getElementById('homepageForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveHomepageBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('hero_title', document.getElementById('heroTitle').value);
+                await saveSetting('hero_subtitle', document.getElementById('heroSubtitle').value);
+                await saveSetting('hero_description', document.getElementById('heroDescription').value);
+                await saveSetting('hero_button1_text', document.getElementById('heroButton1Text').value);
+                await saveSetting('hero_button1_link', document.getElementById('heroButton1Link').value);
+                await saveSetting('hero_button2_text', document.getElementById('heroButton2Text').value);
+                await saveSetting('hero_button2_link', document.getElementById('heroButton2Link').value);
+                await saveSetting('welcome_title', document.getElementById('welcomeTitle').value);
+                await saveSetting('welcome_message', document.getElementById('welcomeMessage').value);
+                await saveSetting('join_preview_title', document.getElementById('joinPreviewTitle').value);
+                await saveSetting('join_preview_text', document.getElementById('joinPreviewText').value);
+                showMessage('homepageMessage', 'success', '✅ Homepage content saved successfully!');
+            } catch (error) {
+                showMessage('homepageMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // FOOTER
+        // ============================================
+        document.getElementById('footerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveFooterBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('footer_description', document.getElementById('footerDescription').value);
+                await saveSetting('copyright_text', document.getElementById('copyrightText').value);
+                await saveSetting('copyright_year', document.getElementById('copyrightYear').value);
+                await saveSetting('footer_credit', document.getElementById('footerCredit').value);
+                showMessage('footerMessage', 'success', '✅ Footer content saved successfully!');
+            } catch (error) {
+                showMessage('footerMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // LOAD EXISTING SETTINGS
+        // ============================================
+        async function loadSettings() {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('*');
+
+                if (error) throw error;
+
+                const settings = {};
+                (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
+
+                // General
+                if (settings.site_name) document.getElementById('siteName').value = settings.site_name;
+                if (settings.site_short_name) document.getElementById('siteShortName').value = settings.site_short_name;
+                if (settings.site_tagline) document.getElementById('siteTagline').value = settings.site_tagline;
+                if (settings.site_description) document.getElementById('siteDescription').value = settings.site_description;
+
+                // Contact
+                if (settings.contact_email) document.getElementById('contactEmail').value = settings.contact_email;
+                if (settings.contact_email_2) document.getElementById('contactEmail2').value = settings.contact_email_2;
+                if (settings.contact_phone) document.getElementById('contactPhone').value = settings.contact_phone;
+                if (settings.contact_phone_2) document.getElementById('contactPhone2').value = settings.contact_phone_2;
+                if (settings.contact_address) document.getElementById('contactAddress').value = settings.contact_address;
+                if (settings.office_hours) document.getElementById('officeHours').value = settings.office_hours;
+                if (settings.office_hours_weekend) document.getElementById('officeHoursWeekend').value = settings.office_hours_weekend;
+
+                // Social
+                if (settings.facebook_url) document.getElementById('facebookUrl').value = settings.facebook_url;
+                if (settings.twitter_url) document.getElementById('twitterUrl').value = settings.twitter_url;
+                if (settings.instagram_url) document.getElementById('instagramUrl').value = settings.instagram_url;
+                if (settings.youtube_url) document.getElementById('youtubeUrl').value = settings.youtube_url;
+                if (settings.linkedin_url) document.getElementById('linkedinUrl').value = settings.linkedin_url;
+                if (settings.whatsapp_url) document.getElementById('whatsappUrl').value = settings.whatsapp_url;
+
+                // Homepage
+                if (settings.hero_title) document.getElementById('heroTitle').value = settings.hero_title;
+                if (settings.hero_subtitle) document.getElementById('heroSubtitle').value = settings.hero_subtitle;
+                if (settings.hero_description) document.getElementById('heroDescription').value = settings.hero_description;
+                if (settings.hero_button1_text) document.getElementById('heroButton1Text').value = settings.hero_button1_text;
+                if (settings.hero_button1_link) document.getElementById('heroButton1Link').value = settings.hero_button1_link;
+                if (settings.hero_button2_text) document.getElementById('heroButton2Text').value = settings.hero_button2_text;
+                if (settings.hero_button2_link) document.getElementById('heroButton2Link').value = settings.hero_button2_link;
+                if (settings.welcome_title) document.getElementById('welcomeTitle').value = settings.welcome_title;
+                if (settings.welcome_message) document.getElementById('welcomeMessage').value = settings.welcome_message;
+                if (settings.join_preview_title) document.getElementById('joinPreviewTitle').value = settings.join_preview_title;
+                if (settings.join_preview_text) document.getElementById('joinPreviewText').value = settings.join_preview_text;
+
+                // Footer
+                if (settings.footer_description) document.getElementById('footerDescription').value = settings.footer_description;
+                if (settings.copyright_text) document.getElementById('copyrightText').value = settings.copyright_text;
+                if (settings.copyright_year) document.getElementById('copyrightYear').value = settings.copyright_year;
+                if (settings.footer_credit) document.getElementById('footerCredit').value = settings.footer_credit;
+
+                // Branding
+                if (settings.site_logo) {
+                    document.getElementById('logoDisplay').innerHTML = `<img src="${settings.site_logo}" alt="Logo">`;
+                    document.getElementById('logoStatus').textContent = 'Custom logo uploaded';
+                }
+                if (settings.site_favicon) {
+                    document.getElementById('faviconDisplay').innerHTML = `<img src="${settings.site_favicon}" alt="Favicon" style="width: 100%; height: 100%; object-fit: contain;">`;
+                    document.getElementById('faviconStatus').textContent = 'Custom favicon uploaded';
+                }
+                if (settings.hero_image) {
+                    document.getElementById('heroImagePreviewContainer').style.display = 'block';
+                    document.getElementById('heroImagePreview').src = settings.hero_image;
+                }
+                if (settings.about_image) {
+                    document.getElementById('aboutImagePreviewContainer').style.display = 'block';
+                    document.getElementById('aboutImagePreview').src = settings.about_image;
+                }
+
+                console.log('✅ Settings loaded');
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>
