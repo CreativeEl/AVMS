@@ -25,7 +25,7 @@ body {
 /* ======= HEADER / NAVIGATION ======= */
 .header {
     background: #1a2a4a;
-    padding: 15px 0;
+    padding: 12px 0;
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -36,19 +36,24 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 55px;
+    gap: 15px;
 }
 
+/* ======= LOGO ======= */
 .logo a {
     display: flex;
     align-items: center;
     text-decoration: none;
     color: white;
-    gap: 12px;
+    gap: 15px;
+    height: 55px;
+    line-height: 1;
 }
 
 .logo-img {
-    width: 42px;
-    height: 42px;
+    width: 55px;
+    height: 55px;
     object-fit: contain;
     border-radius: 50%;
     flex-shrink: 0;
@@ -56,25 +61,33 @@ body {
 }
 
 .logo-text {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
     color: white;
     white-space: nowrap;
+    line-height: 55px;
+    display: inline-flex;
+    align-items: center;
 }
 
+/* ======= NAV MENU ======= */
 .nav-menu ul {
     display: flex;
     list-style: none;
-    gap: 20px;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: nowrap;
 }
 
 .nav-menu a {
     color: rgba(255,255,255,0.8);
     text-decoration: none;
-    font-size: 15px;
-    padding: 5px 10px;
+    font-size: 14px;
+    padding: 6px 10px;
     border-radius: 4px;
     transition: all 0.3s;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .nav-menu a:hover,
@@ -413,7 +426,6 @@ body {
     line-height: 1.8;
 }
 
-/* Fix link color in footer */
 .footer-col p a,
 .footer-col a.contact-email,
 .footer-col a.contact-phone {
@@ -486,6 +498,17 @@ body {
    RESPONSIVE DESIGN
    ============================================ */
 
+@media (max-width: 1024px) {
+    .nav-menu ul {
+        gap: 8px;
+    }
+    
+    .nav-menu a {
+        font-size: 13px;
+        padding: 5px 8px;
+    }
+}
+
 @media (max-width: 768px) {
     .hamburger {
         display: block;
@@ -553,7 +576,7 @@ body {
 }
 
 /* ============================================
-   ABOUT PAGE STYLES
+   PAGE HEADER (About, Join, etc.)
    ============================================ */
 
 .page-header {
@@ -567,12 +590,23 @@ body {
     font-size: 42px;
     font-weight: 800;
     margin-bottom: 10px;
+    line-height: 1.2;
 }
 
 .page-header p {
     font-size: 18px;
     opacity: 0.9;
 }
+
+@media (max-width: 768px) {
+    .page-header h1 {
+        font-size: 32px;
+    }
+}
+
+/* ============================================
+   ABOUT PAGE STYLES
+   ============================================ */
 
 .about-section {
     padding: 60px 0;
@@ -804,10 +838,6 @@ body {
     
     .mv-grid {
         grid-template-columns: 1fr;
-    }
-    
-    .page-header h1 {
-        font-size: 32px;
     }
     
     .achievements-grid {
