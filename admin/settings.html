@@ -8,29 +8,361 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .settings-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
-        .settings-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .settings-card h2 { color: #1a2a4a; font-size: 20px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e8491d; display: flex; align-items: center; gap: 10px; }
-        .settings-card h2 i { color: #e8491d; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-weight: 600; color: #1a2a4a; margin-bottom: 5px; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; font-family: inherit; transition: border-color 0.3s; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #2a4a7a; }
-        .form-group textarea { resize: vertical; min-height: 80px; }
-        .form-group small { display: block; color: #888; font-size: 12px; margin-top: 5px; }
-        .btn-save { background: #28a745; color: white; padding: 12px 30px; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; font-size: 15px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-save:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(40,167,69,0.3); }
-        .save-message { margin-top: 15px; padding: 12px 20px; border-radius: 8px; display: none; }
-        .save-message.show { display: block; }
-        .save-message.success { background: #d4edda; color: #155724; }
-        .save-message.error { background: #f8d7da; color: #721c24; }
-        .settings-actions { display: flex; justify-content: flex-end; margin-top: 20px; }
-        .info-note { background: #e8f0fe; color: #1a3a5a; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #2a4a7a; font-size: 14px; }
-        .info-note i { margin-right: 8px; }
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn:hover {
+            background: #f0f2f5;
+            color: #1a2a4a;
+        }
+        .tab-btn.active {
+            background: #1a2a4a;
+            color: white;
+        }
+        .tab-btn i {
+            font-size: 16px;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .settings-card h2 {
+            color: #1a2a4a;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8491d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .settings-card h2 i {
+            color: #e8491d;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a2a4a;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e7ef;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a4a7a;
+            box-shadow: 0 0 0 3px rgba(42, 74, 122, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-group small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .save-message {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        .save-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        .save-message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        .save-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        .save-message.info {
+            background: #cce5ff;
+            color: #004085;
+            border-left: 4px solid #007bff;
+        }
+        .settings-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .info-note {
+            background: #e8f0fe;
+            color: #1a3a5a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a4a7a;
+            font-size: 14px;
+        }
+        .info-note i {
+            margin-right: 8px;
+        }
+        .warning-note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+            font-size: 14px;
+        }
+        .warning-note i {
+            margin-right: 8px;
+        }
+
+        /* Image Upload Styles */
+        .image-upload-area {
+            border: 3px dashed #d0d7df;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafbfc;
+            margin-bottom: 15px;
+        }
+        .image-upload-area:hover {
+            border-color: #2a4a7a;
+            background: #f0f4f8;
+        }
+        .image-upload-area.dragover {
+            border-color: #e8491d;
+            background: #fff5f2;
+        }
+        .image-upload-area i {
+            font-size: 48px;
+            color: #2a4a7a;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .image-upload-area p {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        .image-upload-area small {
+            color: #888;
+            font-size: 12px;
+        }
+        .image-upload-area input[type="file"] {
+            display: none;
+        }
+        .image-preview {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .image-preview img {
+            max-width: 150px;
+            max-height: 100px;
+            border-radius: 8px;
+            border: 2px solid #e0e7ef;
+            object-fit: contain;
+            background: white;
+        }
+        .image-preview .preview-info {
+            flex: 1;
+        }
+        .image-preview .preview-info p {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .image-preview .preview-info small {
+            color: #888;
+            font-size: 12px;
+        }
+        .image-preview .remove-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .image-preview .remove-btn:hover {
+            background: #c82333;
+        }
+
+        /* Logo Preview */
+        .logo-preview-box {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .logo-preview-box .logo-display {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1a2a4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .logo-preview-box .logo-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .logo-preview-box .logo-info h4 {
+            color: #1a2a4a;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .logo-preview-box .logo-info p {
+            color: #888;
+            font-size: 13px;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
-            .form-row { grid-template-columns: 1fr; }
-            .settings-card { padding: 20px; }
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            .settings-card {
+                padding: 20px;
+            }
+            .settings-tabs {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+            }
+            .tab-btn {
+                padding: 10px 16px;
+                font-size: 13px;
+                white-space: nowrap;
+            }
+            .logo-preview-box {
+                flex-direction: column;
+                text-align: center;
+            }
+            .image-preview {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -63,14 +395,40 @@
                 </div>
             </header>
 
-            <div class="info-note">
-                <i class="fas fa-info-circle"></i>
-                These settings control the content displayed across your website. Changes take effect immediately.
+            <!-- Tabs -->
+            <div class="settings-tabs">
+                <button class="tab-btn active" onclick="switchTab('general', this)">
+                    <i class="fas fa-building"></i> General
+                </button>
+                <button class="tab-btn" onclick="switchTab('branding', this)">
+                    <i class="fas fa-image"></i> Branding
+                </button>
+                <button class="tab-btn" onclick="switchTab('contact', this)">
+                    <i class="fas fa-address-book"></i> Contact
+                </button>
+                <button class="tab-btn" onclick="switchTab('social', this)">
+                    <i class="fas fa-share-alt"></i> Social Media
+                </button>
+                <button class="tab-btn" onclick="switchTab('homepage', this)">
+                    <i class="fas fa-home"></i> Homepage
+                </button>
+                <button class="tab-btn" onclick="switchTab('footer', this)">
+                    <i class="fas fa-shoe-prints"></i> Footer
+                </button>
+                <button class="tab-btn" onclick="switchTab('admin', this)">
+                    <i class="fas fa-user-shield"></i> Admin
+                </button>
             </div>
 
-            <div class="settings-grid">
+            <!-- ============================================
+                 TAB 1: GENERAL
+                 ============================================ -->
+            <div class="tab-content active" id="tab-general">
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    These settings control the general information displayed across your website.
+                </div>
 
-                <!-- General Information -->
                 <div class="settings-card">
                     <h2><i class="fas fa-building"></i> General Information</h2>
                     <form id="generalForm">
@@ -78,26 +436,157 @@
                             <label for="siteName">Association Name</label>
                             <input type="text" id="siteName" placeholder="e.g., Association of Veterinary Medical Students">
                         </div>
-                        <div class="form-group">
-                            <label for="siteShortName">Short Name (used in header)</label>
-                            <input type="text" id="siteShortName" placeholder="e.g., AVMS ABU">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="siteShortName">Short Name (header)</label>
+                                <input type="text" id="siteShortName" placeholder="e.g., AVMS ABU">
+                            </div>
+                            <div class="form-group">
+                                <label for="siteTagline">Slogan / Tagline</label>
+                                <input type="text" id="siteTagline" placeholder="e.g., Advancing Veterinary Students Through Knowledge, Leadership and Service">
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="siteTagline">Slogan / Tagline</label>
-                            <input type="text" id="siteTagline" placeholder="e.g., Advancing Veterinary Students Through Knowledge, Leadership and Service">
-                        </div>
-                        <div class="form-group">
-                            <label for="siteDescription">Website Description (for SEO)</label>
+                            <label for="siteDescription">Website Description (SEO)</label>
                             <textarea id="siteDescription" placeholder="Brief description of your website for search engines..."></textarea>
                         </div>
                         <div class="settings-actions">
-                            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save General Info</button>
+                            <button type="submit" class="btn-save" id="saveGeneralBtn">
+                                <i class="fas fa-save"></i> Save General Info
+                            </button>
                         </div>
                         <div class="save-message" id="generalMessage"></div>
                     </form>
                 </div>
+            </div>
 
-                <!-- Contact Information -->
+            <!-- ============================================
+                 TAB 2: BRANDING (LOGO, FAVICON, IMAGES)
+                 ============================================ -->
+            <div class="tab-content" id="tab-branding">
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    Upload your association logo, favicon, and other branding images here. These will appear across the website.
+                </div>
+
+                <!-- Logo Upload -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-image"></i> Site Logo</h2>
+
+                    <div class="logo-preview-box">
+                        <div class="logo-display" id="logoDisplay">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="logo-info">
+                            <h4>Current Logo</h4>
+                            <p id="logoStatus">Using default paw icon</p>
+                        </div>
+                    </div>
+
+                    <div class="image-upload-area" id="logoUploadArea" onclick="document.getElementById('logoInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload logo</p>
+                        <small>PNG, JPG, or SVG (max 2MB) — Recommended size: 200x200px</small>
+                        <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(event)">
+                    </div>
+
+                    <div id="logoPreview" style="display: none;"></div>
+
+                    <div class="settings-actions">
+                        <button class="btn-save" id="saveLogoBtn" onclick="saveLogo()">
+                            <i class="fas fa-save"></i> Save Logo
+                        </button>
+                    </div>
+                    <div class="save-message" id="logoMessage"></div>
+                </div>
+
+                <!-- Favicon Upload -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-star"></i> Favicon</h2>
+
+                    <div class="logo-preview-box">
+                        <div class="logo-display" id="faviconDisplay" style="border-radius: 8px; background: #f0f4f8;">
+                            <i class="fas fa-globe" style="color: #2a4a7a;"></i>
+                        </div>
+                        <div class="logo-info">
+                            <h4>Current Favicon</h4>
+                            <p id="faviconStatus">Using default globe icon</p>
+                        </div>
+                    </div>
+
+                    <div class="image-upload-area" id="faviconUploadArea" onclick="document.getElementById('faviconInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload favicon</p>
+                        <small>PNG or ICO (max 500KB) — Recommended size: 32x32px</small>
+                        <input type="file" id="faviconInput" accept="image/*,.ico" onchange="handleFaviconUpload(event)">
+                    </div>
+
+                    <div id="faviconPreview" style="display: none;"></div>
+
+                    <div class="settings-actions">
+                        <button class="btn-save" id="saveFaviconBtn" onclick="saveFavicon()">
+                            <i class="fas fa-save"></i> Save Favicon
+                        </button>
+                    </div>
+                    <div class="save-message" id="faviconMessage"></div>
+                </div>
+
+                <!-- Hero Image Upload -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-image"></i> Homepage Hero Image</h2>
+
+                    <div id="heroImagePreviewContainer" style="display: none; margin-bottom: 15px;">
+                        <img id="heroImagePreview" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid #e0e7ef;" />
+                    </div>
+
+                    <div class="image-upload-area" onclick="document.getElementById('heroImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload hero image</p>
+                        <small>JPG or PNG (max 5MB) — Recommended size: 1920x1080px</small>
+                        <input type="file" id="heroImageInput" accept="image/*" onchange="handleHeroImageUpload(event)">
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn-save" id="saveHeroImageBtn" onclick="saveHeroImage()">
+                            <i class="fas fa-save"></i> Save Hero Image
+                        </button>
+                    </div>
+                    <div class="save-message" id="heroImageMessage"></div>
+                </div>
+
+                <!-- About Page Image -->
+                <div class="settings-card">
+                    <h2><i class="fas fa-image"></i> About Page Image</h2>
+
+                    <div id="aboutImagePreviewContainer" style="display: none; margin-bottom: 15px;">
+                        <img id="aboutImagePreview" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid #e0e7ef;" />
+                    </div>
+
+                    <div class="image-upload-area" onclick="document.getElementById('aboutImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload about page image</p>
+                        <small>JPG or PNG (max 3MB) — Recommended size: 800x600px</small>
+                        <input type="file" id="aboutImageInput" accept="image/*" onchange="handleAboutImageUpload(event)">
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn-save" id="saveAboutImageBtn" onclick="saveAboutImage()">
+                            <i class="fas fa-save"></i> Save About Image
+                        </button>
+                    </div>
+                    <div class="save-message" id="aboutImageMessage"></div>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 TAB 3: CONTACT
+                 ============================================ -->
+            <div class="tab-content" id="tab-contact">
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    This information appears in the footer and on the contact page.
+                </div>
+
                 <div class="settings-card">
                     <h2><i class="fas fa-address-book"></i> Contact Information</h2>
                     <form id="contactForm">
@@ -111,53 +600,101 @@
                                 <input type="tel" id="contactPhone" placeholder="e.g., +234 800 000 0000">
                             </div>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contactPhone2">Secondary Phone (optional)</label>
+                                <input type="tel" id="contactPhone2" placeholder="e.g., +234 900 000 0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail2">Secondary Email (optional)</label>
+                                <input type="email" id="contactEmail2" placeholder="e.g., avmsabu@gmail.com">
+                            </div>
+                        </div>
                         <div class="form-group">
                             <label for="contactAddress">Physical Address</label>
                             <textarea id="contactAddress" placeholder="e.g., Faculty of Veterinary Medicine, Ahmadu Bello University, Zaria"></textarea>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="officeHours">Office Hours</label>
+                                <input type="text" id="officeHours" placeholder="e.g., Monday - Friday: 9:00 AM - 5:00 PM">
+                            </div>
+                            <div class="form-group">
+                                <label for="officeHoursWeekend">Weekend Hours</label>
+                                <input type="text" id="officeHoursWeekend" placeholder="e.g., Saturday: 10:00 AM - 2:00 PM">
+                            </div>
+                        </div>
                         <div class="settings-actions">
-                            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Contact Info</button>
+                            <button type="submit" class="btn-save" id="saveContactBtn">
+                                <i class="fas fa-save"></i> Save Contact Info
+                            </button>
                         </div>
                         <div class="save-message" id="contactMessage"></div>
                     </form>
                 </div>
+            </div>
 
-                <!-- Social Media -->
+            <!-- ============================================
+                 TAB 4: SOCIAL MEDIA
+                 ============================================ -->
+            <div class="tab-content" id="tab-social">
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    Add your social media links. These appear in the website footer.
+                </div>
+
                 <div class="settings-card">
                     <h2><i class="fas fa-share-alt"></i> Social Media Links</h2>
                     <form id="socialForm">
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="facebookUrl"><i class="fab fa-facebook" style="color: #1877f2;"></i> Facebook</label>
+                                <label><i class="fab fa-facebook" style="color: #1877f2;"></i> Facebook</label>
                                 <input type="url" id="facebookUrl" placeholder="https://facebook.com/avmsabu">
                             </div>
                             <div class="form-group">
-                                <label for="twitterUrl"><i class="fab fa-twitter" style="color: #1da1f2;"></i> Twitter / X</label>
+                                <label><i class="fab fa-twitter" style="color: #1da1f2;"></i> Twitter / X</label>
                                 <input type="url" id="twitterUrl" placeholder="https://twitter.com/avmsabu">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="instagramUrl"><i class="fab fa-instagram" style="color: #e4405f;"></i> Instagram</label>
+                                <label><i class="fab fa-instagram" style="color: #e4405f;"></i> Instagram</label>
                                 <input type="url" id="instagramUrl" placeholder="https://instagram.com/avmsabu">
                             </div>
                             <div class="form-group">
-                                <label for="youtubeUrl"><i class="fab fa-youtube" style="color: #ff0000;"></i> YouTube</label>
+                                <label><i class="fab fa-youtube" style="color: #ff0000;"></i> YouTube</label>
                                 <input type="url" id="youtubeUrl" placeholder="https://youtube.com/@avmsabu">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="linkedinUrl"><i class="fab fa-linkedin" style="color: #0077b5;"></i> LinkedIn</label>
-                            <input type="url" id="linkedinUrl" placeholder="https://linkedin.com/company/avmsabu">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label><i class="fab fa-linkedin" style="color: #0077b5;"></i> LinkedIn</label>
+                                <input type="url" id="linkedinUrl" placeholder="https://linkedin.com/company/avmsabu">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fab fa-whatsapp" style="color: #25d366;"></i> WhatsApp Group Link</label>
+                                <input type="url" id="whatsappUrl" placeholder="https://chat.whatsapp.com/...">
+                            </div>
                         </div>
                         <div class="settings-actions">
-                            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Social Media</button>
+                            <button type="submit" class="btn-save" id="saveSocialBtn">
+                                <i class="fas fa-save"></i> Save Social Media
+                            </button>
                         </div>
                         <div class="save-message" id="socialMessage"></div>
                     </form>
                 </div>
+            </div>
 
-                <!-- Homepage Content -->
+            <!-- ============================================
+                 TAB 5: HOMEPAGE
+                 ============================================ -->
+            <div class="tab-content" id="tab-homepage">
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    Edit the text that appears on your homepage hero section and welcome message.
+                </div>
+
                 <div class="settings-card">
                     <h2><i class="fas fa-home"></i> Homepage Content</h2>
                     <form id="homepageForm">
@@ -173,18 +710,61 @@
                             <label for="heroDescription">Hero Description</label>
                             <textarea id="heroDescription" placeholder="e.g., Advancing Veterinary Students Through Knowledge, Leadership and Service"></textarea>
                         </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="heroButton1Text">Primary Button Text</label>
+                                <input type="text" id="heroButton1Text" placeholder="e.g., Learn More">
+                            </div>
+                            <div class="form-group">
+                                <label for="heroButton1Link">Primary Button Link</label>
+                                <input type="text" id="heroButton1Link" placeholder="e.g., about.html">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="heroButton2Text">Secondary Button Text</label>
+                                <input type="text" id="heroButton2Text" placeholder="e.g., Join AVMS">
+                            </div>
+                            <div class="form-group">
+                                <label for="heroButton2Link">Secondary Button Link</label>
+                                <input type="text" id="heroButton2Link" placeholder="e.g., join.html">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="welcomeTitle">Welcome Section Title</label>
+                            <input type="text" id="welcomeTitle" placeholder="e.g., Welcome to AVMS">
+                        </div>
                         <div class="form-group">
                             <label for="welcomeMessage">Welcome Message</label>
-                            <textarea id="welcomeMessage" placeholder="Welcome message on homepage..." style="min-height: 120px;"></textarea>
+                            <textarea id="welcomeMessage" placeholder="Welcome message on homepage..." style="min-height: 150px;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="joinPreviewTitle">Join Preview Title</label>
+                            <input type="text" id="joinPreviewTitle" placeholder="e.g., Join AVMS Today">
+                        </div>
+                        <div class="form-group">
+                            <label for="joinPreviewText">Join Preview Text</label>
+                            <textarea id="joinPreviewText" placeholder="e.g., Become part of the largest veterinary student community in Northern Nigeria."></textarea>
                         </div>
                         <div class="settings-actions">
-                            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Homepage</button>
+                            <button type="submit" class="btn-save" id="saveHomepageBtn">
+                                <i class="fas fa-save"></i> Save Homepage
+                            </button>
                         </div>
                         <div class="save-message" id="homepageMessage"></div>
                     </form>
                 </div>
+            </div>
 
-                <!-- Footer Content -->
+            <!-- ============================================
+                 TAB 6: FOOTER
+                 ============================================ -->
+            <div class="tab-content" id="tab-footer">
+                <div class="info-note">
+                    <i class="fas fa-info-circle"></i>
+                    Edit the text that appears in your website footer.
+                </div>
+
                 <div class="settings-card">
                     <h2><i class="fas fa-shoe-prints"></i> Footer Content</h2>
                     <form id="footerForm">
@@ -202,197 +782,61 @@
                                 <input type="text" id="copyrightYear" placeholder="e.g., 2024">
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="footerCredit">Footer Credit (optional)</label>
+                            <input type="text" id="footerCredit" placeholder="e.g., Designed & Managed by the MIS Unit">
+                        </div>
                         <div class="settings-actions">
-                            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Footer</button>
+                            <button type="submit" class="btn-save" id="saveFooterBtn">
+                                <i class="fas fa-save"></i> Save Footer
+                            </button>
                         </div>
                         <div class="save-message" id="footerMessage"></div>
                     </form>
                 </div>
+            </div>
 
-                <!-- Admin Account -->
-                <div class="settings-card">
-                    <h2><i class="fas fa-user-shield"></i> Admin Account</h2>
-                    <form id="adminForm">
-                        <div class="form-group">
-                            <label>Current Admin Email</label>
-                            <input type="text" id="currentAdminEmail" readonly style="background: #f0f4f8;">
-                            <small>This is the email you logged in with</small>
-                        </div>
-                        <div class="info-note" style="margin-top: 15px;">
-                            <i class="fas fa-info-circle"></i>
-                            To change admin credentials, edit the <strong>admin/index.html</strong> file on GitHub and update the <code>admins</code> array.
-                        </div>
-                    </form>
+            <!-- ============================================
+                 TAB 7: ADMIN
+                 ============================================ -->
+            <div class="tab-content" id="tab-admin">
+                <div class="warning-note">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Important:</strong> Admin credentials are stored in the code. To change them, edit <code>admin/index.html</code> on GitHub.
                 </div>
 
-            </div>
-        </main>
-    </div>
+                <div class="settings-card">
+                    <h2><i class="fas fa-user-shield"></i> Admin Account</h2>
+                    <div class="form-group">
+                        <label>Current Admin Email</label>
+                        <input type="text" id="currentAdminEmail" readonly style="background: #f0f4f8;">
+                        <small>This is the email you logged in with</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Admin Login Time</label>
+                        <input type="text" id="adminLoginTime" readonly style="background: #f0f4f8;">
+                    </div>
+                </div>
 
-    <script src="../js/config.js"></script>
-    <script>
-        // Auth check
-        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
-        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-        
-        if (!adminLoggedIn) {
-            window.location.href = 'index.html';
-        } else {
-            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
-            document.getElementById('currentAdminEmail').value = adminEmail || 'Unknown';
-        }
+                <div class="settings-card">
+                    <h2><i class="fas fa-key"></i> How to Change Admin Credentials</h2>
+                    <div style="line-height: 1.8; color: #555;">
+                        <p>1. Go to your GitHub repository</p>
+                        <p>2. Open <code>admin/index.html</code></p>
+                        <p>3. Find the <code>admins</code> array in the JavaScript section</p>
+                        <p>4. Update or add new admin credentials:</p>
+                        <pre style="background: #1a2a4a; color: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 13px;">
+const admins = [
+    { email: 'admin@avmsabu.com', password: 'newpassword123' },
+    { email: 'youremail@example.com', password: 'yourpassword' }
+];</pre>
+                        <p style="margin-top: 15px;">5. Commit the changes</p>
+                        <p>6. Wait 1-2 minutes for Vercel to deploy</p>
+                    </div>
+                </div>
 
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('adminLoggedIn');
-            localStorage.removeItem('adminEmail');
-            sessionStorage.removeItem('adminLoggedIn');
-            sessionStorage.removeItem('adminEmail');
-            window.location.href = 'index.html';
-        });
-
-        // ============================================
-        // SAVE SETTINGS TO SUPABASE
-        // ============================================
-        
-        // Helper to save settings
-        async function saveSetting(key, value) {
-            const { error } = await supabase
-                .from('site_settings')
-                .upsert({ setting_key: key, setting_value: value, updated_at: new Date().toISOString() }, { onConflict: 'setting_key' });
-            if (error) throw error;
-        }
-
-        // Helper to show save message
-        function showMessage(elementId, success, text) {
-            const el = document.getElementById(elementId);
-            el.className = 'save-message show ' + (success ? 'success' : 'error');
-            el.textContent = text;
-            setTimeout(() => { el.className = 'save-message'; }, 4000);
-        }
-
-        // ============================================
-        // GENERAL INFORMATION
-        // ============================================
-        document.getElementById('generalForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            try {
-                await saveSetting('site_name', document.getElementById('siteName').value);
-                await saveSetting('site_short_name', document.getElementById('siteShortName').value);
-                await saveSetting('site_tagline', document.getElementById('siteTagline').value);
-                await saveSetting('site_description', document.getElementById('siteDescription').value);
-                showMessage('generalMessage', true, '✅ General information saved successfully!');
-            } catch (error) {
-                showMessage('generalMessage', false, '❌ Error: ' + error.message);
-            }
-        });
-
-        // ============================================
-        // CONTACT INFORMATION
-        // ============================================
-        document.getElementById('contactForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            try {
-                await saveSetting('contact_email', document.getElementById('contactEmail').value);
-                await saveSetting('contact_phone', document.getElementById('contactPhone').value);
-                await saveSetting('contact_address', document.getElementById('contactAddress').value);
-                showMessage('contactMessage', true, '✅ Contact information saved successfully!');
-            } catch (error) {
-                showMessage('contactMessage', false, '❌ Error: ' + error.message);
-            }
-        });
-
-        // ============================================
-        // SOCIAL MEDIA
-        // ============================================
-        document.getElementById('socialForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            try {
-                await saveSetting('facebook_url', document.getElementById('facebookUrl').value);
-                await saveSetting('twitter_url', document.getElementById('twitterUrl').value);
-                await saveSetting('instagram_url', document.getElementById('instagramUrl').value);
-                await saveSetting('youtube_url', document.getElementById('youtubeUrl').value);
-                await saveSetting('linkedin_url', document.getElementById('linkedinUrl').value);
-                showMessage('socialMessage', true, '✅ Social media links saved successfully!');
-            } catch (error) {
-                showMessage('socialMessage', false, '❌ Error: ' + error.message);
-            }
-        });
-
-        // ============================================
-        // HOMEPAGE
-        // ============================================
-        document.getElementById('homepageForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            try {
-                await saveSetting('hero_title', document.getElementById('heroTitle').value);
-                await saveSetting('hero_subtitle', document.getElementById('heroSubtitle').value);
-                await saveSetting('hero_description', document.getElementById('heroDescription').value);
-                await saveSetting('welcome_message', document.getElementById('welcomeMessage').value);
-                showMessage('homepageMessage', true, '✅ Homepage content saved successfully!');
-            } catch (error) {
-                showMessage('homepageMessage', false, '❌ Error: ' + error.message);
-            }
-        });
-
-        // ============================================
-        // FOOTER
-        // ============================================
-        document.getElementById('footerForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            try {
-                await saveSetting('footer_description', document.getElementById('footerDescription').value);
-                await saveSetting('copyright_text', document.getElementById('copyrightText').value);
-                await saveSetting('copyright_year', document.getElementById('copyrightYear').value);
-                showMessage('footerMessage', true, '✅ Footer content saved successfully!');
-            } catch (error) {
-                showMessage('footerMessage', false, '❌ Error: ' + error.message);
-            }
-        });
-
-        // ============================================
-        // LOAD EXISTING SETTINGS
-        // ============================================
-        async function loadSettings() {
-            try {
-                const { data, error } = await supabase
-                    .from('site_settings')
-                    .select('*');
-
-                if (error) throw error;
-
-                const settings = {};
-                (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
-
-                // Populate fields
-                if (settings.site_name) document.getElementById('siteName').value = settings.site_name;
-                if (settings.site_short_name) document.getElementById('siteShortName').value = settings.site_short_name;
-                if (settings.site_tagline) document.getElementById('siteTagline').value = settings.site_tagline;
-                if (settings.site_description) document.getElementById('siteDescription').value = settings.site_description;
-                if (settings.contact_email) document.getElementById('contactEmail').value = settings.contact_email;
-                if (settings.contact_phone) document.getElementById('contactPhone').value = settings.contact_phone;
-                if (settings.contact_address) document.getElementById('contactAddress').value = settings.contact_address;
-                if (settings.facebook_url) document.getElementById('facebookUrl').value = settings.facebook_url;
-                if (settings.twitter_url) document.getElementById('twitterUrl').value = settings.twitter_url;
-                if (settings.instagram_url) document.getElementById('instagramUrl').value = settings.instagram_url;
-                if (settings.youtube_url) document.getElementById('youtubeUrl').value = settings.youtube_url;
-                if (settings.linkedin_url) document.getElementById('linkedinUrl').value = settings.linkedin_url;
-                if (settings.hero_title) document.getElementById('heroTitle').value = settings.hero_title;
-                if (settings.hero_subtitle) document.getElementById('heroSubtitle').value = settings.hero_subtitle;
-                if (settings.hero_description) document.getElementById('heroDescription').value = settings.hero_description;
-                if (settings.welcome_message) document.getElementById('welcomeMessage').value = settings.welcome_message;
-                if (settings.footer_description) document.getElementById('footerDescription').value = settings.footer_description;
-                if (settings.copyright_text) document.getElementById('copyrightText').value = settings.copyright_text;
-                if (settings.copyright_year) document.getElementById('copyrightYear').value = settings.copyright_year;
-
-                console.log('✅ Settings loaded');
-            } catch (error) {
-                console.error('Error loading settings:', error);
-            }
-        }
-
-        loadSettings();
-    </script>
-</body>
-</html>
+                <div class="settings-card">
+                    <h2><i class="fas fa-database"></i> System Information</h2>
+                    <div style="line-height: 2; color: #555; font-size: 14px;">
+                        <p><strong>Supabase URL:</strong> <span id="supabaseUrlDisplay" style="color: #2a4a7a;"></span></p>
+                        <p><strong>Website URL
