@@ -43,6 +43,64 @@
         .empty-state { text-align: center; padding: 40px; color: #888; }
         .checkbox-group { display: flex; align-items: center; gap: 8px; }
         .checkbox-group input { width: auto; }
+        
+        /* Event Image Upload Styles */
+        .image-upload-area {
+            border: 3px dashed #d0d7df;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+        .image-upload-area:hover {
+            border-color: #2a4a7a;
+            background: #f0f4f8;
+        }
+        .image-upload-area i {
+            font-size: 40px;
+            color: #2a4a7a;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .image-upload-area p {
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .image-upload-area small {
+            color: #888;
+            font-size: 12px;
+        }
+        .image-upload-area input[type="file"] {
+            display: none;
+        }
+        
+        .image-preview-box {
+            margin-top: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e0e7ef;
+            background: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+        }
+        .image-preview-box img {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 8px;
+        }
+        
+        .existing-image-info {
+            background: #e8f0fe;
+            color: #1a3a5a;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-left: 4px solid #2a4a7a;
+        }
     </style>
 </head>
 <body>
@@ -112,6 +170,8 @@
             <h2 id="modalTitle">New Event</h2>
             <form id="eventForm">
                 <input type="hidden" id="editId" value="">
+                <input type="hidden" id="eventImageUrl" value="">
+                
                 <div class="form-group">
                     <label for="eventTitle">Event Title *</label>
                     <input type="text" id="eventTitle" required placeholder="Enter event title">
@@ -120,6 +180,25 @@
                     <label for="eventDescription">Description *</label>
                     <textarea id="eventDescription" required placeholder="Describe the event..."></textarea>
                 </div>
+                
+                <!-- Event Image Upload -->
+                <div class="form-group">
+                    <label>Event Image</label>
+                    <div id="existingImageInfo" class="existing-image-info" style="display: none;">
+                        <i class="fas fa-info-circle"></i> Current image: <span id="existingImageName">-</span>
+                    </div>
+                    <div class="image-upload-area" onclick="document.getElementById('eventImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p id="uploadAreaText">Click to upload event image</p>
+                        <small>JPG or PNG (max 3MB) — Recommended: 800x600px</small>
+                        <input type="file" id="eventImageInput" accept="image/*" onchange="handleEventImageUpload(event)">
+                    </div>
+                    <div id="eventImagePreview" class="image-preview-box" style="display: none;">
+                        <img id="eventImagePreviewImg" src="" alt="Event preview">
+                        <p style="margin-top: 10px; color: #888; font-size: 13px;" id="imageFileName"></p>
+                    </div>
+                </div>
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="eventDate">Event Date *</label>
@@ -179,7 +258,9 @@
 
     <script src="../js/config.js"></script>
     <script>
-        // Auth check
+        // ============================================
+        // AUTH CHECK
+        // ============================================
         const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
         const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
         
@@ -189,7 +270,9 @@
             document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
         }
 
-        // Logout
+        // ============================================
+        // LOGOUT
+        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('adminLoggedIn');
@@ -199,7 +282,9 @@
             window.location.href = 'index.html';
         });
 
-        // Load events
+        // ============================================
+        // LOAD EVENTS
+        // ============================================
         async function loadEvents() {
             const tbody = document.getElementById('eventsTableBody');
             const today = new Date().toISOString().split('T')[0];
@@ -219,9 +304,10 @@
 
                 tbody.innerHTML = data.map(event => {
                     const isUpcoming = event.event_date >= today;
+                    const imageIndicator = event.image_url ? '<i class="fas fa-image" style="color: #28a745; margin-right: 5px;" title="Has image"></i>' : '';
                     return `
                     <tr>
-                        <td><strong>${event.title}</strong></td>
+                        <td>${imageIndicator}<strong>${event.title}</strong></td>
                         <td>${new Date(event.event_date).toLocaleDateString()}</td>
                         <td>${event.venue || 'TBD'}</td>
                         <td><span class="badge ${event.status === 'published' ? 'badge-published' : 'badge-draft'}">${event.status}</span></td>
@@ -239,12 +325,19 @@
             }
         }
 
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
         function openAddModal() {
             document.getElementById('modalTitle').textContent = 'New Event';
             document.getElementById('editId').value = '';
             document.getElementById('eventForm').reset();
             document.getElementById('eventStatus').value = 'published';
             document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('eventImageUrl').value = '';
+            document.getElementById('eventImagePreview').style.display = 'none';
+            document.getElementById('existingImageInfo').style.display = 'none';
+            document.getElementById('uploadAreaText').textContent = 'Click to upload event image';
             document.getElementById('eventModal').classList.add('show');
         }
 
@@ -264,6 +357,21 @@
                     document.getElementById('eventRegistrationLink').value = data.registration_link || '';
                     document.getElementById('eventStatus').value = data.status || 'draft';
                     document.getElementById('eventFeatured').checked = data.featured || false;
+                    document.getElementById('eventImageUrl').value = data.image_url || '';
+                    
+                    // Show existing image info
+                    if (data.image_url) {
+                        document.getElementById('existingImageName').textContent = data.image_url.split('/').pop();
+                        document.getElementById('existingImageInfo').style.display = 'block';
+                        document.getElementById('eventImagePreviewImg').src = data.image_url;
+                        document.getElementById('eventImagePreview').style.display = 'block';
+                        document.getElementById('imageFileName').textContent = 'Current image — upload a new one to replace';
+                        document.getElementById('uploadAreaText').textContent = 'Click to change image';
+                    } else {
+                        document.getElementById('existingImageInfo').style.display = 'none';
+                        document.getElementById('eventImagePreview').style.display = 'none';
+                        document.getElementById('uploadAreaText').textContent = 'Click to upload event image';
+                    }
                 }
             });
             document.getElementById('eventModal').classList.add('show');
@@ -271,26 +379,103 @@
 
         function closeModal() {
             document.getElementById('eventModal').classList.remove('show');
+            document.getElementById('eventImageInput').value = '';
+            document.getElementById('eventImagePreview').style.display = 'none';
+            document.getElementById('existingImageInfo').style.display = 'none';
         }
 
+        // ============================================
+        // EVENT IMAGE UPLOAD
+        // ============================================
+        function handleEventImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 3 * 1024 * 1024) {
+                alert('❌ File is too large. Max 3MB allowed.');
+                event.target.value = '';
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('eventImagePreviewImg').src = e.target.result;
+                document.getElementById('imageFileName').textContent = file.name;
+                document.getElementById('eventImagePreview').style.display = 'block';
+                document.getElementById('existingImageInfo').style.display = 'none';
+                document.getElementById('uploadAreaText').textContent = 'Click to change image';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadEventImage(file) {
+            const timestamp = Date.now();
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${timestamp}_event.${fileExt}`;
+            const filePath = `events/${fileName}`;
+
+            // Try site-assets bucket first
+            let uploadResult = await supabase.storage
+                .from('site-assets')
+                .upload(filePath, file, { upsert: true });
+
+            let bucketUsed = 'site-assets';
+
+            if (uploadResult.error) {
+                // Try fallback bucket
+                uploadResult = await supabase.storage
+                    .from('membership-documents')
+                    .upload(filePath, file, { upsert: true });
+                bucketUsed = 'membership-documents';
+            }
+
+            if (uploadResult.error) throw uploadResult.error;
+
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from(bucketUsed)
+                .getPublicUrl(filePath);
+
+            return urlData.publicUrl;
+        }
+
+        // ============================================
+        // FORM SUBMISSION
+        // ============================================
         document.getElementById('eventForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const data = {
-                title: document.getElementById('eventTitle').value,
-                description: document.getElementById('eventDescription').value,
-                event_date: document.getElementById('eventDate').value,
-                venue: document.getElementById('eventVenue').value,
-                start_time: document.getElementById('eventStartTime').value || null,
-                end_time: document.getElementById('eventEndTime').value || null,
-                category: document.getElementById('eventCategory').value,
-                registration_link: document.getElementById('eventRegistrationLink').value || null,
-                status: document.getElementById('eventStatus').value,
-                featured: document.getElementById('eventFeatured').checked,
-                published_at: new Date().toISOString()
-            };
+            const btn = document.querySelector('#eventForm .btn-save');
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             try {
+                // Upload new image if selected
+                const fileInput = document.getElementById('eventImageInput');
+                let imageUrl = document.getElementById('eventImageUrl').value;
+                
+                if (fileInput.files && fileInput.files[0]) {
+                    imageUrl = await uploadEventImage(fileInput.files[0]);
+                }
+
+                const data = {
+                    title: document.getElementById('eventTitle').value,
+                    description: document.getElementById('eventDescription').value,
+                    event_date: document.getElementById('eventDate').value,
+                    venue: document.getElementById('eventVenue').value,
+                    start_time: document.getElementById('eventStartTime').value || null,
+                    end_time: document.getElementById('eventEndTime').value || null,
+                    category: document.getElementById('eventCategory').value,
+                    registration_link: document.getElementById('eventRegistrationLink').value || null,
+                    status: document.getElementById('eventStatus').value,
+                    featured: document.getElementById('eventFeatured').checked,
+                    image_url: imageUrl || null,
+                    published_at: new Date().toISOString()
+                };
+
                 let result;
                 if (id) {
                     result = await supabase.from('events').update(data).eq('id', parseInt(id));
@@ -303,9 +488,15 @@
                 alert(id ? '✅ Event updated successfully!' : '✅ Event created successfully!');
             } catch (error) {
                 alert('❌ Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
 
+        // ============================================
+        // DELETE EVENT
+        // ============================================
         async function deleteEvent(id) {
             if (!confirm('Are you sure you want to delete this event?')) return;
             try {
@@ -318,6 +509,9 @@
             }
         }
 
+        // ============================================
+        // INIT
+        // ============================================
         loadEvents();
 
         document.getElementById('eventModal').addEventListener('click', function(e) {
