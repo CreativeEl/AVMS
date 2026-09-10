@@ -6,7 +6,6 @@
     <title>Admin Login - AVMS ABU Zaria</title>
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .admin-login {
             min-height: 100vh;
@@ -114,22 +113,11 @@
     </div>
 
     <script>
-        // ============================================
-        // ADMIN LOGIN - WORKING VERSION
-        // ============================================
-        
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔐 Admin login page loaded');
+            console.log('🔐 Login page loaded');
             
             const form = document.getElementById('loginForm');
             const errorDiv = document.getElementById('loginError');
-            
-            // Check if already logged in - use BOTH session and local storage
-            if (sessionStorage.getItem('adminLoggedIn') === 'true' || localStorage.getItem('adminLoggedIn') === 'true') {
-                console.log('✅ Already logged in, redirecting to dashboard...');
-                window.location.href = 'dashboard.html';
-                return;
-            }
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
@@ -138,9 +126,6 @@
                 const email = document.getElementById('adminEmail').value;
                 const password = document.getElementById('adminPassword').value;
                 
-                console.log('📧 Login attempt:', email);
-                
-                // Admin credentials
                 const admins = [
                     { email: 'admin@avmsabu.com', password: 'admin123' },
                     { email: 'avms@abu.edu.ng', password: 'avms2024' }
@@ -150,18 +135,11 @@
                 
                 if (admin) {
                     console.log('✅ Login successful!');
-                    
-                    // Set BOTH sessionStorage AND localStorage for maximum persistence
-                    sessionStorage.setItem('adminLoggedIn', 'true');
-                    sessionStorage.setItem('adminEmail', email);
                     localStorage.setItem('adminLoggedIn', 'true');
                     localStorage.setItem('adminEmail', email);
-                    
-                    console.log('📦 Session stored. Redirecting to dashboard...');
                     window.location.href = 'dashboard.html';
                 } else {
-                    console.log('❌ Login failed');
-                    errorDiv.textContent = '❌ Invalid email or password. Please try again.';
+                    errorDiv.textContent = '❌ Invalid email or password.';
                     errorDiv.classList.add('show');
                 }
             });
