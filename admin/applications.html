@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Applications - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 20px; border: 2px solid #e0e7ef; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
+        .filter-btn:hover { border-color: #2a4a7a; }
+        .filter-btn.active { background: #1a2a4a; color: white; border-color: #1a2a4a; }
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f8f9fa; padding: 12px 15px; text-align: left; font-weight: 600; color: #1a2a4a; border-bottom: 2px solid #e0e7ef; font-size: 14px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #e0e7ef; font-size: 14px; }
+        tr:hover { background: #f8f9fa; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-pending { background: #fff3cd; color: #856404; }
+        .badge-approved { background: #d4edda; color: #155724; }
+        .badge-rejected { background: #f8d7da; color: #721c24; }
+        .btn-view { background: #2a4a7a; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; }
+        .btn-approve { background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; }
+        .btn-reject { background: #dc3545; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .btn-view:hover { background: #1a3a5a; }
+        .btn-approve:hover { background: #218838; }
+        .btn-reject:hover { background: #c82333; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2 { margin-bottom: 20px; color: #1a2a4a; }
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e7ef; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #666; font-weight: 600; }
+        .detail-value { color: #1a2a4a; font-weight: 500; }
+        .document-links { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; }
+        .document-links h4 { color: #1a2a4a; margin-bottom: 10px; }
+        .document-links a { display: inline-block; margin: 5px 10px 5px 0; padding: 8px 15px; background: #2a4a7a; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; }
+        .document-links a:hover { background: #1a3a5a; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-close { background: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-close:hover { background: #5a6268; }
+        .empty-state { text-align: center; padding: 40px; color: #888; }
+        .search-box { padding: 10px 15px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; width: 250px; }
+        .search-box:focus { outline: none; border-color: #2a4a7a; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="applications.html" class="active"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-hand-holding-heart"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Membership Applications</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="page-header">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterApplications('all', this)">All</button>
+                    <button class="filter-btn" onclick="filterApplications('pending', this)">Pending</button>
+                    <button class="filter-btn" onclick="filterApplications('approved', this)">Approved</button>
+                    <button class="filter-btn" onclick="filterApplications('rejected', this)">Rejected</button>
+                </div>
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search by name..." oninput="searchApplications()">
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Level</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicationsTableBody">
+                        <tr><td colspan="7" class="empty-state">Loading applications...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- View Details Modal -->
+    <div class="modal" id="applicationModal">
+        <div class="modal-content">
+            <h2>Application Details</h2>
+            <div id="applicationDetails"></div>
+            <div class="modal-actions">
+                <button class="btn-close" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // Auth check
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        // State
+        let allApplications = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // Load applications
+        async function loadApplications() {
+            const tbody = document.getElementById('applicationsTableBody');
+            try {
+                const { data, error } = await supabase
+                    .from('membership_applications')
+                    .select('*')
+                    .order('applied_at', { ascending: false });
+
+                if (error) throw error;
+
+                allApplications = data || [];
+                displayApplications();
+            } catch (error) {
+                console.error('Error loading applications:', error);
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error loading applications: ${error.message}</td></tr>`;
+            }
+        }
+
+        // Display applications with filters
+        function displayApplications() {
+            const tbody = document.getElementById('applicationsTableBody');
+            let filtered = allApplications;
+
+            // Apply status filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(app => app.status === currentFilter);
+            }
+
+            // Apply search filter
+            if (currentSearch) {
+                const search = currentSearch.toLowerCase();
+                filtered = filtered.filter(app => 
+                    (app.first_name + ' ' + app.surname).toLowerCase().includes(search) ||
+                    (app.email || '').toLowerCase().includes(search) ||
+                    (app.reg_number || '').toLowerCase().includes(search)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No applications found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(app => `
+                <tr>
+                    <td><strong>${app.first_name} ${app.surname}</strong></td>
+                    <td>${app.email || '-'}</td>
+                    <td>${app.phone || '-'}</td>
+                    <td>${app.level || '-'}</td>
+                    <td>${new Date(app.applied_at).toLocaleDateString()}</td>
+                    <td><span class="badge badge-${app.status}">${app.status}</span></td>
+                    <td>
+                        <button class="btn-view" onclick="viewApplication(${app.id})"><i class="fas fa-eye"></i> View</button>
+                        ${app.status === 'pending' ? `
+                            <button class="btn-approve" onclick="updateStatus(${app.id}, 'approved')"><i class="fas fa-check"></i></button>
+                            <button class="btn-reject" onclick="updateStatus(${app.id}, 'rejected')"><i class="fas fa-times"></i></button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Filter
+        function filterApplications(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            displayApplications();
+        }
+
+        // Search
+        function searchApplications() {
+            currentSearch = document.getElementById('searchBox').value;
+            displayApplications();
+        }
+
+        // View application details
+        function viewApplication(id) {
+            const app = allApplications.find(a => a.id === id);
+            if (!app) return;
+
+            const details = document.getElementById('applicationDetails');
+            details.innerHTML = `
+                <div class="detail-row"><span class="detail-label">Full Name:</span><span class="detail-value">${app.title || ''} ${app.first_name} ${app.surname}</span></div>
+                <div class="detail-row"><span class="detail-label">Email:</span><span class="detail-value">${app.email || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Phone:</span><span class="detail-value">${app.phone || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Date of Birth:</span><span class="detail-value">${app.dob || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Gender:</span><span class="detail-value">${app.gender || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Nationality:</span><span class="detail-value">${app.nationality || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">State of Origin:</span><span class="detail-value">${app.state_of_origin || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Registration Number:</span><span class="detail-value">${app.reg_number || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Level:</span><span class="detail-value">${app.level || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Home Address:</span><span class="detail-value">${app.home_address || '-'}</span></div>
+                <div class="detail-row"><span class="detail-label">Applied Date:</span><span class="detail-value">${new Date(app.applied_at).toLocaleString()}</span></div>
+                <div class="detail-row"><span class="detail-label">Status:</span><span class="badge badge-${app.status}">${app.status}</span></div>
+                
+                <div class="document-links">
+                    <h4>📎 Uploaded Documents</h4>
+                    ${app.passport_photo_url ? `<a href="${app.passport_photo_url}" target="_blank"><i class="fas fa-image"></i> Passport Photo</a>` : '<p style="color: #888; font-size: 13px;">No passport photo</p>'}
+                    ${app.admission_letter_url ? `<a href="${app.admission_letter_url}" target="_blank"><i class="fas fa-file-pdf"></i> Admission Letter</a>` : ''}
+                    ${app.student_id_url ? `<a href="${app.student_id_url}" target="_blank"><i class="fas fa-id-card"></i> Student ID</a>` : ''}
+                    ${app.payment_receipt_url ? `<a href="${app.payment_receipt_url}" target="_blank"><i class="fas fa-receipt"></i> Payment Receipt</a>` : ''}
+                </div>
+            `;
+            document.getElementById('applicationModal').classList.add('show');
+        }
+
+        // Update status
+        async function updateStatus(id, status) {
+            if (!confirm(`Are you sure you want to ${status} this application?`)) return;
+            try {
+                const { error } = await supabase
+                    .from('membership_applications')
+                    .update({ status: status })
+                    .eq('id', id);
+                if (error) throw error;
+                loadApplications();
+                alert(`✅ Application ${status} successfully!`);
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('applicationModal').classList.remove('show');
+        }
+
+        loadApplications();
+
+        document.getElementById('applicationModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
