@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Scholarships - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .btn-add { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-add:hover { background: #218838; }
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #f8f9fa; padding: 12px 15px; text-align: left; font-weight: 600; color: #1a2a4a; border-bottom: 2px solid #e0e7ef; font-size: 14px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #e0e7ef; font-size: 14px; }
+        tr:hover { background: #f8f9fa; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-expired { background: #f8d7da; color: #721c24; }
+        .badge-draft { background: #fff3cd; color: #856404; }
+        .btn-edit { background: #2a4a7a; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; }
+        .btn-delete { background: #dc3545; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .btn-edit:hover { background: #1a3a5a; }
+        .btn-delete:hover { background: #c82333; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2 { margin-bottom: 20px; color: #1a2a4a; }
+        .modal-content .form-group { margin-bottom: 15px; }
+        .modal-content label { display: block; font-weight: 600; margin-bottom: 5px; color: #1a2a4a; font-size: 14px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .modal-content textarea { resize: vertical; min-height: 80px; }
+        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #2a4a7a; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-save { background: #28a745; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-cancel { background: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-save:hover { background: #218838; }
+        .btn-cancel:hover { background: #5a6268; }
+        .empty-state { text-align: center; padding: 40px; color: #888; }
+        .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 20px; border: 2px solid #e0e7ef; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
+        .filter-btn:hover { border-color: #2a4a7a; }
+        .filter-btn.active { background: #1a2a4a; color: white; border-color: #1a2a4a; }
+        .search-box { padding: 10px 15px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; width: 250px; }
+        .search-box:focus { outline: none; border-color: #2a4a7a; }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="scholarships.html" class="active"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-hand-holding-heart"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Manage Scholarships</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="page-header">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterScholarships('all', this)">All</button>
+                    <button class="filter-btn" onclick="filterScholarships('active', this)">Active</button>
+                    <button class="filter-btn" onclick="filterScholarships('expired', this)">Expired</button>
+                    <button class="filter-btn" onclick="filterScholarships('draft', this)">Draft</button>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search scholarships..." oninput="searchScholarships()">
+                    <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Scholarship</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Provider</th>
+                            <th>Deadline</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scholarshipsTableBody">
+                        <tr><td colspan="5" class="empty-state">Loading scholarships...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="scholarshipModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Scholarship</h2>
+            <form id="scholarshipForm">
+                <input type="hidden" id="editId" value="">
+                <div class="form-group">
+                    <label for="schTitle">Scholarship Title *</label>
+                    <input type="text" id="schTitle" required placeholder="e.g., Merit Scholarship for Veterinary Students">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="schProvider">Provider *</label>
+                        <input type="text" id="schProvider" required placeholder="e.g., ABU Zaria Faculty of Veterinary Medicine">
+                    </div>
+                    <div class="form-group">
+                        <label for="schStatus">Status</label>
+                        <select id="schStatus">
+                            <option value="active">Active (visible)</option>
+                            <option value="expired">Expired</option>
+                            <option value="draft">Draft (not visible)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="schDescription">Description *</label>
+                    <textarea id="schDescription" required placeholder="Describe the scholarship..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="schEligibility">Eligibility</label>
+                    <textarea id="schEligibility" placeholder="Who is eligible? e.g., Open to all veterinary students with CGPA 4.0+"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="schRequirements">Requirements</label>
+                    <textarea id="schRequirements" placeholder="What documents are needed? e.g., Transcripts, recommendation letters..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="schOpeningDate">Opening Date</label>
+                        <input type="date" id="schOpeningDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="schDeadline">Deadline *</label>
+                        <input type="date" id="schDeadline" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="schApplicationLink">Application Link</label>
+                    <input type="url" id="schApplicationLink" placeholder="https://...">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Scholarship</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // Auth check
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        let allScholarships = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        async function loadScholarships() {
+            const tbody = document.getElementById('scholarshipsTableBody');
+            try {
+                const { data, error } = await supabase
+                    .from('scholarships')
+                    .select('*')
+                    .order('deadline', { ascending: true });
+
+                if (error) throw error;
+
+                allScholarships = data || [];
+                displayScholarships();
+            } catch (error) {
+                console.error('Error loading scholarships:', error);
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state">Error loading scholarships: ${error.message}</td></tr>`;
+            }
+        }
+
+        function displayScholarships() {
+            const tbody = document.getElementById('scholarshipsTableBody');
+            let filtered = allScholarships;
+
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(s => s.status === currentFilter);
+            }
+
+            if (currentSearch) {
+                const search = currentSearch.toLowerCase();
+                filtered = filtered.filter(s =>
+                    (s.title || '').toLowerCase().includes(search) ||
+                    (s.provider || '').toLowerCase().includes(search)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No scholarships found. Click "Add Scholarship" to create one.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(s => {
+                const deadline = s.deadline ? new Date(s.deadline).toLocaleDateString() : 'Not set';
+                const isExpired = s.deadline && new Date(s.deadline) < new Date();
+                return `
+                    <tr>
+                        <td><strong>${s.title}</strong></td>
+                        <td>${s.provider || '-'}</td>
+                        <td>${deadline} ${isExpired ? '⚠️' : ''}</td>
+                        <td><span class="badge badge-${s.status || 'draft'}">${s.status || 'draft'}</span></td>
+                        <td>
+                            <button class="btn-edit" onclick="editScholarship(${s.id})"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="btn-delete" onclick="deleteScholarship(${s.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterScholarships(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            displayScholarships();
+        }
+
+        function searchScholarships() {
+            currentSearch = document.getElementById('searchBox').value;
+            displayScholarships();
+        }
+
+        function openAddModal() {
+            document.getElementById('modalTitle').textContent = 'Add Scholarship';
+            document.getElementById('editId').value = '';
+            document.getElementById('scholarshipForm').reset();
+            document.getElementById('schStatus').value = 'active';
+            document.getElementById('scholarshipModal').classList.add('show');
+        }
+
+        function editScholarship(id) {
+            const s = allScholarships.find(s => s.id === id);
+            if (!s) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Scholarship';
+            document.getElementById('editId').value = id;
+            document.getElementById('schTitle').value = s.title || '';
+            document.getElementById('schProvider').value = s.provider || '';
+            document.getElementById('schStatus').value = s.status || 'active';
+            document.getElementById('schDescription').value = s.description || '';
+            document.getElementById('schEligibility').value = s.eligibility || '';
+            document.getElementById('schRequirements').value = s.requirements || '';
+            document.getElementById('schOpeningDate').value = s.opening_date || '';
+            document.getElementById('schDeadline').value = s.deadline || '';
+            document.getElementById('schApplicationLink').value = s.application_link || '';
+            
+            document.getElementById('scholarshipModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('scholarshipModal').classList.remove('show');
+        }
+
+        document.getElementById('scholarshipForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = {
+                title: document.getElementById('schTitle').value,
+                provider: document.getElementById('schProvider').value,
+                status: document.getElementById('schStatus').value,
+                description: document.getElementById('schDescription').value,
+                eligibility: document.getElementById('schEligibility').value || null,
+                requirements: document.getElementById('schRequirements').value || null,
+                opening_date: document.getElementById('schOpeningDate').value || null,
+                deadline: document.getElementById('schDeadline').value,
+                application_link: document.getElementById('schApplicationLink').value || null,
+                updated_at: new Date().toISOString()
+            };
+
+            try {
+                let result;
+                if (id) {
+                    result = await supabase.from('scholarships').update(data).eq('id', parseInt(id));
+                } else {
+                    result = await supabase.from('scholarships').insert([data]);
+                }
+                if (result.error) throw result.error;
+                closeModal();
+                loadScholarships();
+                alert(id ? '✅ Scholarship updated successfully!' : '✅ Scholarship added successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        });
+
+        async function deleteScholarship(id) {
+            if (!confirm('Are you sure you want to delete this scholarship?')) return;
+            try {
+                const { error } = await supabase.from('scholarships').delete().eq('id', id);
+                if (error) throw error;
+                loadScholarships();
+                alert('✅ Scholarship deleted successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        loadScholarships();
+
+        document.getElementById('scholarshipModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+    </script>
+</body>
+</html>
