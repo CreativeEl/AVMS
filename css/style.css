@@ -43,10 +43,9 @@ body {
     align-items: center;
     text-decoration: none;
     color: white;
-    gap: 12px;                    /* ← ADDED: Gap between logo & text */
+    gap: 12px;
 }
 
-/* ← ADDED: Logo image styles */
 .logo-img {
     width: 42px;
     height: 42px;
@@ -60,7 +59,7 @@ body {
     font-size: 22px;
     font-weight: 700;
     color: white;
-    white-space: nowrap;          /* ← ADDED: Prevent text wrapping */
+    white-space: nowrap;
 }
 
 .nav-menu ul {
@@ -133,8 +132,8 @@ body {
     text-align: center;
     position: relative;
     overflow: hidden;
-    background-size: cover;         /* ← ADDED for hero image */
-    background-position: center;    /* ← ADDED for hero image */
+    background-size: cover;
+    background-position: center;
 }
 
 .hero::before {
@@ -414,7 +413,7 @@ body {
     line-height: 1.8;
 }
 
-/* ← ADDED: Fix blue link color in footer */
+/* Fix link color in footer */
 .footer-col p a,
 .footer-col a.contact-email,
 .footer-col a.contact-phone {
@@ -452,13 +451,16 @@ body {
 .social-links {
     display: flex;
     gap: 15px;
-    flex-wrap: wrap;                /* ← ADDED: Allow wrapping on mobile */
+    flex-wrap: wrap;
 }
 
 .social-links a {
     color: rgba(255,255,255,0.7);
     font-size: 22px;
     transition: color 0.3s;
+    text-decoration: none !important;
+    display: inline-block;
+    line-height: 1;
 }
 
 .social-links a:hover {
@@ -484,7 +486,6 @@ body {
    RESPONSIVE DESIGN
    ============================================ */
 
-/* Tablets */
 @media (max-width: 768px) {
     .hamburger {
         display: block;
@@ -526,7 +527,6 @@ body {
     }
 }
 
-/* Mobile */
 @media (max-width: 480px) {
     .footer-grid {
         grid-template-columns: 1fr;
@@ -556,7 +556,6 @@ body {
    ABOUT PAGE STYLES
    ============================================ */
 
-/* Page Header */
 .page-header {
     background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
     color: white;
@@ -575,7 +574,6 @@ body {
     opacity: 0.9;
 }
 
-/* About Section */
 .about-section {
     padding: 60px 0;
     background: white;
@@ -606,9 +604,9 @@ body {
     padding: 80px 40px;
     text-align: center;
     border: 2px dashed #2a4a7a;
-    background-size: cover;         /* ← ADDED for about image */
-    background-position: center;    /* ← ADDED for about image */
-    min-height: 300px;              /* ← ADDED for about image */
+    background-size: cover;
+    background-position: center;
+    min-height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -626,7 +624,6 @@ body {
     font-size: 16px;
 }
 
-/* Mission & Vision */
 .mission-vision {
     padding: 60px 0;
     background: #f8f9fa;
@@ -668,7 +665,6 @@ body {
     line-height: 1.8;
 }
 
-/* Objectives */
 .objectives {
     padding: 60px 0;
     background: white;
@@ -712,7 +708,6 @@ body {
     line-height: 1.6;
 }
 
-/* History */
 .history {
     padding: 60px 0;
     background: #f8f9fa;
@@ -730,7 +725,6 @@ body {
     font-size: 17px;
 }
 
-/* Achievements */
 .achievements {
     padding: 60px 0;
     background: white;
@@ -760,7 +754,6 @@ body {
     font-size: 16px;
 }
 
-/* Values */
 .values {
     padding: 60px 0;
     background: #f8f9fa;
@@ -804,7 +797,6 @@ body {
     line-height: 1.6;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .about-grid {
         grid-template-columns: 1fr;
@@ -913,7 +905,6 @@ body {
     font-size: 15px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .leader-card-full {
         flex-direction: column;
@@ -1097,7 +1088,6 @@ body {
     font-size: 14px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .event-card-full {
         padding: 20px;
@@ -1272,7 +1262,6 @@ body {
     color: #888;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .gallery-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -1457,7 +1446,6 @@ body {
     margin-right: 8px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .download-item {
         flex-wrap: wrap;
@@ -1482,7 +1470,7 @@ body {
 }
 
 /* ============================================
-   JOIN US PAGE - COMPLETE STYLES
+   JOIN US PAGE - MULTI-STEP FORM
    ============================================ */
 
 .membership-section {
@@ -1511,10 +1499,6 @@ body {
     color: #666;
     margin-bottom: 30px;
 }
-
-/* ============================================
-   PROGRESS STEPS - CLICKABLE
-   ============================================ */
 
 .steps-indicator {
     display: flex;
@@ -1600,10 +1584,6 @@ body {
     color: #1a2a4a;
 }
 
-/* ============================================
-   FORM PAGES
-   ============================================ */
-
 .form-page {
     display: none;
     animation: fadeIn 0.5s ease;
@@ -1628,10 +1608,6 @@ body {
     color: #888;
     margin-bottom: 25px;
 }
-
-/* ============================================
-   FORM ROWS & GROUPS
-   ============================================ */
 
 .form-row {
     display: grid;
@@ -1676,10 +1652,6 @@ body {
     cursor: not-allowed;
 }
 
-/* ============================================
-   FILE UPLOAD - COMPULSORY
-   ============================================ */
-
 .form-group input[type="file"] {
     padding: 12px;
     border: 2px solid #e0e7ef;
@@ -1717,10 +1689,6 @@ body {
     color: #888;
     margin-top: 5px;
 }
-
-/* ============================================
-   FILE PREVIEW AREA
-   ============================================ */
 
 .file-preview-area {
     background: #f8f9fa;
@@ -1781,10 +1749,6 @@ body {
     margin-left: auto;
 }
 
-/* ============================================
-   FORM NAVIGATION
-   ============================================ */
-
 .form-navigation {
     display: flex;
     gap: 15px;
@@ -1836,10 +1800,6 @@ body {
     transform: translateX(-2px);
 }
 
-/* ============================================
-   DECLARATION BOX
-   ============================================ */
-
 .declaration-box {
     background: #f8f9fa;
     padding: 20px;
@@ -1880,10 +1840,6 @@ body {
 .checkbox-group input[type="checkbox"]:checked + label {
     color: #1a2a4a;
 }
-
-/* ============================================
-   SUMMARY BOX
-   ============================================ */
 
 .summary-box {
     background: #f8f9fa;
@@ -1926,10 +1882,6 @@ body {
 .summary-item ul li {
     color: #555;
 }
-
-/* ============================================
-   CONFIRMATION MESSAGE
-   ============================================ */
 
 .confirmation-box {
     padding: 40px 20px;
@@ -2020,10 +1972,6 @@ body {
     box-shadow: 0 4px 15px rgba(232, 73, 29, 0.3);
 }
 
-/* ============================================
-   FORM MESSAGES
-   ============================================ */
-
 #formMessage {
     margin-top: 15px;
 }
@@ -2033,10 +1981,6 @@ body {
     border-radius: 8px;
     font-weight: 500;
 }
-
-/* ============================================
-   LOADING SPINNER
-   ============================================ */
 
 .spinner {
     display: inline-block;
@@ -2058,10 +2002,6 @@ body {
     opacity: 0.7;
     cursor: not-allowed;
 }
-
-/* ============================================
-   RESPONSIVE
-   ============================================ */
 
 @media (max-width: 768px) {
     .membership-container {
@@ -2412,7 +2352,6 @@ body {
     margin-top: 15px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .donation-form .form-row {
         grid-template-columns: 1fr;
@@ -2449,7 +2388,6 @@ body {
     gap: 50px;
 }
 
-/* Contact Info */
 .contact-info h2 {
     color: #1a2a4a;
     font-size: 28px;
@@ -2518,13 +2456,13 @@ body {
     color: #2a4a7a;
     font-size: 28px;
     transition: color 0.3s;
+    text-decoration: none !important;
 }
 
 .social-media .social-links a:hover {
     color: #e8491d;
 }
 
-/* Contact Form */
 .contact-form {
     background: #f8f9fa;
     padding: 40px;
@@ -2588,7 +2526,6 @@ body {
     margin-top: 15px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .contact-grid {
         grid-template-columns: 1fr;
