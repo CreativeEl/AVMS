@@ -66,6 +66,16 @@
             width: 100%;
             padding: 14px;
             font-size: 16px;
+            background: #e8491d;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .login-box .btn:hover {
+            background: #c73d17;
         }
         .login-box .error-msg {
             background: #f8d7da;
@@ -98,12 +108,64 @@
                     <label for="adminPassword">Password</label>
                     <input type="password" id="adminPassword" name="adminPassword" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+                <button type="submit" class="btn">Login</button>
             </form>
         </div>
     </div>
 
-    <script src="../js/config.js"></script>
-    <script src="js/admin-login.js"></script>
+    <script>
+        // ============================================
+        // ADMIN LOGIN - WORKING VERSION
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔐 Admin login page loaded');
+            
+            const form = document.getElementById('loginForm');
+            const errorDiv = document.getElementById('loginError');
+            
+            // Check if already logged in - use BOTH session and local storage
+            if (sessionStorage.getItem('adminLoggedIn') === 'true' || localStorage.getItem('adminLoggedIn') === 'true') {
+                console.log('✅ Already logged in, redirecting to dashboard...');
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                errorDiv.classList.remove('show');
+                
+                const email = document.getElementById('adminEmail').value;
+                const password = document.getElementById('adminPassword').value;
+                
+                console.log('📧 Login attempt:', email);
+                
+                // Admin credentials
+                const admins = [
+                    { email: 'admin@avmsabu.com', password: 'admin123' },
+                    { email: 'avms@abu.edu.ng', password: 'avms2024' }
+                ];
+                
+                const admin = admins.find(a => a.email === email && a.password === password);
+                
+                if (admin) {
+                    console.log('✅ Login successful!');
+                    
+                    // Set BOTH sessionStorage AND localStorage for maximum persistence
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    sessionStorage.setItem('adminEmail', email);
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    localStorage.setItem('adminEmail', email);
+                    
+                    console.log('📦 Session stored. Redirecting to dashboard...');
+                    window.location.href = 'dashboard.html';
+                } else {
+                    console.log('❌ Login failed');
+                    errorDiv.textContent = '❌ Invalid email or password. Please try again.';
+                    errorDiv.classList.add('show');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
