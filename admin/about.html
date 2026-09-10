@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage About Page - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .info-box {
+            background: #e8f0fe;
+            color: #1a3a5a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a4a7a;
+            font-size: 14px;
+        }
+        .info-box i { margin-right: 8px; }
+        
+        .section-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .section-tab {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        .section-tab:hover { background: #f0f2f5; color: #1a2a4a; }
+        .section-tab.active { background: #1a2a4a; color: white; }
+        
+        .section-content { display: none; }
+        .section-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .settings-card h2 {
+            color: #1a2a4a;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e8491d;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .settings-card h2 i { color: #e8491d; }
+        
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a2a4a;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e7ef;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a4a7a;
+            box-shadow: 0 0 0 3px rgba(42, 74, 122, 0.1);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.6;
+        }
+        .form-group small {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .btn-save {
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        .btn-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .save-message {
+            margin-top: 15px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        .save-message.show { display: block; animation: fadeIn 0.3s ease; }
+        .save-message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .save-message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .save-message.info { background: #cce5ff; color: #004085; border-left: 4px solid #007bff; }
+        
+        .settings-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Image Upload */
+        .image-upload-area {
+            border: 3px dashed #d0d7df;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+        .image-upload-area:hover { border-color: #2a4a7a; background: #f0f4f8; }
+        .image-upload-area i { font-size: 48px; color: #2a4a7a; margin-bottom: 15px; display: block; }
+        .image-upload-area p { color: #666; margin-bottom: 5px; font-size: 15px; }
+        .image-upload-area small { color: #888; font-size: 12px; }
+        .image-upload-area input[type="file"] { display: none; }
+        
+        .image-preview-box {
+            margin-bottom: 15px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e0e7ef;
+            background: #f8f9fa;
+            text-align: center;
+            padding: 20px;
+        }
+        .image-preview-box img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .settings-card { padding: 20px; }
+            .section-tabs { overflow-x: auto; flex-wrap: nowrap; }
+            .section-tab { white-space: nowrap; font-size: 13px; padding: 10px 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="about.html" class="active"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Manage About Page</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Edit all content on your About page. Changes take effect immediately on the public website.
+            </div>
+
+            <!-- Section Tabs -->
+            <div class="section-tabs">
+                <button class="section-tab active" onclick="switchSection('who', this)"><i class="fas fa-users"></i> Who We Are</button>
+                <button class="section-tab" onclick="switchSection('mission', this)"><i class="fas fa-bullseye"></i> Mission</button>
+                <button class="section-tab" onclick="switchSection('vision', this)"><i class="fas fa-eye"></i> Vision</button>
+                <button class="section-tab" onclick="switchSection('history', this)"><i class="fas fa-history"></i> History</button>
+                <button class="section-tab" onclick="switchSection('values', this)"><i class="fas fa-star"></i> Values</button>
+                <button class="section-tab" onclick="switchSection('image', this)"><i class="fas fa-image"></i> About Image</button>
+            </div>
+
+            <!-- ============================================
+                 SECTION: WHO WE ARE
+                 ============================================ -->
+            <div class="section-content active" id="section-who">
+                <div class="settings-card">
+                    <h2><i class="fas fa-users"></i> Who We Are</h2>
+                    <form id="whoForm">
+                        <div class="form-group">
+                            <label for="whoTitle">Section Title</label>
+                            <input type="text" id="whoTitle" placeholder="e.g., Who We Are">
+                        </div>
+                        <div class="form-group">
+                            <label for="whoContent">Content</label>
+                            <textarea id="whoContent" placeholder="Write about who AVMS is..." style="min-height: 200px;"></textarea>
+                            <small>Use double line breaks (press Enter twice) to separate paragraphs.</small>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveWhoBtn">
+                                <i class="fas fa-save"></i> Save Content
+                            </button>
+                        </div>
+                        <div class="save-message" id="whoMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: MISSION
+                 ============================================ -->
+            <div class="section-content" id="section-mission">
+                <div class="settings-card">
+                    <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+                    <form id="missionForm">
+                        <div class="form-group">
+                            <label for="missionTitle">Section Title</label>
+                            <input type="text" id="missionTitle" placeholder="e.g., Our Mission">
+                        </div>
+                        <div class="form-group">
+                            <label for="missionContent">Content</label>
+                            <textarea id="missionContent" placeholder="Write the mission statement..."></textarea>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveMissionBtn">
+                                <i class="fas fa-save"></i> Save Mission
+                            </button>
+                        </div>
+                        <div class="save-message" id="missionMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: VISION
+                 ============================================ -->
+            <div class="section-content" id="section-vision">
+                <div class="settings-card">
+                    <h2><i class="fas fa-eye"></i> Our Vision</h2>
+                    <form id="visionForm">
+                        <div class="form-group">
+                            <label for="visionTitle">Section Title</label>
+                            <input type="text" id="visionTitle" placeholder="e.g., Our Vision">
+                        </div>
+                        <div class="form-group">
+                            <label for="visionContent">Content</label>
+                            <textarea id="visionContent" placeholder="Write the vision statement..."></textarea>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveVisionBtn">
+                                <i class="fas fa-save"></i> Save Vision
+                            </button>
+                        </div>
+                        <div class="save-message" id="visionMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: HISTORY
+                 ============================================ -->
+            <div class="section-content" id="section-history">
+                <div class="settings-card">
+                    <h2><i class="fas fa-history"></i> Our History</h2>
+                    <form id="historyForm">
+                        <div class="form-group">
+                            <label for="historyTitle">Section Title</label>
+                            <input type="text" id="historyTitle" placeholder="e.g., Our History">
+                        </div>
+                        <div class="form-group">
+                            <label for="historyContent">Content</label>
+                            <textarea id="historyContent" placeholder="Write the history of AVMS..." style="min-height: 250px;"></textarea>
+                            <small>Use double line breaks (press Enter twice) to separate paragraphs.</small>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveHistoryBtn">
+                                <i class="fas fa-save"></i> Save History
+                            </button>
+                        </div>
+                        <div class="save-message" id="historyMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: VALUES
+                 ============================================ -->
+            <div class="section-content" id="section-values">
+                <div class="settings-card">
+                    <h2><i class="fas fa-star"></i> Core Values</h2>
+                    <p style="color: #666; margin-bottom: 20px;">These are the 6 core values displayed on the About page. Edit each one below.</p>
+                    <form id="valuesForm">
+                        <!-- Value 1 -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="value1Icon" placeholder="fa-star">
+                                    <small>FontAwesome name</small>
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="value1Title" placeholder="Excellence">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Description</label>
+                                    <input type="text" id="value1Desc" placeholder="Striving for the highest standards...">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Value 2 -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="value2Icon" placeholder="fa-hand-holding-heart">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="value2Title" placeholder="Integrity">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Description</label>
+                                    <input type="text" id="value2Desc" placeholder="Upholding honesty...">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Value 3 -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="value3Icon" placeholder="fa-users">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="value3Title" placeholder="Unity">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Description</label>
+                                    <input type="text" id="value3Desc" placeholder="Fostering togetherness...">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Value 4 -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="value4Icon" placeholder="fa-lightbulb">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="value4Title" placeholder="Innovation">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Description</label>
+                                    <input type="text" id="value4Desc" placeholder="Embracing creativity...">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Value 5 -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="value5Icon" placeholder="fa-handshake">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="value5Title" placeholder="Service">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Description</label>
+                                    <input type="text" id="value5Desc" placeholder="Dedicating ourselves...">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Value 6 -->
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Icon</label>
+                                    <input type="text" id="value6Icon" placeholder="fa-heart">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Title</label>
+                                    <input type="text" id="value6Title" placeholder="Passion">
+                                </div>
+                                <div class="form-group" style="margin: 0;">
+                                    <label>Description</label>
+                                    <input type="text" id="value6Desc" placeholder="Approaching veterinary medicine...">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="saveValuesBtn">
+                                <i class="fas fa-save"></i> Save Values
+                            </button>
+                        </div>
+                        <div class="save-message" id="valuesMessage"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 SECTION: ABOUT IMAGE
+                 ============================================ -->
+            <div class="section-content" id="section-image">
+                <div class="settings-card">
+                    <h2><i class="fas fa-image"></i> About Page Image</h2>
+                    <p style="color: #666; margin-bottom: 20px;">This image appears in the "Who We Are" section on the About page.</p>
+
+                    <div id="aboutImagePreview" class="image-preview-box">
+                        <p style="color: #888;">No image uploaded yet</p>
+                    </div>
+
+                    <div class="image-upload-area" onclick="document.getElementById('aboutImageInput').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Click to upload about page image</p>
+                        <small>JPG or PNG (max 3MB) — Recommended: 800x600px</small>
+                        <input type="file" id="aboutImageInput" accept="image/*" onchange="handleAboutImageUpload(event)">
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn-save" id="saveAboutImageBtn" onclick="saveAboutImage()">
+                            <i class="fas fa-save"></i> Save Image
+                        </button>
+                    </div>
+                    <div class="save-message" id="aboutImageMessage"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        // ============================================
+        // STATE
+        // ============================================
+        let pendingAboutImage = null;
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // SECTION SWITCHING
+        // ============================================
+        function switchSection(section, btn) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('section-' + section).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        async function saveSetting(key, value) {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert(
+                    { setting_key: key, setting_value: value, updated_at: new Date().toISOString() },
+                    { onConflict: 'setting_key' }
+                );
+            if (error) throw error;
+        }
+
+        function showMessage(elementId, type, text) {
+            const el = document.getElementById(elementId);
+            el.className = 'save-message show ' + type;
+            el.innerHTML = text;
+            setTimeout(() => { 
+                el.className = 'save-message'; 
+                el.innerHTML = '';
+            }, 5000);
+        }
+
+        function showLoading(btn, text = 'Saving...') {
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span> ${text}`;
+            return original;
+        }
+
+        function hideLoading(btn, original) {
+            btn.disabled = false;
+            btn.innerHTML = original;
+        }
+
+        // ============================================
+        // SAVE: WHO WE ARE
+        // ============================================
+        document.getElementById('whoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveWhoBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('about_who_title', document.getElementById('whoTitle').value);
+                await saveSetting('about_who_content', document.getElementById('whoContent').value);
+                showMessage('whoMessage', 'success', '✅ Who We Are section saved successfully!');
+            } catch (error) {
+                showMessage('whoMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: MISSION
+        // ============================================
+        document.getElementById('missionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveMissionBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('about_mission_title', document.getElementById('missionTitle').value);
+                await saveSetting('about_mission_content', document.getElementById('missionContent').value);
+                showMessage('missionMessage', 'success', '✅ Mission saved successfully!');
+            } catch (error) {
+                showMessage('missionMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: VISION
+        // ============================================
+        document.getElementById('visionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveVisionBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('about_vision_title', document.getElementById('visionTitle').value);
+                await saveSetting('about_vision_content', document.getElementById('visionContent').value);
+                showMessage('visionMessage', 'success', '✅ Vision saved successfully!');
+            } catch (error) {
+                showMessage('visionMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: HISTORY
+        // ============================================
+        document.getElementById('historyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveHistoryBtn');
+            const original = showLoading(btn);
+
+            try {
+                await saveSetting('about_history_title', document.getElementById('historyTitle').value);
+                await saveSetting('about_history_content', document.getElementById('historyContent').value);
+                showMessage('historyMessage', 'success', '✅ History saved successfully!');
+            } catch (error) {
+                showMessage('historyMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // SAVE: VALUES
+        // ============================================
+        document.getElementById('valuesForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveValuesBtn');
+            const original = showLoading(btn);
+
+            try {
+                for (let i = 1; i <= 6; i++) {
+                    await saveSetting(`about_value${i}_icon`, document.getElementById(`value${i}Icon`).value);
+                    await saveSetting(`about_value${i}_title`, document.getElementById(`value${i}Title`).value);
+                    await saveSetting(`about_value${i}_desc`, document.getElementById(`value${i}Desc`).value);
+                }
+                showMessage('valuesMessage', 'success', '✅ Core Values saved successfully!');
+            } catch (error) {
+                showMessage('valuesMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
+
+        // ============================================
+        // ABOUT IMAGE UPLOAD
+        // ============================================
+        function handleAboutImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 3 * 1024 * 1024) {
+                showMessage('aboutImageMessage', 'error', '❌ File is too large. Maximum size is 3MB.');
+                event.target.value = '';
+                return;
+            }
+
+            pendingAboutImage = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('aboutImagePreview').innerHTML = 
+                    `<img src="${e.target.result}" alt="About preview">`;
+                showMessage('aboutImageMessage', 'info', `📷 Selected: ${file.name}. Click "Save Image" to upload.`);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function saveAboutImage() {
+            if (!pendingAboutImage) {
+                showMessage('aboutImageMessage', 'error', '❌ Please select an image first.');
+                return;
+            }
+
+            const btn = document.getElementById('saveAboutImageBtn');
+            const original = showLoading(btn, 'Uploading...');
+
+            try {
+                const timestamp = Date.now();
+                const fileExt = pendingAboutImage.name.split('.').pop();
+                const fileName = `${timestamp}_about.${fileExt}`;
+                const filePath = `about/${fileName}`;
+
+                // Try site-assets bucket
+                let uploadResult = await supabase.storage
+                    .from('site-assets')
+                    .upload(filePath, pendingAboutImage, { upsert: true });
+
+                let bucketUsed = 'site-assets';
+
+                if (uploadResult.error) {
+                    uploadResult = await supabase.storage
+                        .from('membership-documents')
+                        .upload(filePath, pendingAboutImage, { upsert: true });
+                    bucketUsed = 'membership-documents';
+                }
+
+                if (uploadResult.error) throw uploadResult.error;
+
+                const { data: urlData } = supabase.storage
+                    .from(bucketUsed)
+                    .getPublicUrl(filePath);
+
+                await saveSetting('about_image', urlData.publicUrl);
+
+                showMessage('aboutImageMessage', 'success', '✅ About image uploaded and saved successfully!');
+                pendingAboutImage = null;
+                document.getElementById('aboutImageInput').value = '';
+
+            } catch (error) {
+                showMessage('aboutImageMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        }
+
+        // ============================================
+        // LOAD EXISTING SETTINGS
+        // ============================================
+        async function loadSettings() {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('*');
+
+                if (error) throw error;
+
+                const settings = {};
+                (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
+
+                // Who We Are
+                if (settings.about_who_title) document.getElementById('whoTitle').value = settings.about_who_title;
+                if (settings.about_who_content) document.getElementById('whoContent').value = settings.about_who_content;
+
+                // Mission
+                if (settings.about_mission_title) document.getElementById('missionTitle').value = settings.about_mission_title;
+                if (settings.about_mission_content) document.getElementById('missionContent').value = settings.about_mission_content;
+
+                // Vision
+                if (settings.about_vision_title) document.getElementById('visionTitle').value = settings.about_vision_title;
+                if (settings.about_vision_content) document.getElementById('visionContent').value = settings.about_vision_content;
+
+                // History
+                if (settings.about_history_title) document.getElementById('historyTitle').value = settings.about_history_title;
+                if (settings.about_history_content) document.getElementById('historyContent').value = settings.about_history_content;
+
+                // Values
+                for (let i = 1; i <= 6; i++) {
+                    if (settings[`about_value${i}_icon`]) document.getElementById(`value${i}Icon`).value = settings[`about_value${i}_icon`];
+                    if (settings[`about_value${i}_title`]) document.getElementById(`value${i}Title`).value = settings[`about_value${i}_title`];
+                    if (settings[`about_value${i}_desc`]) document.getElementById(`value${i}Desc`).value = settings[`about_value${i}_desc`];
+                }
+
+                // About Image
+                if (settings.about_image) {
+                    document.getElementById('aboutImagePreview').innerHTML = 
+                        `<img src="${settings.about_image}" alt="About image">`;
+                }
+
+                console.log('✅ About page settings loaded');
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+        }
+
+        loadSettings();
+    </script>
+</body>
+</html>
