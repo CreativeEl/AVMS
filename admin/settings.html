@@ -376,8 +376,15 @@
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
                 <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
                 <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="highlights.html"><i class="fas fa-star"></i> <span>Event Highlights</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
-                <a href="donations.html"><i class="fas fa-hand-holding-heart"></i> <span>Donations</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
                 <a href="settings.html" class="active"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -469,29 +476,22 @@
                     Upload your association logo, favicon, and other branding images here. These will appear across the website.
                 </div>
 
-                <!-- Logo Upload -->
                 <div class="settings-card">
                     <h2><i class="fas fa-image"></i> Site Logo</h2>
-
                     <div class="logo-preview-box">
-                        <div class="logo-display" id="logoDisplay">
-                            <i class="fas fa-paw"></i>
-                        </div>
+                        <div class="logo-display" id="logoDisplay"><i class="fas fa-paw"></i></div>
                         <div class="logo-info">
                             <h4>Current Logo</h4>
                             <p id="logoStatus">Using default paw icon</p>
                         </div>
                     </div>
-
                     <div class="image-upload-area" id="logoUploadArea" onclick="document.getElementById('logoInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Click to upload logo</p>
                         <small>PNG, JPG, or SVG (max 2MB) — Recommended size: 200x200px</small>
                         <input type="file" id="logoInput" accept="image/*" onchange="handleLogoUpload(event)">
                     </div>
-
                     <div id="logoPreview" style="display: none;"></div>
-
                     <div class="settings-actions">
                         <button class="btn-save" id="saveLogoBtn" onclick="saveLogo()">
                             <i class="fas fa-save"></i> Save Logo
@@ -500,10 +500,8 @@
                     <div class="save-message" id="logoMessage"></div>
                 </div>
 
-                <!-- Favicon Upload -->
                 <div class="settings-card">
                     <h2><i class="fas fa-star"></i> Favicon</h2>
-
                     <div class="logo-preview-box">
                         <div class="logo-display" id="faviconDisplay" style="border-radius: 8px; background: #f0f4f8;">
                             <i class="fas fa-globe" style="color: #2a4a7a;"></i>
@@ -513,16 +511,13 @@
                             <p id="faviconStatus">Using default globe icon</p>
                         </div>
                     </div>
-
                     <div class="image-upload-area" id="faviconUploadArea" onclick="document.getElementById('faviconInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Click to upload favicon</p>
                         <small>PNG or ICO (max 500KB) — Recommended size: 32x32px</small>
                         <input type="file" id="faviconInput" accept="image/*,.ico" onchange="handleFaviconUpload(event)">
                     </div>
-
                     <div id="faviconPreview" style="display: none;"></div>
-
                     <div class="settings-actions">
                         <button class="btn-save" id="saveFaviconBtn" onclick="saveFavicon()">
                             <i class="fas fa-save"></i> Save Favicon
@@ -531,21 +526,17 @@
                     <div class="save-message" id="faviconMessage"></div>
                 </div>
 
-                <!-- Hero Image Upload -->
                 <div class="settings-card">
                     <h2><i class="fas fa-image"></i> Homepage Hero Image</h2>
-
                     <div id="heroImagePreviewContainer" style="display: none; margin-bottom: 15px;">
                         <img id="heroImagePreview" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid #e0e7ef;" />
                     </div>
-
                     <div class="image-upload-area" onclick="document.getElementById('heroImageInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Click to upload hero image</p>
                         <small>JPG or PNG (max 5MB) — Recommended size: 1920x1080px</small>
                         <input type="file" id="heroImageInput" accept="image/*" onchange="handleHeroImageUpload(event)">
                     </div>
-
                     <div class="settings-actions">
                         <button class="btn-save" id="saveHeroImageBtn" onclick="saveHeroImage()">
                             <i class="fas fa-save"></i> Save Hero Image
@@ -554,21 +545,17 @@
                     <div class="save-message" id="heroImageMessage"></div>
                 </div>
 
-                <!-- About Page Image -->
                 <div class="settings-card">
                     <h2><i class="fas fa-image"></i> About Page Image</h2>
-
                     <div id="aboutImagePreviewContainer" style="display: none; margin-bottom: 15px;">
                         <img id="aboutImagePreview" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid #e0e7ef;" />
                     </div>
-
                     <div class="image-upload-area" onclick="document.getElementById('aboutImageInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Click to upload about page image</p>
                         <small>JPG or PNG (max 3MB) — Recommended size: 800x600px</small>
                         <input type="file" id="aboutImageInput" accept="image/*" onchange="handleAboutImageUpload(event)">
                     </div>
-
                     <div class="settings-actions">
                         <button class="btn-save" id="saveAboutImageBtn" onclick="saveAboutImage()">
                             <i class="fas fa-save"></i> Save About Image
@@ -933,13 +920,11 @@ const admins = [
             const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
             const filePath = `${folder}/${fileName}`;
 
-            // Ensure bucket exists or use existing 'membership-documents' bucket
             const { data, error } = await supabase.storage
                 .from('site-assets')
                 .upload(filePath, file, { upsert: true });
 
             if (error) {
-                // Try fallback bucket
                 const { data: fallbackData, error: fallbackError } = await supabase.storage
                     .from('membership-documents')
                     .upload(filePath, file, { upsert: true });
@@ -989,19 +974,15 @@ const admins = [
         function handleLogoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             if (file.size > 2 * 1024 * 1024) {
                 showMessage('logoMessage', 'error', '❌ File is too large. Max 2MB allowed.');
                 return;
             }
-
             pendingLogoFile = file;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('logoDisplay').innerHTML = `<img src="${e.target.result}" alt="Logo preview">`;
                 document.getElementById('logoStatus').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-                
                 document.getElementById('logoPreview').style.display = 'block';
                 document.getElementById('logoPreview').innerHTML = `
                     <div class="image-preview">
@@ -1010,9 +991,7 @@ const admins = [
                             <p><strong>${file.name}</strong></p>
                             <small>${(file.size / 1024).toFixed(1)} KB — Ready to upload</small>
                         </div>
-                        <button class="remove-btn" onclick="cancelLogoUpload()">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                        <button class="remove-btn" onclick="cancelLogoUpload()"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 `;
             };
@@ -1032,17 +1011,13 @@ const admins = [
                 showMessage('logoMessage', 'error', '❌ Please select a logo file first.');
                 return;
             }
-
             const btn = document.getElementById('saveLogoBtn');
             const original = showLoading(btn, 'Uploading...');
-
             try {
                 const url = await uploadImage(pendingLogoFile, 'logos');
                 await saveSetting('site_logo', url);
-                
                 document.getElementById('logoStatus').textContent = `Uploaded: ${pendingLogoFile.name}`;
                 showMessage('logoMessage', 'success', '✅ Logo uploaded and saved successfully!');
-                
                 pendingLogoFile = null;
                 document.getElementById('logoInput').value = '';
                 document.getElementById('logoPreview').style.display = 'none';
@@ -1061,19 +1036,15 @@ const admins = [
         function handleFaviconUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             if (file.size > 500 * 1024) {
                 showMessage('faviconMessage', 'error', '❌ File is too large. Max 500KB allowed.');
                 return;
             }
-
             pendingFaviconFile = file;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('faviconDisplay').innerHTML = `<img src="${e.target.result}" alt="Favicon preview" style="width: 100%; height: 100%; object-fit: contain;">`;
                 document.getElementById('faviconStatus').textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-
                 document.getElementById('faviconPreview').style.display = 'block';
                 document.getElementById('faviconPreview').innerHTML = `
                     <div class="image-preview">
@@ -1082,9 +1053,7 @@ const admins = [
                             <p><strong>${file.name}</strong></p>
                             <small>${(file.size / 1024).toFixed(1)} KB — Ready to upload</small>
                         </div>
-                        <button class="remove-btn" onclick="cancelFaviconUpload()">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                        <button class="remove-btn" onclick="cancelFaviconUpload()"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 `;
             };
@@ -1104,17 +1073,13 @@ const admins = [
                 showMessage('faviconMessage', 'error', '❌ Please select a favicon file first.');
                 return;
             }
-
             const btn = document.getElementById('saveFaviconBtn');
             const original = showLoading(btn, 'Uploading...');
-
             try {
                 const url = await uploadImage(pendingFaviconFile, 'favicons');
                 await saveSetting('site_favicon', url);
-                
                 document.getElementById('faviconStatus').textContent = `Uploaded: ${pendingFaviconFile.name}`;
                 showMessage('faviconMessage', 'success', '✅ Favicon uploaded and saved successfully!');
-                
                 pendingFaviconFile = null;
                 document.getElementById('faviconInput').value = '';
                 document.getElementById('faviconPreview').style.display = 'none';
@@ -1133,14 +1098,11 @@ const admins = [
         function handleHeroImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             if (file.size > 5 * 1024 * 1024) {
                 showMessage('heroImageMessage', 'error', '❌ File is too large. Max 5MB allowed.');
                 return;
             }
-
             pendingHeroImageFile = file;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('heroImagePreviewContainer').style.display = 'block';
@@ -1155,10 +1117,8 @@ const admins = [
                 showMessage('heroImageMessage', 'error', '❌ Please select an image first.');
                 return;
             }
-
             const btn = document.getElementById('saveHeroImageBtn');
             const original = showLoading(btn, 'Uploading...');
-
             try {
                 const url = await uploadImage(pendingHeroImageFile, 'hero');
                 await saveSetting('hero_image', url);
@@ -1179,14 +1139,11 @@ const admins = [
         function handleAboutImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             if (file.size > 3 * 1024 * 1024) {
                 showMessage('aboutImageMessage', 'error', '❌ File is too large. Max 3MB allowed.');
                 return;
             }
-
             pendingAboutImageFile = file;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('aboutImagePreviewContainer').style.display = 'block';
@@ -1201,10 +1158,8 @@ const admins = [
                 showMessage('aboutImageMessage', 'error', '❌ Please select an image first.');
                 return;
             }
-
             const btn = document.getElementById('saveAboutImageBtn');
             const original = showLoading(btn, 'Uploading...');
-
             try {
                 const url = await uploadImage(pendingAboutImageFile, 'about');
                 await saveSetting('about_image', url);
@@ -1224,7 +1179,6 @@ const admins = [
             e.preventDefault();
             const btn = document.getElementById('saveContactBtn');
             const original = showLoading(btn);
-
             try {
                 await saveSetting('contact_email', document.getElementById('contactEmail').value);
                 await saveSetting('contact_email_2', document.getElementById('contactEmail2').value);
@@ -1248,7 +1202,6 @@ const admins = [
             e.preventDefault();
             const btn = document.getElementById('saveSocialBtn');
             const original = showLoading(btn);
-
             try {
                 await saveSetting('facebook_url', document.getElementById('facebookUrl').value);
                 await saveSetting('twitter_url', document.getElementById('twitterUrl').value);
@@ -1271,7 +1224,6 @@ const admins = [
             e.preventDefault();
             const btn = document.getElementById('saveHomepageBtn');
             const original = showLoading(btn);
-
             try {
                 await saveSetting('hero_title', document.getElementById('heroTitle').value);
                 await saveSetting('hero_subtitle', document.getElementById('heroSubtitle').value);
@@ -1299,7 +1251,6 @@ const admins = [
             e.preventDefault();
             const btn = document.getElementById('saveFooterBtn');
             const original = showLoading(btn);
-
             try {
                 await saveSetting('footer_description', document.getElementById('footerDescription').value);
                 await saveSetting('copyright_text', document.getElementById('copyrightText').value);
@@ -1318,22 +1269,16 @@ const admins = [
         // ============================================
         async function loadSettings() {
             try {
-                const { data, error } = await supabase
-                    .from('site_settings')
-                    .select('*');
-
+                const { data, error } = await supabase.from('site_settings').select('*');
                 if (error) throw error;
 
                 const settings = {};
                 (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
 
-                // General
                 if (settings.site_name) document.getElementById('siteName').value = settings.site_name;
                 if (settings.site_short_name) document.getElementById('siteShortName').value = settings.site_short_name;
                 if (settings.site_tagline) document.getElementById('siteTagline').value = settings.site_tagline;
                 if (settings.site_description) document.getElementById('siteDescription').value = settings.site_description;
-
-                // Contact
                 if (settings.contact_email) document.getElementById('contactEmail').value = settings.contact_email;
                 if (settings.contact_email_2) document.getElementById('contactEmail2').value = settings.contact_email_2;
                 if (settings.contact_phone) document.getElementById('contactPhone').value = settings.contact_phone;
@@ -1341,16 +1286,12 @@ const admins = [
                 if (settings.contact_address) document.getElementById('contactAddress').value = settings.contact_address;
                 if (settings.office_hours) document.getElementById('officeHours').value = settings.office_hours;
                 if (settings.office_hours_weekend) document.getElementById('officeHoursWeekend').value = settings.office_hours_weekend;
-
-                // Social
                 if (settings.facebook_url) document.getElementById('facebookUrl').value = settings.facebook_url;
                 if (settings.twitter_url) document.getElementById('twitterUrl').value = settings.twitter_url;
                 if (settings.instagram_url) document.getElementById('instagramUrl').value = settings.instagram_url;
                 if (settings.youtube_url) document.getElementById('youtubeUrl').value = settings.youtube_url;
                 if (settings.linkedin_url) document.getElementById('linkedinUrl').value = settings.linkedin_url;
                 if (settings.whatsapp_url) document.getElementById('whatsappUrl').value = settings.whatsapp_url;
-
-                // Homepage
                 if (settings.hero_title) document.getElementById('heroTitle').value = settings.hero_title;
                 if (settings.hero_subtitle) document.getElementById('heroSubtitle').value = settings.hero_subtitle;
                 if (settings.hero_description) document.getElementById('heroDescription').value = settings.hero_description;
@@ -1362,14 +1303,10 @@ const admins = [
                 if (settings.welcome_message) document.getElementById('welcomeMessage').value = settings.welcome_message;
                 if (settings.join_preview_title) document.getElementById('joinPreviewTitle').value = settings.join_preview_title;
                 if (settings.join_preview_text) document.getElementById('joinPreviewText').value = settings.join_preview_text;
-
-                // Footer
                 if (settings.footer_description) document.getElementById('footerDescription').value = settings.footer_description;
                 if (settings.copyright_text) document.getElementById('copyrightText').value = settings.copyright_text;
                 if (settings.copyright_year) document.getElementById('copyrightYear').value = settings.copyright_year;
                 if (settings.footer_credit) document.getElementById('footerCredit').value = settings.footer_credit;
-
-                // Branding
                 if (settings.site_logo) {
                     document.getElementById('logoDisplay').innerHTML = `<img src="${settings.site_logo}" alt="Logo">`;
                     document.getElementById('logoStatus').textContent = 'Custom logo uploaded';
