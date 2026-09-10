@@ -135,13 +135,26 @@
 
     <script src="../js/config.js"></script>
     <script>
-        // Check auth
-        if (!sessionStorage.getItem('adminLoggedIn')) {
+        // ============================================
+        // AUTH CHECK - FIXED
+        // ============================================
+        const adminLoggedIn = sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = sessionStorage.getItem('adminEmail');
+        
+        if (!adminLoggedIn) {
+            console.log('❌ Not logged in, redirecting...');
             window.location.href = 'index.html';
+        } else {
+            console.log('✅ Logged in as:', adminEmail);
+            const adminNameEl = document.getElementById('adminName');
+            if (adminNameEl) {
+                adminNameEl.textContent = adminEmail?.split('@')[0] || 'Admin';
+            }
         }
-        document.getElementById('adminName').textContent = sessionStorage.getItem('adminEmail')?.split('@')[0] || 'Admin';
 
-        // Logout
+        // ============================================
+        // LOGOUT
+        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             sessionStorage.removeItem('adminLoggedIn');
@@ -149,10 +162,15 @@
             window.location.href = 'index.html';
         });
 
-        // Load leaders
+        // ============================================
+        // LOAD LEADERS
+        // ============================================
         async function loadLeaders() {
             const tbody = document.getElementById('leadersTableBody');
+            if (!tbody) return;
+            
             try {
+                console.log('📤 Loading leaders...');
                 const { data, error } = await supabase
                     .from('leaders')
                     .select('*')
@@ -164,6 +182,8 @@
                     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No leaders found. Click "Add Leader" to create one.</td></tr>`;
                     return;
                 }
+
+                console.log('✅ Found', data.length, 'leaders');
 
                 tbody.innerHTML = data.map(leader => `
                     <tr>
@@ -179,12 +199,14 @@
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('Error loading leaders:', error);
-                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading leaders</td></tr>`;
+                console.error('❌ Error loading leaders:', error);
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading leaders: ${error.message}</td></tr>`;
             }
         }
 
-        // Modal functions
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
         function openAddModal() {
             document.getElementById('modalTitle').textContent = 'Add Leader';
             document.getElementById('editId').value = '';
@@ -213,7 +235,9 @@
             document.getElementById('leaderModal').classList.remove('show');
         }
 
-        // Save leader
+        // ============================================
+        // SAVE LEADER
+        // ============================================
         document.getElementById('leaderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
@@ -241,7 +265,9 @@
             }
         });
 
-        // Delete leader
+        // ============================================
+        // DELETE LEADER
+        // ============================================
         async function deleteLeader(id) {
             if (!confirm('Are you sure you want to delete this leader?')) return;
             try {
@@ -254,7 +280,9 @@
             }
         }
 
-        // Load on page load
+        // ============================================
+        // INIT
+        // ============================================
         loadLeaders();
 
         // Close modal on outside click
