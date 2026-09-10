@@ -136,13 +136,13 @@
     <script src="../js/config.js"></script>
     <script>
         // ============================================
-        // AUTH CHECK - FIXED
+        // AUTH CHECK - USES BOTH sessionStorage AND localStorage
         // ============================================
-        const adminLoggedIn = sessionStorage.getItem('adminLoggedIn');
-        const adminEmail = sessionStorage.getItem('adminEmail');
+        const adminLoggedIn = sessionStorage.getItem('adminLoggedIn') || localStorage.getItem('adminLoggedIn');
+        const adminEmail = sessionStorage.getItem('adminEmail') || localStorage.getItem('adminEmail');
         
         if (!adminLoggedIn) {
-            console.log('❌ Not logged in, redirecting...');
+            console.log('❌ Not logged in, redirecting to login...');
             window.location.href = 'index.html';
         } else {
             console.log('✅ Logged in as:', adminEmail);
@@ -153,12 +153,14 @@
         }
 
         // ============================================
-        // LOGOUT
+        // LOGOUT - CLEARS BOTH STORAGES
         // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             sessionStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminEmail');
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
             window.location.href = 'index.html';
         });
 
