@@ -199,6 +199,21 @@
             .section-tab { white-space: nowrap; font-size: 13px; padding: 10px 15px; }
             .form-row { grid-template-columns: 1fr; }
         }
+
+        /* ===== SIDEBAR SECTION LABELS (NEW) ===== */
+        .sidebar-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            padding: 18px 20px 6px 20px;
+            user-select: none;
+        }
+        .sidebar-section-label:first-child { padding-top: 4px; }
+        @media (max-width: 768px) {
+            .admin-sidebar .sidebar-section-label { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -206,21 +221,41 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
+                <!-- ===== OVERVIEW ===== -->
+                <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+                <!-- ===== CONTENT ===== -->
+                <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
                 <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
                 <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
-                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
                 <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
                 <a href="highlights.html"><i class="fas fa-star"></i> <span>Event Highlights</span></a>
                 <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+
+                <!-- ===== PAGES ===== -->
+                <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html" class="active"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
+
+                <!-- ===== CBT PORTAL ===== -->
+                <div class="sidebar-section-label">CBT Portal</div>
+                <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
+                <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
+                <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
+
+                <!-- ===== ENGAGEMENT ===== -->
+                <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+
+                <!-- ===== SYSTEM ===== -->
+                <div class="sidebar-section-label">System</div>
                 <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
             <div class="sidebar-footer">
