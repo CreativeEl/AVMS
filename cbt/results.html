@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - AVMS CBT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           TOP BAR
+           ============================================ */
+        .topbar {
+            background: #1a2a4a;
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .topbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+        }
+        .topbar-brand .icon {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .topbar-brand .text h1 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .topbar-brand .text p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+        }
+        .btn-dashboard {
+            background: #e8491d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-dashboard:hover {
+            background: #c73d17;
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           MAIN
+           ============================================ */
+        .main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        /* ============================================
+           SCORE CARD
+           ============================================ */
+        .score-card {
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .score-card-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-emoji {
+            font-size: 60px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .result-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .result-subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 25px;
+        }
+
+        /* Circular score */
+        .score-circle-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 4px solid rgba(255,255,255,0.2);
+        }
+        .score-percent {
+            font-size: 44px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .score-percent-label {
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            margin-top: 5px;
+        }
+
+        /* Pass / fail label */
+        .result-label {
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .result-label.pass {
+            background: #28a745;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+        }
+        .result-label.fail {
+            background: #dc3545;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        /* Score meta line */
+        .score-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .score-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.9);
+        }
+        .score-meta-item i {
+            color: #e8491d;
+        }
+
+        /* ============================================
+           STATS ROW
+           ============================================ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-top: 4px solid #2a4a7a;
+        }
+        .stat-card.correct { border-top-color: #28a745; }
+        .stat-card.wrong { border-top-color: #dc3545; }
+        .stat-card.skipped { border-top-color: #6c757d; }
+        .stat-card i {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        .stat-card.correct i { color: #28a745; }
+        .stat-card.wrong i { color: #dc3545; }
+        .stat-card.skipped i { color: #6c757d; }
+        .stat-card h3 {
+            font-size: 30px;
+            color: #1a2a4a;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        .stat-card p {
+            color: #888;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           ACTION BUTTONS
+           ============================================ */
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .btn-action {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: #e8491d;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #c73d17;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(232, 73, 29, 0.4);
+        }
+        .btn-secondary {
+            background: #2a4a7a;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #1a3a5a;
+            transform: translateY(-2px);
+        }
+        .btn-ghost {
+            background: white;
+            color: #2a4a7a;
+            border: 2px solid #2a4a7a;
+        }
+        .btn-ghost:hover {
+            background: #f0f4f8;
+        }
+
+        /* ============================================
+           REVIEW SECTION
+           ============================================ */
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .review-header h2 {
+            color: #1a2a4a;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .review-header h2 i { color: #e8491d; }
+
+        .review-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-pill {
+            padding: 8px 18px;
+            border: 2px solid #e0e7ef;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+            font-family: inherit;
+            color: #555;
+        }
+        .filter-pill:hover { border-color: #2a4a7a; }
+        .filter-pill.active {
+            background: #1a2a4a;
+            color: white;
+            border-color: #1a2a4a;
+        }
+
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .review-item {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid #e0e7ef;
+        }
+        .review-item.correct { border-left-color: #28a745; }
+        .review-item.wrong { border-left-color: #dc3545; }
+        .review-item.skipped { border-left-color: #6c757d; }
+
+        .review-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .review-item-number {
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .review-status-badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .review-status-badge.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+        .review-status-badge.wrong {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .review-status-badge.skipped {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .review-question {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a2a4a;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .review-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .review-option {
+            padding: 12px 18px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            background: #f8f9fa;
+            border: 2px solid #e0e7ef;
+            color: #333;
+        }
+        .review-option .option-letter {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e0e7ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+            color: #555;
+        }
+        /* The correct answer — always green */
+        .review-option.is-correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        .review-option.is-correct .option-letter {
+            background: #28a745;
+            color: white;
+        }
+        /* What the user chose — if wrong, red */
+        .review-option.user-chose-wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        .review-option.user-chose-wrong .option-letter {
+            background: #dc3545;
+            color: white;
+        }
+        /* What the user chose — if correct, add a small check */
+        .review-option.user-chose-correct {
+            background: #d4edda;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+        }
+
+        .option-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+            margin-left: auto;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .option-tag.correct-tag {
+            background: #28a745;
+            color: white;
+        }
+        .option-tag.your-tag {
+            background: #2a4a7a;
+            color: white;
+        }
+        .option-tag.wrong-tag {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Solution box */
+        .solution-box {
+            background: #e8f0fe;
+            border-left: 4px solid #2a4a7a;
+            padding: 15px 18px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        .solution-box-header {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2a4a7a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .solution-box p {
+            color: #1a3a5a;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Answered note */
+        .user-answer-note {
+            font-size: 13px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .user-answer-note strong {
+            color: #1a2a4a;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .empty-state i {
+            font-size: 50px;
+            color: #d0d7df;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 640px) {
+            .score-card { padding: 30px 20px; }
+            .result-title { font-size: 22px; }
+            .result-emoji { font-size: 45px; }
+            .score-circle { width: 130px; height: 130px; }
+            .score-percent { font-size: 34px; }
+            .score-meta { gap: 15px; font-size: 12px; }
+            .review-item { padding: 20px 15px; }
+            .review-question { font-size: 15px; }
+            .actions-row { flex-direction: column; }
+            .btn-action { width: 100%; justify-content: center; }
+        }
+
+        /* Print styles */
+        @media print {
+            body { background: white; }
+            .topbar, .actions-row, .review-filters { display: none !important; }
+            .score-card { background: #1a2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="topbar-inner">
+            <a href="dashboard.html" class="topbar-brand">
+                <div class="icon">🎓</div>
+                <div class="text">
+                    <h1>AVMS CBT Results</h1>
+                    <p>Association of Veterinary Medical Students</p>
+                </div>
+            </a>
+            <a href="dashboard.html" class="btn-dashboard">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main" id="mainContent">
+        <!-- Populated by JS -->
+    </div>
+
+    <script>
+        // ============================================
+        // SESSION CHECK
+        // ============================================
+        const studentJson = sessionStorage.getItem('cbt_student');
+        const resultJson = sessionStorage.getItem('cbt_last_result');
+
+        if (!studentJson) {
+            window.location.href = 'login.html';
+            throw new Error('No session');
+        }
+        if (!resultJson) {
+            alert('No result found. Redirecting to dashboard.');
+            window.location.href = 'dashboard.html';
+            throw new Error('No result');
+        }
+
+        const student = JSON.parse(studentJson);
+        const result = JSON.parse(resultJson);
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentFilter = 'all';
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}m ${secs}s`;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ============================================
+        // COMPUTE SUMMARY
+        // ============================================
+        let correctCount = 0;
+        let wrongCount = 0;
+        let skippedCount = 0;
+
+        result.answers.forEach(a => {
+            if (!a.user_answer) skippedCount++;
+            else if (a.is_correct) correctCount++;
+            else wrongCount++;
+        });
+
+        const percentage = result.percentage;
+        const passed = percentage >= 50;
+
+        // ============================================
+        // EMOJI + MESSAGE
+        // ============================================
+        let emoji, title, subtitle;
+        if (percentage >= 80) {
+            emoji = '🏆';
+            title = 'Excellent!';
+            subtitle = 'Outstanding performance — you nailed it!';
+        } else if (percentage >= 65) {
+            emoji = '🎉';
+            title = 'Great Job!';
+            subtitle = 'Solid work — keep it up!';
+        } else if (percentage >= 50) {
+            emoji = '👍';
+            title = 'Good Effort!';
+            subtitle = 'You passed — but there\'s room to improve.';
+        } else if (percentage >= 30) {
+            emoji = '📚';
+            title = 'Keep Practicing';
+            subtitle = 'Review the solutions below and try again.';
+        } else {
+            emoji = '💪';
+            title = 'Don\'t Give Up!';
+            subtitle = 'Study the solutions carefully, then retake the test.';
+        }
+
+        // ============================================
+        // BUILD MAIN CONTENT
+        // ============================================
+        const main = document.getElementById('mainContent');
+
+        main.innerHTML = `
+            <!-- SCORE CARD -->
+            <div class="score-card">
+                <div class="score-card-inner">
+                    <span class="result-emoji">${emoji}</span>
+                    <div class="result-title">${title}</div>
+                    <div class="result-subtitle">${subtitle}</div>
+
+                    <div class="score-circle-wrap">
+                        <div class="score-circle">
+                            <div class="score-percent">${percentage}%</div>
+                            <div class="score-percent-label">${result.score} / ${result.total}</div>
+                        </div>
+                    </div>
+
+                    <div class="result-label ${passed ? 'pass' : 'fail'}">
+                        ${passed ? '✓ Passed' : '✗ Failed'}
+                    </div>
+
+                    <div class="score-meta">
+                        <div class="score-meta-item">
+                            <i class="fas fa-book"></i>
+                            <span>${result.course_code} — ${result.course_name}</span>
+                        </div>
+                        <div class="score-meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Time used: ${formatTime(result.time_taken_seconds)}</span>
+                        </div>
+                        <div class="score-meta-item">
+                            <i class="fas fa-${result.mode === 'exam' ? 'clipboard-list' : 'pen'}"></i>
+                            <span>${result.mode === 'exam' ? 'Exam' : 'Practice Test'}</span>
+                        </div>
+                        ${result.auto_submitted ? `
+                            <div class="score-meta-item" style="color: #ffc107;">
+                                <i class="fas fa-exclamation-triangle" style="color: #ffc107;"></i>
+                                <span>Auto-submitted (time up / left page)</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATS ROW -->
+            <div class="stats-row">
+                <div class="stat-card correct">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>${correctCount}</h3>
+                    <p>Correct</p>
+                </div>
+                <div class="stat-card wrong">
+                    <i class="fas fa-times-circle"></i>
+                    <h3>${wrongCount}</h3>
+                    <p>Wrong</p>
+                </div>
+                <div class="stat-card skipped">
+                    <i class="fas fa-minus-circle"></i>
+                    <h3>${skippedCount}</h3>
+                    <p>Skipped</p>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="actions-row">
+                <button class="btn-action btn-primary" onclick="retake()">
+                    <i class="fas fa-redo"></i> Retake ${result.mode === 'exam' ? 'Exam' : 'Test'}
+                </button>
+                <a href="dashboard.html" class="btn-action btn-secondary">
+                    <i class="fas fa-home"></i> Back to Dashboard
+                </a>
+                <button class="btn-action btn-ghost" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Results
+                </button>
+            </div>
+
+            <!-- REVIEW SECTION -->
+            <div class="review-header">
+                <h2><i class="fas fa-search"></i> Review Answers</h2>
+                <div class="review-filters">
+                    <button class="filter-pill active" onclick="filterReview('all', this)">All (${result.total})</button>
+                    <button class="filter-pill" onclick="filterReview('correct', this)">✓ Correct (${correctCount})</button>
+                    <button class="filter-pill" onclick="filterReview('wrong', this)">✗ Wrong (${wrongCount})</button>
+                    <button class="filter-pill" onclick="filterReview('skipped', this)">− Skipped (${skippedCount})</button>
+                </div>
+            </div>
+
+            <div class="review-list" id="reviewList"></div>
+        `;
+
+        // ============================================
+        // RENDER REVIEW LIST
+        // ============================================
+        function renderReview() {
+            const list = document.getElementById('reviewList');
+            let filtered = result.answers;
+
+            if (currentFilter === 'correct') filtered = filtered.filter(a => a.is_correct);
+            else if (currentFilter === 'wrong') filtered = filtered.filter(a => a.user_answer && !a.is_correct);
+            else if (currentFilter === 'skipped') filtered = filtered.filter(a => !a.user_answer);
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No questions match this filter.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filtered.map((a, i) => {
+                const originalIndex = result.answers.indexOf(a) + 1;
+                let statusClass, statusIcon, statusText;
+                if (!a.user_answer) {
+                    statusClass = 'skipped';
+                    statusIcon = 'fa-minus-circle';
+                    statusText = 'Skipped';
+                } else if (a.is_correct) {
+                    statusClass = 'correct';
+                    statusIcon = 'fa-check-circle';
+                    statusText = 'Correct';
+                } else {
+                    statusClass = 'wrong';
+                    statusIcon = 'fa-times-circle';
+                    statusText = 'Wrong';
+                }
+
+                // Build options with visual cues
+                const optionsHtml = a.options.map(opt => {
+                    const isCorrect = opt.letter === a.correct_answer;
+                    const isUserChoice = opt.letter === a.user_answer;
+                    let cls = '';
+                    let tag = '';
+
+                    if (isCorrect && isUserChoice) {
+                        cls = 'is-correct user-chose-correct';
+                        tag = '<span class="option-tag correct-tag">✓ Your Answer (Correct)</span>';
+                    } else if (isCorrect) {
+                        cls = 'is-correct';
+                        tag = '<span class="option-tag correct-tag">✓ Correct Answer</span>';
+                    } else if (isUserChoice) {
+                        cls = 'user-chose-wrong';
+                        tag = '<span class="option-tag wrong-tag">✗ Your Answer</span>';
+                    }
+
+                    return `
+                        <div class="review-option ${cls}">
+                            <div class="option-letter">${opt.letter}</div>
+                            <div>${escapeHtml(opt.text)}</div>
+                            ${tag}
+                        </div>
+                    `;
+                }).join('');
+
+                const userAnswerNote = a.user_answer
+                    ? `<div class="user-answer-note">You chose <strong>${a.user_answer}</strong>. Correct answer is <strong>${a.correct_answer}</strong>.</div>`
+                    : `<div class="user-answer-note">You did not answer this question. Correct answer is <strong>${a.correct_answer}</strong>.</div>`;
+
+                const solutionHtml = a.solution
+                    ? `
+                        <div class="solution-box">
+                            <div class="solution-box-header">
+                                <i class="fas fa-lightbulb"></i> Solution
+                            </div>
+                            <p>${escapeHtml(a.solution)}</p>
+                        </div>
+                    `
+                    : '';
+
+                return `
+                    <div class="review-item ${statusClass}">
+                        <div class="review-item-header">
+                            <span class="review-item-number">Question ${originalIndex}</span>
+                            <span class="review-status-badge ${statusClass}">
+                                <i class="fas ${statusIcon}"></i> ${statusText}
+                            </span>
+                        </div>
+                        <div class="review-question">${escapeHtml(a.question)}</div>
+                        <div class="review-options">${optionsHtml}</div>
+                        ${userAnswerNote}
+                        ${solutionHtml}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // FILTER
+        // ============================================
+        function filterReview(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            renderReview();
+        }
+
+        // ============================================
+        // RETAKE
+        // ============================================
+        function retake() {
+            // Keep the same mode config, just clear the test progress
+            const storageKey = `cbt_test_${result.course_id}_${result.mode}`;
+            localStorage.removeItem(storageKey);
+            sessionStorage.removeItem('cbt_last_result');
+
+            // Redirect to the test/exam page directly
+            const goTo = result.mode === 'exam' ? 'exam.html' : 'test.html';
+            window.location.href = goTo;
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        renderReview();
+
+        // Clear the result from session so refresh doesn't re-show stale data
+        // (Keep it until user navigates away though — they may want to filter)
+        window.addEventListener('beforeunload', () => {
+            // Don't clear — user might want to go back and see it
+        });
+
+        console.log('✅ Results page loaded');
+    </script>
+</body>
+</html>
