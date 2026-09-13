@@ -2643,3 +2643,67 @@ body {
 .admin-login-btn i {
     margin-right: 8px;
 }
+
+/* ============================================
+   CBT PRACTICE BUTTON IN NAVIGATION
+   ============================================ */
+
+.nav-cbt-item {
+    list-style: none;
+    margin-left: 8px;
+}
+
+.nav-cbt-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e8491d !important;
+    color: white !important;
+    padding: 8px 18px !important;
+    border-radius: 30px !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(232, 73, 29, 0.3) !important;
+    white-space: nowrap;
+}
+
+.nav-cbt-btn:hover {
+    background: #c73d17 !important;
+    color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(232, 73, 29, 0.5) !important;
+}
+
+.nav-cbt-btn i {
+    font-size: 13px;
+}
+
+/* Tablet: keep nav readable */
+@media (max-width: 1024px) {
+    .nav-cbt-btn {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+    }
+    .nav-cbt-btn i {
+        font-size: 11px;
+    }
+}
+
+/* Mobile: full-width tappable row in the dropdown */
+@media (max-width: 768px) {
+    .nav-cbt-item {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+    }
+    .nav-cbt-btn {
+        display: flex !important;
+        justify-content: center;
+        width: 100%;
+        padding: 12px 20px !important;
+        font-size: 14px !important;
+        border-radius: 8px !important;
+    }
+}
