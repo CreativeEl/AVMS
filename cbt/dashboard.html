@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Dashboard - AVMS ABU Zaria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+            min-height: 100vh;
+        }
+
+        /* ============================================
+           TOP BAR
+           ============================================ */
+        .topbar {
+            background: #1a2a4a;
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .topbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+        }
+        .topbar-brand .icon {
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .topbar-brand .text h1 {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .topbar-brand .text p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .user-pill {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 13px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-pill i {
+            color: #e8491d;
+        }
+        .btn-logout {
+            background: #e8491d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-logout:hover {
+            background: #c73d17;
+            transform: translateY(-2px);
+        }
+
+        /* ============================================
+           MAIN
+           ============================================ */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        /* Welcome card */
+        .welcome-card {
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            color: white;
+            padding: 35px 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+        .welcome-card-inner {
+            position: relative;
+            z-index: 1;
+        }
+        .welcome-card h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        .welcome-card p {
+            color: rgba(255,255,255,0.85);
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .welcome-meta {
+            display: flex;
+            gap: 25px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .welcome-meta .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .welcome-meta .meta-item i {
+            color: #e8491d;
+        }
+
+        /* Semester selector */
+        .semester-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .semester-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a2a4a;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .semester-label i {
+            color: #e8491d;
+        }
+        .semester-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .semester-tab {
+            background: #f8f9fa;
+            border: 3px solid #e0e7ef;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .semester-tab i {
+            font-size: 24px;
+            color: #2a4a7a;
+        }
+        .semester-tab:hover {
+            border-color: #2a4a7a;
+            background: #f0f4f8;
+        }
+        .semester-tab.active {
+            border-color: #e8491d;
+            background: #fff5f2;
+            color: #1a2a4a;
+        }
+        .semester-tab.active i {
+            color: #e8491d;
+        }
+
+        /* Courses section */
+        .courses-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .courses-section-header h3 {
+            color: #1a2a4a;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .courses-section-header h3 i {
+            color: #e8491d;
+        }
+        .course-count {
+            background: #e8f0fe;
+            color: #2a4a7a;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-top: 4px solid #2a4a7a;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .course-code {
+            background: #1a2a4a;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+        .course-semester-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .course-semester-badge.sem1 {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .course-semester-badge.sem2 {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .course-name {
+            color: #1a2a4a;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .course-description {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .course-stats {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+            border-top: 1px solid #e0e7ef;
+            border-bottom: 1px solid #e0e7ef;
+        }
+        .course-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #666;
+        }
+        .course-stat i {
+            color: #2a4a7a;
+        }
+        .course-stat strong {
+            color: #1a2a4a;
+        }
+
+        .course-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .btn-mode {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-family: inherit;
+        }
+        .btn-mode .mode-label {
+            font-size: 12px;
+            opacity: 0.85;
+            font-weight: 500;
+        }
+        .btn-test {
+            background: #2a4a7a;
+            color: white;
+        }
+        .btn-test:hover:not(:disabled) {
+            background: #1a3a5a;
+            transform: translateY(-2px);
+        }
+        .btn-exam {
+            background: #e8491d;
+            color: white;
+        }
+        .btn-exam:hover:not(:disabled) {
+            background: #c73d17;
+            transform: translateY(-2px);
+        }
+        .btn-mode:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .btn-mode i {
+            font-size: 16px;
+        }
+
+        /* Empty / loading states */
+        .empty-state {
+            background: white;
+            padding: 60px 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: #888;
+            grid-column: 1 / -1;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .empty-state i {
+            font-size: 60px;
+            color: #d0d7df;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .empty-state h4 {
+            color: #1a2a4a;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .page-footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #888;
+            font-size: 13px;
+            border-top: 1px solid #e0e7ef;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 640px) {
+            .topbar-inner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .topbar-user {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .welcome-card {
+                padding: 25px 20px;
+            }
+            .welcome-card h2 {
+                font-size: 22px;
+            }
+            .semester-tabs {
+                grid-template-columns: 1fr;
+            }
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+            .course-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================
+         TOP BAR
+         ============================================ -->
+    <div class="topbar">
+        <div class="topbar-inner">
+            <a href="dashboard.html" class="topbar-brand">
+                <div class="icon">🎓</div>
+                <div class="text">
+                    <h1>AVMS CBT Practice</h1>
+                    <p>Association of Veterinary Medical Students</p>
+                </div>
+            </a>
+            <div class="topbar-user">
+                <div class="user-pill">
+                    <i class="fas fa-user-graduate"></i>
+                    <span id="topbarName">Student</span>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MAIN CONTENT
+         ============================================ -->
+    <div class="main">
+
+        <!-- Welcome Card -->
+        <div class="welcome-card">
+            <div class="welcome-card-inner">
+                <h2 id="welcomeTitle">Welcome 👋</h2>
+                <p>Ready to practice? Choose a semester, then pick a course to test yourself.</p>
+                <div class="welcome-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-id-card"></i>
+                        <span id="metaRegNo">—</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-layer-group"></i>
+                        <span id="metaLevel">Level —</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="metaState">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Semester Selector -->
+        <div class="semester-section">
+            <div class="semester-label">
+                <i class="fas fa-calendar-alt"></i> Choose Semester
+            </div>
+            <div class="semester-tabs">
+                <button class="semester-tab active" data-semester="1" onclick="selectSemester(1, this)">
+                    <i class="fas fa-calendar-day"></i>
+                    <span>1st Semester</span>
+                </button>
+                <button class="semester-tab" data-semester="2" onclick="selectSemester(2, this)">
+                    <i class="fas fa-calendar-week"></i>
+                    <span>2nd Semester</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Courses Section -->
+        <div class="courses-section-header">
+            <h3>
+                <i class="fas fa-book"></i>
+                <span id="coursesTitle">1st Semester Courses</span>
+            </h3>
+            <span class="course-count" id="courseCount">0 courses</span>
+        </div>
+
+        <div class="courses-grid" id="coursesGrid">
+            <div class="empty-state">
+                <span class="spinner" style="border-color: #2a4a7a; border-top-color: transparent; width: 30px; height: 30px;"></span>
+                <p style="margin-top: 15px;">Loading courses...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="page-footer">
+            🎓 AVMS CBT Practice Portal · Ahmadu Bello University, Zaria
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SESSION CHECK
+        // ============================================
+        const studentJson = sessionStorage.getItem('cbt_student');
+
+        if (!studentJson) {
+            console.log('❌ No session — redirecting to login');
+            window.location.href = 'login.html';
+            throw new Error('Not logged in');
+        }
+
+        let student;
+        try {
+            student = JSON.parse(studentJson);
+        } catch (err) {
+            console.error('Bad session data:', err);
+            sessionStorage.removeItem('cbt_student');
+            window.location.href = 'login.html';
+            throw err;
+        }
+
+        console.log('✅ Logged in as:', student.full_name);
+
+        // ============================================
+        // POPULATE STUDENT INFO
+        // ============================================
+        document.getElementById('topbarName').textContent = student.full_name.split(' ')[0];
+        document.getElementById('welcomeTitle').textContent = `Welcome, ${student.full_name.split(' ')[0]}! 👋`;
+        document.getElementById('metaRegNo').textContent = student.reg_no;
+        document.getElementById('metaLevel').textContent = `Level ${student.level}`;
+        document.getElementById('metaState').textContent =
+            student.state_of_origin.charAt(0).toUpperCase() + student.state_of_origin.slice(1);
+
+        // ============================================
+        // STATE
+        // ============================================
+        let currentSemester = 1;
+        let allCourses = [];
+        let questionCounts = {}; // { course_id: count }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        function logout() {
+            if (!confirm('Are you sure you want to log out?')) return;
+            sessionStorage.removeItem('cbt_student');
+            window.location.href = 'login.html';
+        }
+
+        // ============================================
+        // SELECT SEMESTER
+        // ============================================
+        function selectSemester(sem, btn) {
+            currentSemester = sem;
+            document.querySelectorAll('.semester-tab').forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('coursesTitle').textContent = `${sem === 1 ? '1st' : '2nd'} Semester Courses`;
+            displayCourses();
+        }
+
+        // ============================================
+        // LOAD COURSES
+        // ============================================
+        async function loadCourses() {
+            try {
+                const { data, error } = await supabase
+                    .from('cbt_courses')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('code', { ascending: true });
+
+                if (error) throw error;
+
+                allCourses = data || [];
+                console.log(`✅ Loaded ${allCourses.length} courses`);
+
+                // Load question counts for all courses
+                await loadQuestionCounts();
+
+                displayCourses();
+            } catch (err) {
+                console.error('Error loading courses:', err);
+                document.getElementById('coursesGrid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Could not load courses</h4>
+                        <p>Please check your internet connection and refresh the page.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // LOAD QUESTION COUNTS
+        // ============================================
+        async function loadQuestionCounts() {
+            try {
+                const { data, error } = await supabase
+                    .from('cbt_questions')
+                    .select('course_id')
+                    .eq('is_active', true);
+
+                if (error) throw error;
+
+                // Count per course
+                questionCounts = {};
+                (data || []).forEach(q => {
+                    questionCounts[q.course_id] = (questionCounts[q.course_id] || 0) + 1;
+                });
+
+                console.log('📊 Question counts loaded:', questionCounts);
+            } catch (err) {
+                console.error('Error loading question counts:', err);
+                questionCounts = {};
+            }
+        }
+
+        // ============================================
+        // DISPLAY COURSES FOR CURRENT SEMESTER
+        // ============================================
+        function displayCourses() {
+            const grid = document.getElementById('coursesGrid');
+            const filtered = allCourses.filter(c => c.semester === currentSemester);
+
+            document.getElementById('courseCount').textContent =
+                `${filtered.length} course${filtered.length !== 1 ? 's' : ''}`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-book-open"></i>
+                        <h4>No courses for this semester yet</h4>
+                        <p>Check back later — the admin will add courses soon.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(course => {
+                const qCount = questionCounts[course.id] || 0;
+                const canTakeTest = qCount >= 10;   // require at least 10 questions
+                const canTakeExam = qCount >= 20;   // require at least 20 for exam
+
+                return `
+                    <div class="course-card">
+                        <div class="course-header">
+                            <span class="course-code">${course.code}</span>
+                            <span class="course-semester-badge ${course.semester === 1 ? 'sem1' : 'sem2'}">
+                                ${course.semester === 1 ? '1st Sem' : '2nd Sem'}
+                            </span>
+                        </div>
+                        <div class="course-name">${course.name}</div>
+                        <div class="course-description">${course.description || 'No description available.'}</div>
+                        <div class="course-stats">
+                            <div class="course-stat">
+                                <i class="fas fa-question-circle"></i>
+                                <strong>${qCount}</strong> questions
+                            </div>
+                            <div class="course-stat">
+                                <i class="fas fa-clock"></i>
+                                Test 40m · Exam 60m
+                            </div>
+                        </div>
+                        <div class="course-actions">
+                            <button class="btn-mode btn-test" onclick="startMode('test', ${course.id}, '${course.code}')" ${!canTakeTest ? 'disabled title="Need at least 10 questions"' : ''}>
+                                <i class="fas fa-pen"></i>
+                                Take Test
+                                <span class="mode-label">40 Qs · 40 min</span>
+                            </button>
+                            <button class="btn-mode btn-exam" onclick="startMode('exam', ${course.id}, '${course.code}')" ${!canTakeExam ? 'disabled title="Need at least 20 questions"' : ''}>
+                                <i class="fas fa-clipboard-list"></i>
+                                Take Exam
+                                <span class="mode-label">60 Qs · 60 min</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // START TEST / EXAM
+        // ============================================
+        function startMode(mode, courseId, courseCode) {
+            const course = allCourses.find(c => c.id === courseId);
+            const qCount = questionCounts[courseId] || 0;
+            const requiredQs = mode === 'test' ? 40 : 60;
+
+            if (qCount < requiredQs) {
+                alert(
+                    `⚠️ Not enough questions for this ${mode}.\n\n` +
+                    `This course has ${qCount} question${qCount !== 1 ? 's' : ''}.\n` +
+                    `A ${mode} needs ${requiredQs} questions.\n\n` +
+                    `Please try again later or contact admin.`
+                );
+                return;
+            }
+
+            // Save mode + course for the test page to pick up
+            const modeConfig = {
+                mode: mode,
+                course_id: courseId,
+                course_code: courseCode,
+                course_name: course ? course.name : '',
+                question_count: mode === 'test' ? 40 : 60,
+                time_minutes: mode === 'test' ? 40 : 60,
+                started_from: 'dashboard'
+            };
+            sessionStorage.setItem('cbt_current_mode', JSON.stringify(modeConfig));
+
+            console.log('🎬 Starting:', modeConfig);
+            window.location.href = mode === 'test' ? 'test.html' : 'exam.html';
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        loadCourses();
+    </script>
+</body>
+</html>
