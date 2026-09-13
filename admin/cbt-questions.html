@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Questions - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .btn-add { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-add:hover { background: #218838; }
+        .btn-bulk { background: #2a4a7a; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-bulk:hover { background: #1a3a5a; }
+        .btn-export { background: #e8491d; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-export:hover { background: #c73d17; }
+
+        .info-box {
+            background: #e8f0fe;
+            color: #1a3a5a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2a4a7a;
+            font-size: 14px;
+        }
+        .info-box i { margin-right: 8px; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-mini {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .stat-mini i {
+            font-size: 28px;
+            color: #e8491d;
+        }
+        .stat-mini h3 {
+            color: #1a2a4a;
+            font-size: 22px;
+            margin-bottom: 2px;
+        }
+        .stat-mini p {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        th { background: #f8f9fa; padding: 12px 15px; text-align: left; font-weight: 600; color: #1a2a4a; border-bottom: 2px solid #e0e7ef; font-size: 14px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #e0e7ef; font-size: 14px; }
+        tr:hover { background: #f8f9fa; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-active { background: #d4edda; color: #155724; }
+        .badge-inactive { background: #f8d7da; color: #721c24; }
+        .badge-easy { background: #d4edda; color: #155724; }
+        .badge-medium { background: #fff3cd; color: #856404; }
+        .badge-hard { background: #f8d7da; color: #721c24; }
+        .course-pill {
+            background: #1a2a4a;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .question-preview {
+            max-width: 320px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .answer-pill {
+            background: #e8491d;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .btn-edit { background: #2a4a7a; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; }
+        .btn-delete { background: #dc3545; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
+        .btn-edit:hover { background: #1a3a5a; }
+        .btn-delete:hover { background: #c82333; }
+        .btn-toggle { background: #6c757d; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; margin-right: 5px; }
+        .btn-toggle:hover { background: #5a6268; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 750px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-content h2 { margin-bottom: 20px; color: #1a2a4a; }
+        .modal-content .form-group { margin-bottom: 15px; }
+        .modal-content label { display: block; font-weight: 600; margin-bottom: 5px; color: #1a2a4a; font-size: 14px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #2a4a7a; }
+        .modal-content textarea { resize: vertical; min-height: 80px; }
+        .modal-content small { display: block; color: #888; font-size: 12px; margin-top: 4px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .option-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 50px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .option-label {
+            background: #2a4a7a;
+            color: white;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .option-row input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #28a745;
+            cursor: pointer;
+            margin: 0 auto;
+        }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; }
+        .checkbox-group input[type="checkbox"] { width: auto; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-save { background: #28a745; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-cancel { background: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .btn-save:hover { background: #218838; }
+        .btn-cancel:hover { background: #5a6268; }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+        .empty-state { text-align: center; padding: 40px; color: #888; }
+        .search-box { padding: 10px 15px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; width: 280px; }
+        .search-box:focus { outline: none; border-color: #2a4a7a; }
+        .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 20px; border: 2px solid #e0e7ef; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
+        .filter-btn:hover { border-color: #2a4a7a; }
+        .filter-btn.active { background: #1a2a4a; color: white; border-color: #1a2a4a; }
+        .course-filter { padding: 8px 15px; border: 2px solid #e0e7ef; border-radius: 25px; font-size: 14px; font-weight: 600; background: white; cursor: pointer; }
+
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s ease-in-out infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .bulk-info {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-left: 4px solid #ffc107;
+        }
+        .csv-example {
+            background: #1a2a4a;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 11px;
+            overflow-x: auto;
+            margin: 10px 0;
+            white-space: pre;
+            line-height: 1.5;
+        }
+
+        /* ===== SIDEBAR SECTION LABELS ===== */
+        .sidebar-section-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            padding: 18px 20px 6px 20px;
+            user-select: none;
+        }
+        .sidebar-section-label:first-child { padding-top: 4px; }
+        @media (max-width: 768px) {
+            .admin-sidebar .sidebar-section-label { display: none; }
+            .form-row { grid-template-columns: 1fr; }
+            .search-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <!-- ===== OVERVIEW ===== -->
+                <div class="sidebar-section-label">Overview</div>
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+                <!-- ===== CONTENT ===== -->
+                <div class="sidebar-section-label">Content</div>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="highlights.html"><i class="fas fa-star"></i> <span>Event Highlights</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+
+                <!-- ===== PAGES ===== -->
+                <div class="sidebar-section-label">Pages</div>
+                <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
+
+                <!-- ===== CBT PORTAL ===== -->
+                <div class="sidebar-section-label">CBT Portal</div>
+                <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
+                <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
+                <a href="cbt-questions.html" class="active"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
+
+                <!-- ===== ENGAGEMENT ===== -->
+                <div class="sidebar-section-label">Engagement</div>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+
+                <!-- ===== SYSTEM ===== -->
+                <div class="sidebar-section-label">System</div>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>CBT Questions</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Manage the question bank. Questions are pulled from here when students take practice tests. Each question has <strong>4 options (A–D)</strong>, a <strong>correct answer</strong>, and a <strong>solution</strong> for the review page.
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-mini">
+                    <i class="fas fa-question-circle"></i>
+                    <div>
+                        <h3 id="statTotal">0</h3>
+                        <p>Total Questions</p>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3 id="statActive">0</h3>
+                        <p>Active</p>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-book"></i>
+                    <div>
+                        <h3 id="statCourses">0</h3>
+                        <p>Courses Covered</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Bar -->
+            <div class="page-header">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <select class="course-filter" id="courseFilter" onchange="filterByCourse()">
+                        <option value="">All Courses</option>
+                    </select>
+                    <button class="filter-btn active" onclick="filterQuestions('all', this)">All</button>
+                    <button class="filter-btn" onclick="filterQuestions('active', this)">Active</button>
+                    <button class="filter-btn" onclick="filterQuestions('inactive', this)">Inactive</button>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search questions..." oninput="searchQuestions()">
+                    <button class="btn-bulk" onclick="openBulkModal()"><i class="fas fa-upload"></i> Bulk Import</button>
+                    <button class="btn-export" onclick="exportToJS()"><i class="fas fa-download"></i> Export to JS</button>
+                    <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Question</button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Course</th>
+                            <th>Question</th>
+                            <th>Answer</th>
+                            <th>Difficulty</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="questionsTableBody">
+                        <tr><td colspan="7" class="empty-state">Loading questions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Question Modal -->
+    <div class="modal" id="questionModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Question</h2>
+            <form id="questionForm">
+                <input type="hidden" id="editId" value="">
+                <div class="form-group">
+                    <label for="courseSelect">Course *</label>
+                    <select id="courseSelect" required>
+                        <option value="">Select course...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="questionText">Question Text *</label>
+                    <textarea id="questionText" required placeholder="e.g., Which of the following is NOT a noble gas?" style="min-height: 70px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Options — fill all 4, then select the correct one *</label>
+                    <div class="option-row">
+                        <span class="option-label">A</span>
+                        <input type="text" id="optionA" required placeholder="Option A text">
+                        <input type="radio" name="correctAnswer" value="A" id="ansA">
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">B</span>
+                        <input type="text" id="optionB" required placeholder="Option B text">
+                        <input type="radio" name="correctAnswer" value="B" id="ansB">
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">C</span>
+                        <input type="text" id="optionC" required placeholder="Option C text">
+                        <input type="radio" name="correctAnswer" value="C" id="ansC">
+                    </div>
+                    <div class="option-row">
+                        <span class="option-label">D</span>
+                        <input type="text" id="optionD" required placeholder="Option D text">
+                        <input type="radio" name="correctAnswer" value="D" id="ansD">
+                    </div>
+                    <small>👉 Click the radio button next to the correct answer</small>
+                </div>
+                <div class="form-group">
+                    <label for="solution">Solution / Explanation</label>
+                    <textarea id="solution" placeholder="Explain why this is the correct answer. Shown on the review page."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="difficulty">Difficulty</label>
+                        <select id="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox-group" style="margin-top: 30px;">
+                            <input type="checkbox" id="isActive" checked>
+                            <label for="isActive" style="margin: 0; cursor: pointer;">Active (available for tests)</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="saveBtn">Save Question</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bulk Import Modal -->
+    <div class="modal" id="bulkModal">
+        <div class="modal-content">
+            <h2>Bulk Import Questions (CSV)</h2>
+            <div class="bulk-info">
+                <i class="fas fa-info-circle"></i> Paste CSV below. <strong>One question per line.</strong> All fields separated by commas. Correct answer must be <strong>A, B, C, or D</strong>.
+            </div>
+            <div class="csv-example">course_code,question_text,option_a,option_b,option_c,option_d,correct_answer,solution,difficulty
+CHM101,Which is NOT a noble gas?,Helium,Neon,Oxygen,Argon,C,Oxygen is in Group 16 - not a noble gas.,easy
+CHM101,What is the atomic number of carbon?,6,12,14,8,A,Carbon has 6 protons.,easy</div>
+            <form id="bulkForm">
+                <div class="form-group">
+                    <label for="bulkData">CSV Data *</label>
+                    <textarea id="bulkData" required placeholder="Paste CSV here..." style="min-height: 220px; font-family: monospace; font-size: 12px;"></textarea>
+                    <small>Header row is optional. Courses must exist — they are matched by course_code.</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeBulkModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="bulkSaveBtn">Import All</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+
+        if (!adminLoggedIn) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
+        }
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // STATE
+        // ============================================
+        let allQuestions = [];
+        let allCourses = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentCourseFilter = '';
+
+        // ============================================
+        // LOAD COURSES (for dropdowns)
+        // ============================================
+        async function loadCourses() {
+            const { data, error } = await supabase
+                .from('cbt_courses')
+                .select('id, code, name, semester')
+                .order('code', { ascending: true });
+
+            if (error) {
+                console.error('Error loading courses:', error);
+                return;
+            }
+
+            allCourses = data || [];
+
+            // Populate dropdowns
+            const filterSelect = document.getElementById('courseFilter');
+            const formSelect = document.getElementById('courseSelect');
+
+            filterSelect.innerHTML = '<option value="">All Courses</option>';
+            formSelect.innerHTML = '<option value="">Select course...</option>';
+
+            allCourses.forEach(c => {
+                const opt1 = document.createElement('option');
+                opt1.value = c.id;
+                opt1.textContent = `${c.code} — ${c.name}`;
+                filterSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = c.id;
+                opt2.textContent = `${c.code} — ${c.name}`;
+                formSelect.appendChild(opt2);
+            });
+        }
+
+        // ============================================
+        // LOAD QUESTIONS
+        // ============================================
+        async function loadQuestions() {
+            const tbody = document.getElementById('questionsTableBody');
+            try {
+                const { data, error } = await supabase
+                    .from('cbt_questions')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allQuestions = data || [];
+                updateStats();
+                displayQuestions();
+            } catch (error) {
+                console.error('Error loading questions:', error);
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error loading questions: ${error.message}</td></tr>`;
+            }
+        }
+
+        function updateStats() {
+            const total = allQuestions.length;
+            const active = allQuestions.filter(q => q.is_active).length;
+            const courseSet = new Set(allQuestions.map(q => q.course_id).filter(Boolean));
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statActive').textContent = active;
+            document.getElementById('statCourses').textContent = courseSet.size;
+        }
+
+        function getCourseCode(courseId) {
+            const c = allCourses.find(c => c.id === courseId);
+            return c ? c.code : '—';
+        }
+
+        // ============================================
+        // DISPLAY QUESTIONS
+        // ============================================
+        function displayQuestions() {
+            const tbody = document.getElementById('questionsTableBody');
+            let filtered = allQuestions;
+
+            if (currentFilter === 'active') {
+                filtered = filtered.filter(q => q.is_active);
+            } else if (currentFilter === 'inactive') {
+                filtered = filtered.filter(q => !q.is_active);
+            }
+
+            if (currentCourseFilter) {
+                filtered = filtered.filter(q => q.course_id === parseInt(currentCourseFilter));
+            }
+
+            if (currentSearch) {
+                const search = currentSearch.toLowerCase();
+                filtered = filtered.filter(q =>
+                    (q.question_text || '').toLowerCase().includes(search) ||
+                    (q.option_a || '').toLowerCase().includes(search) ||
+                    (q.option_b || '').toLowerCase().includes(search) ||
+                    (q.option_c || '').toLowerCase().includes(search) ||
+                    (q.option_d || '').toLowerCase().includes(search)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No questions found. Click "Add Question" or "Bulk Import" to get started.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map((q, i) => `
+                <tr>
+                    <td style="color: #888; font-size: 12px;">${i + 1}</td>
+                    <td><span class="course-pill">${getCourseCode(q.course_id)}</span></td>
+                    <td><div class="question-preview" title="${escapeHtml(q.question_text)}">${escapeHtml(q.question_text)}</div></td>
+                    <td><span class="answer-pill">${q.correct_answer}</span></td>
+                    <td><span class="badge badge-${q.difficulty || 'medium'}">${q.difficulty || 'medium'}</span></td>
+                    <td><span class="badge ${q.is_active ? 'badge-active' : 'badge-inactive'}">${q.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <button class="btn-toggle" onclick="toggleActive(${q.id}, ${!q.is_active})" title="${q.is_active ? 'Deactivate' : 'Activate'}">
+                            <i class="fas fa-${q.is_active ? 'ban' : 'check'}"></i>
+                        </button>
+                        <button class="btn-edit" onclick="editQuestion(${q.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" onclick="deleteQuestion(${q.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function filterQuestions(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            displayQuestions();
+        }
+
+        function filterByCourse() {
+            currentCourseFilter = document.getElementById('courseFilter').value;
+            displayQuestions();
+        }
+
+        function searchQuestions() {
+            currentSearch = document.getElementById('searchBox').value;
+            displayQuestions();
+        }
+
+        // ============================================
+        // MODAL: ADD / EDIT
+        // ============================================
+        function openAddModal() {
+            if (allCourses.length === 0) {
+                alert('⚠️ Please add at least one course first (CBT Courses page).');
+                return;
+            }
+            document.getElementById('modalTitle').textContent = 'Add Question';
+            document.getElementById('editId').value = '';
+            document.getElementById('questionForm').reset();
+            document.getElementById('difficulty').value = 'medium';
+            document.getElementById('isActive').checked = true;
+            document.getElementById('questionModal').classList.add('show');
+        }
+
+        function editQuestion(id) {
+            const q = allQuestions.find(q => q.id === id);
+            if (!q) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Question';
+            document.getElementById('editId').value = id;
+            document.getElementById('courseSelect').value = q.course_id || '';
+            document.getElementById('questionText').value = q.question_text || '';
+            document.getElementById('optionA').value = q.option_a || '';
+            document.getElementById('optionB').value = q.option_b || '';
+            document.getElementById('optionC').value = q.option_c || '';
+            document.getElementById('optionD').value = q.option_d || '';
+
+            document.querySelectorAll('input[name="correctAnswer"]').forEach(r => r.checked = false);
+            const ansRadio = document.getElementById('ans' + q.correct_answer);
+            if (ansRadio) ansRadio.checked = true;
+
+            document.getElementById('solution').value = q.solution || '';
+            document.getElementById('difficulty').value = q.difficulty || 'medium';
+            document.getElementById('isActive').checked = q.is_active !== false;
+            document.getElementById('questionModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('questionModal').classList.remove('show');
+        }
+
+        // ============================================
+        // SAVE QUESTION
+        // ============================================
+        document.getElementById('questionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const btn = document.getElementById('saveBtn');
+            const original = btn.innerHTML;
+
+            const selectedAnswer = document.querySelector('input[name="correctAnswer"]:checked');
+            if (!selectedAnswer) {
+                alert('❌ Please select the correct answer (A, B, C, or D).');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+            const data = {
+                course_id: parseInt(document.getElementById('courseSelect').value),
+                question_text: document.getElementById('questionText').value.trim(),
+                option_a: document.getElementById('optionA').value.trim(),
+                option_b: document.getElementById('optionB').value.trim(),
+                option_c: document.getElementById('optionC').value.trim(),
+                option_d: document.getElementById('optionD').value.trim(),
+                correct_answer: selectedAnswer.value,
+                solution: document.getElementById('solution').value.trim() || null,
+                difficulty: document.getElementById('difficulty').value,
+                is_active: document.getElementById('isActive').checked
+            };
+
+            try {
+                let result;
+                if (id) {
+                    result = await supabase.from('cbt_questions').update(data).eq('id', parseInt(id));
+                } else {
+                    result = await supabase.from('cbt_questions').insert([data]);
+                }
+                if (result.error) throw result.error;
+
+                closeModal();
+                loadQuestions();
+                alert(id ? '✅ Question updated successfully!' : '✅ Question added successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        });
+
+        // ============================================
+        // TOGGLE ACTIVE
+        // ============================================
+        async function toggleActive(id, newState) {
+            try {
+                const { error } = await supabase
+                    .from('cbt_questions')
+                    .update({ is_active: newState })
+                    .eq('id', id);
+                if (error) throw error;
+                loadQuestions();
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // DELETE QUESTION
+        // ============================================
+        async function deleteQuestion(id) {
+            if (!confirm('Are you sure you want to delete this question?')) return;
+            try {
+                const { error } = await supabase.from('cbt_questions').delete().eq('id', id);
+                if (error) throw error;
+                loadQuestions();
+                alert('✅ Question deleted successfully!');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // BULK IMPORT
+        // ============================================
+        function openBulkModal() {
+            if (allCourses.length === 0) {
+                alert('⚠️ Please add at least one course first.');
+                return;
+            }
+            document.getElementById('bulkForm').reset();
+            document.getElementById('bulkModal').classList.add('show');
+        }
+
+        function closeBulkModal() {
+            document.getElementById('bulkModal').classList.remove('show');
+        }
+
+        document.getElementById('bulkForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('bulkSaveBtn');
+            const original = btn.innerHTML;
+
+            const rawText = document.getElementById('bulkData').value.trim();
+            if (!rawText) {
+                alert('❌ Please paste CSV data.');
+                return;
+            }
+
+            const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
+            let startIndex = 0;
+            if (lines[0].toLowerCase().includes('course_code')) startIndex = 1;
+
+            // Build a code→id map for fast lookup
+            const codeMap = {};
+            allCourses.forEach(c => { codeMap[c.code.toUpperCase()] = c.id; });
+
+            const questions = [];
+            const errors = [];
+
+            for (let i = startIndex; i < lines.length; i++) {
+                // Support quoted CSV: naive parser — good enough for simple text
+                const parts = parseCSVLine(lines[i]);
+                if (parts.length < 7) {
+                    errors.push(`Line ${i + 1}: Need at least 7 fields (course_code, question, A, B, C, D, correct_answer)`);
+                    continue;
+                }
+
+                const [course_code, question_text, option_a, option_b, option_c, option_d, correct_answer, solution, difficulty] = parts;
+                const cid = codeMap[(course_code || '').toUpperCase()];
+
+                if (!cid) {
+                    errors.push(`Line ${i + 1}: Course code "${course_code}" not found`);
+                    continue;
+                }
+                if (!question_text || !option_a || !option_b || !option_c || !option_d) {
+                    errors.push(`Line ${i + 1}: Missing question or option text`);
+                    continue;
+                }
+                const ca = (correct_answer || '').toUpperCase().trim();
+                if (!['A', 'B', 'C', 'D'].includes(ca)) {
+                    errors.push(`Line ${i + 1}: Correct answer must be A, B, C, or D`);
+                    continue;
+                }
+
+                questions.push({
+                    course_id: cid,
+                    question_text: question_text.trim(),
+                    option_a: option_a.trim(),
+                    option_b: option_b.trim(),
+                    option_c: option_c.trim(),
+                    option_d: option_d.trim(),
+                    correct_answer: ca,
+                    solution: (solution || '').trim() || null,
+                    difficulty: (difficulty || 'medium').toLowerCase().trim(),
+                    is_active: true
+                });
+            }
+
+            if (questions.length === 0) {
+                alert('❌ No valid questions found.\n\n' + errors.join('\n'));
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner"></span> Importing ${questions.length}...`;
+
+            try {
+                // Insert in batches of 100 to be safe
+                const batchSize = 100;
+                for (let i = 0; i < questions.length; i += batchSize) {
+                    const batch = questions.slice(i, i + batchSize);
+                    const { error } = await supabase.from('cbt_questions').insert(batch);
+                    if (error) throw error;
+                }
+
+                closeBulkModal();
+                loadQuestions();
+                alert(`✅ Successfully imported ${questions.length} questions!${errors.length ? '\n\nSkipped ' + errors.length + ' lines:\n' + errors.join('\n') : ''}`);
+            } catch (error) {
+                alert('❌ Import error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        });
+
+        // Simple CSV parser that supports quoted fields
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+                    else inQuotes = !inQuotes;
+                } else if (ch === ',' && !inQuotes) {
+                    result.push(current);
+                    current = '';
+                } else {
+                    current += ch;
+                }
+            }
+            result.push(current);
+            return result;
+        }
+
+        // ============================================
+        // EXPORT TO JS FILE
+        // ============================================
+        async function exportToJS() {
+            if (allQuestions.length === 0) {
+                alert('⚠️ No questions to export.');
+                return;
+            }
+            if (!confirm(`Export all ${allQuestions.length} questions to a .js file?\n\nThe file will be downloaded to your computer.\n\nYou can then commit it to your GitHub repo as cbt/questions-bank.js`)) return;
+
+            // Group by course
+            const grouped = {};
+            allQuestions.filter(q => q.is_active).forEach(q => {
+                const course = allCourses.find(c => c.id === q.course_id);
+                if (!course) return;
+                const key = course.code;
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        course_code: course.code,
+                        course_name: course.name,
+                        semester: course.semester,
+                        level: course.level || '100',
+                        questions: []
+                    };
+                }
+                grouped[key].questions.push({
+                    q: q.question_text,
+                    options: [q.option_a, q.option_b, q.option_c, q.option_d],
+                    answer: q.correct_answer,
+                    solution: q.solution || '',
+                    difficulty: q.difficulty || 'medium'
+                });
+            });
+
+            const jsContent = `// ============================================\n// AVMS CBT QUESTION BANK\n// Generated: ${new Date().toISOString()}\n// Total Questions: ${allQuestions.filter(q => q.is_active).length}\n// ============================================\n\nconst QUESTIONS_BANK = ${JSON.stringify(grouped, null, 2)};\n\n// Export for use in other files\nif (typeof module !== 'undefined' && module.exports) {\n    module.exports = QUESTIONS_BANK;\n}\n`;
+
+            const blob = new Blob([jsContent], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'questions-bank.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('✅ questions-bank.js downloaded!\n\nCommit it to: cbt/questions-bank.js in your GitHub repo.');
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        async function init() {
+            await loadCourses();
+            await loadQuestions();
+        }
+        init();
+
+        // Close on outside click
+        document.getElementById('questionModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        document.getElementById('bulkModal').addEventListener('click', function(e) {
+            if (e.target === this) closeBulkModal();
+        });
+    </script>
+</body>
+</html>
