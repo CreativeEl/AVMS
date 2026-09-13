@@ -75,6 +75,24 @@ body {
     text-align: center;
 }
 
+/* ============================================
+   SIDEBAR SECTION LABELS (NEW)
+   ============================================ */
+
+.sidebar-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    padding: 18px 20px 6px 20px;
+    user-select: none;
+}
+
+.sidebar-section-label:first-child {
+    padding-top: 4px;
+}
+
 .sidebar-footer {
     padding: 15px 20px;
     border-top: 1px solid rgba(255,255,255,0.1);
@@ -293,6 +311,9 @@ body {
         display: none;
     }
     .admin-sidebar .sidebar-footer a span {
+        display: none;
+    }
+    .admin-sidebar .sidebar-section-label {
         display: none;
     }
     .admin-main {
