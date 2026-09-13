@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Practice Login - AVMS ABU Zaria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .back-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        /* Main login card */
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-circle {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(26, 42, 74, 0.3);
+        }
+
+        .login-header h1 {
+            color: #1a2a4a;
+            font-size: 26px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Welcome note */
+        .welcome-note {
+            background: #e8f0fe;
+            border-left: 4px solid #2a4a7a;
+            padding: 15px 18px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: #1a3a5a;
+            line-height: 1.6;
+        }
+        .welcome-note i {
+            color: #2a4a7a;
+            margin-right: 6px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #1a2a4a;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            color: #2a4a7a;
+            margin-right: 6px;
+            width: 16px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            border: 2px solid #e0e7ef;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: #fafbfc;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2a4a7a;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(42, 74, 122, 0.1);
+        }
+
+        .input-wrapper .toggle-visibility {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .input-wrapper .toggle-visibility:hover {
+            color: #2a4a7a;
+        }
+
+        .form-hint {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        .form-hint.warning {
+            color: #e8491d;
+            font-weight: 600;
+        }
+
+        /* Error message */
+        .error-msg {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Login button */
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: #e8491d;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover:not(:disabled) {
+            background: #c73d17;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(232, 73, 29, 0.4);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer note */
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e7ef;
+            font-size: 13px;
+            color: #888;
+            line-height: 1.6;
+        }
+        .login-footer a {
+            color: #2a4a7a;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Success message */
+        .success-msg {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .success-msg.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 22px;
+                border-radius: 16px;
+            }
+            .login-header h1 {
+                font-size: 22px;
+            }
+            .logo-circle {
+                width: 65px;
+                height: 65px;
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Back to homepage -->
+        <a href="../index.html" class="back-link">
+            <i class="fas fa-arrow-left"></i> Back to AVMS Homepage
+        </a>
+
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-circle">🎓</div>
+                <h1>AVMS CBT Practice</h1>
+                <p>Association of Veterinary Medical Students<br>Ahmadu Bello University, Zaria</p>
+            </div>
+
+            <div class="welcome-note">
+                <i class="fas fa-info-circle"></i>
+                <strong>Welcome!</strong> Log in with your <strong>Registration Number</strong> and <strong>State of Origin</strong> to access practice tests and exams for your courses.
+            </div>
+
+            <div id="errorMsg" class="error-msg"></div>
+            <div id="successMsg" class="success-msg">
+                <i class="fas fa-check-circle" style="font-size: 20px;"></i>
+                <span id="successText">Login successful! Redirecting...</span>
+            </div>
+
+            <form id="loginForm" autocomplete="off">
+                <div class="form-group">
+                    <label for="regNo"><i class="fas fa-id-card"></i> Registration Number</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="regNo" name="regNo" placeholder="e.g., VET/2024/001" required autocomplete="off">
+                    </div>
+                    <small class="form-hint">Your university registration number (case-insensitive)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="stateOfOrigin"><i class="fas fa-map-marker-alt"></i> State of Origin</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="stateOfOrigin" name="stateOfOrigin" placeholder="e.g., kano" required autocomplete="off">
+                        <button type="button" class="toggle-visibility" onclick="togglePassword()" aria-label="Show/hide">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <small class="form-hint warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Use lowercase only. e.g., kano, lagos, kaduna
+                    </small>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login to CBT Portal
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <i class="fas fa-question-circle"></i>
+                Can't log in? Contact AVMS admin.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // LOGIN PAGE LOGIC
+        // ============================================
+        console.log('🎓 CBT Login page loaded');
+
+        const form = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+        const loginBtn = document.getElementById('loginBtn');
+        const regNoInput = document.getElementById('regNo');
+        const stateInput = document.getElementById('stateOfOrigin');
+
+        // ============================================
+        // SHOW / HIDE STATE OF ORIGIN
+        // ============================================
+        function togglePassword() {
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (stateInput.type === 'password') {
+                stateInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                stateInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        // ============================================
+        // AUTO-LOWERCASE STATE OF ORIGIN AS USER TYPES
+        // ============================================
+        stateInput.addEventListener('input', function() {
+            this.value = this.value.toLowerCase();
+        });
+
+        // ============================================
+        // TRIM REG NO AND REMOVE EXTRA SPACES
+        // ============================================
+        regNoInput.addEventListener('input', function() {
+            this.value = this.value.trim().replace(/\s+/g, '');
+        });
+
+        // ============================================
+        // SHOW ERROR MESSAGE
+        // ============================================
+        function showError(message) {
+            errorMsg.innerHTML = '<i class="fas fa-times-circle"></i> ' + message;
+            errorMsg.classList.add('show');
+            successMsg.classList.remove('show');
+        }
+
+        function hideMessages() {
+            errorMsg.classList.remove('show');
+        }
+
+        // ============================================
+        // SHOW SUCCESS
+        // ============================================
+        function showSuccess(message) {
+            document.getElementById('successText').textContent = message;
+            successMsg.classList.add('show');
+            errorMsg.classList.remove('show');
+        }
+
+        // ============================================
+        // LOADING STATE ON BUTTON
+        // ============================================
+        function setLoading(isLoading) {
+            if (isLoading) {
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<span class="spinner"></span> Verifying...';
+            } else {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to CBT Portal';
+            }
+        }
+
+        // ============================================
+        // FORM SUBMIT
+        // ============================================
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideMessages();
+
+            const regNo = regNoInput.value.trim();
+            const stateOfOrigin = stateInput.value.trim().toLowerCase();
+
+            // Basic validation
+            if (!regNo) {
+                showError('Please enter your Registration Number.');
+                regNoInput.focus();
+                return;
+            }
+
+            if (!stateOfOrigin) {
+                showError('Please enter your State of Origin.');
+                stateInput.focus();
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                console.log('🔍 Checking credentials for:', regNo);
+
+                // Query the cbt_students table
+                const { data, error } = await supabase
+                    .from('cbt_students')
+                    .select('*')
+                    .eq('reg_no', regNo)
+                    .eq('state_of_origin', stateOfOrigin)
+                    .eq('is_active', true)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('Database error:', error);
+                    showError('Connection error. Please try again.');
+                    setLoading(false);
+                    return;
+                }
+
+                if (!data) {
+                    console.log('❌ No matching student found');
+                    showError('Invalid Registration Number or State of Origin. Please check and try again.');
+                    setLoading(false);
+                    return;
+                }
+
+                // SUCCESS — store session
+                console.log('✅ Login successful for:', data.full_name);
+
+                sessionStorage.setItem('cbt_student', JSON.stringify({
+                    id: data.id,
+                    reg_no: data.reg_no,
+                    full_name: data.full_name,
+                    state_of_origin: data.state_of_origin,
+                    department: data.department,
+                    level: data.level,
+                    logged_in_at: new Date().toISOString()
+                }));
+
+                // Also set in localStorage for "remember" across tabs (optional)
+                localStorage.setItem('cbt_last_reg_no', data.reg_no);
+
+                showSuccess(`Welcome, ${data.full_name.split(' ')[0]}! Redirecting...`);
+
+                // Redirect after short delay
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1200);
+
+            } catch (err) {
+                console.error('Unexpected error:', err);
+                showError('Something went wrong. Please try again.');
+                setLoading(false);
+            }
+        });
+
+        // ============================================
+        // AUTO-FILL REG NO IF REMEMBERED
+        // ============================================
+        const lastRegNo = localStorage.getItem('cbt_last_reg_no');
+        if (lastRegNo) {
+            regNoInput.value = lastRegNo;
+            stateInput.focus();
+        } else {
+            regNoInput.focus();
+        }
+
+        // ============================================
+        // CLEAR OLD SESSION ON LOGIN PAGE
+        // ============================================
+        // (So the student is forced to log in again)
+        sessionStorage.removeItem('cbt_student');
+        console.log('🧹 Cleared any old session');
+    </script>
+</body>
+</html>
