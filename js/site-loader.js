@@ -43,25 +43,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 // ============================================
-// APPLY LOGO
+// APPLY LOGO — FIXED
+// - Updates existing .logo-img only
+// - Never creates duplicate images
+// - Never hides .logo-text
 // ============================================
 function applyLogo(settings) {
     if (!settings.site_logo) return;
 
-    document.querySelectorAll('.logo-text, .logo-img, .header-logo').forEach(el => {
+    document.querySelectorAll('.logo-img').forEach(el => {
         if (el.tagName === 'IMG') {
             el.src = settings.site_logo;
-        } else if (el.classList.contains('logo-text')) {
-            const parent = el.parentElement;
-            if (parent && !parent.querySelector('.custom-logo-img')) {
-                const img = document.createElement('img');
-                img.src = settings.site_logo;
-                img.alt = 'Logo';
-                img.className = 'custom-logo-img';
-                img.style.cssText = 'height: 40px; width: 40px; object-fit: contain; border-radius: 50%;';
-                el.parentElement.insertBefore(img, el);
-                el.style.display = 'none';
-            }
         }
     });
 }
