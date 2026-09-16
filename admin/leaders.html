@@ -23,22 +23,70 @@
         .btn-delete { background: #dc3545; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; }
         .btn-edit:hover { background: #1a3a5a; }
         .btn-delete:hover { background: #c82333; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; }
         .modal-content h2 { margin-bottom: 20px; color: #1a2a4a; }
         .modal-content .form-group { margin-bottom: 15px; }
         .modal-content label { display: block; font-weight: 600; margin-bottom: 5px; color: #1a2a4a; }
-        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #2a4a7a; }
         .modal-content textarea { resize: vertical; min-height: 80px; }
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
         .btn-save { background: #28a745; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .btn-cancel { background: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .btn-save:hover { background: #218838; }
         .btn-cancel:hover { background: #5a6268; }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
         .empty-state { text-align: center; padding: 40px; color: #888; }
-        .photo-thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 18px; overflow: hidden; }
-        /* ===== SIDEBAR SECTION LABELS (NEW) ===== */
+        .photo-thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 20px; overflow: hidden; }
+
+        /* Image upload area */
+        .image-upload-area {
+            border: 3px dashed #d0d7df;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #fafbfc;
+        }
+        .image-upload-area:hover { border-color: #2a4a7a; background: #f0f4f8; }
+        .image-upload-area i { font-size: 40px; color: #2a4a7a; margin-bottom: 10px; display: block; }
+        .image-upload-area p { color: #666; margin-bottom: 5px; font-size: 14px; }
+        .image-upload-area small { color: #888; font-size: 12px; }
+        .image-upload-area input[type="file"] { display: none; }
+
+        .image-preview-box {
+            margin-top: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e0e7ef;
+            background: #f8f9fa;
+            text-align: center;
+            padding: 15px;
+        }
+        .image-preview-box img {
+            max-width: 160px;
+            max-height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            margin: 0 auto 10px;
+        }
+        .image-preview-box .remove-btn {
+            background: #dc3545;
+            color: white;
+            padding: 6px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .image-preview-box .remove-btn:hover { background: #c82333; }
+
+        /* Sidebar section labels */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
@@ -56,15 +104,14 @@
 </head>
 <body>
     <div class="admin-wrapper">
-        <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <!-- ===== OVERVIEW ===== -->
+                <!-- OVERVIEW -->
                 <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
-                <!-- ===== CONTENT ===== -->
+                <!-- CONTENT -->
                 <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html" class="active"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
@@ -75,25 +122,25 @@
                 <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
                 <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
 
-                <!-- ===== PAGES ===== -->
+                <!-- PAGES -->
                 <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
 
-                <!-- ===== CBT PORTAL ===== -->
+                <!-- CBT PORTAL -->
                 <div class="sidebar-section-label">CBT Portal</div>
                 <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
                 <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
                 <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
 
-                <!-- ===== ENGAGEMENT ===== -->
+                <!-- ENGAGEMENT -->
                 <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
 
-                <!-- ===== SYSTEM ===== -->
+                <!-- SYSTEM -->
                 <div class="sidebar-section-label">System</div>
                 <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -102,7 +149,6 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="admin-main">
             <header class="admin-header">
                 <h1>Manage Leaders</h1>
@@ -143,6 +189,25 @@
             <h2 id="modalTitle">Add Leader</h2>
             <form id="leaderForm">
                 <input type="hidden" id="editId" value="">
+                <input type="hidden" id="existingPhotoUrl" value="">
+
+                <!-- Photo Upload -->
+                <div class="form-group">
+                    <label>Photo</label>
+                    <div class="image-upload-area" onclick="document.getElementById('leaderPhotoInput').click()">
+                        <i class="fas fa-camera"></i>
+                        <p id="uploadAreaText">Click to upload a photo</p>
+                        <small>JPG or PNG (max 3MB) — Recommended: 400x400px</small>
+                        <input type="file" id="leaderPhotoInput" accept="image/*" onchange="handlePhotoSelect(event)">
+                    </div>
+                    <div id="photoPreviewBox" class="image-preview-box" style="display: none;">
+                        <img id="photoPreviewImg" src="" alt="Preview">
+                        <button type="button" class="remove-btn" onclick="removePhoto()">
+                            <i class="fas fa-times"></i> Remove Photo
+                        </button>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label for="leaderName">Name *</label>
                     <input type="text" id="leaderName" required placeholder="Enter full name">
@@ -168,7 +233,7 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn-save">Save Leader</button>
+                    <button type="submit" class="btn-save" id="saveLeaderBtn">Save Leader</button>
                 </div>
             </form>
         </div>
@@ -177,33 +242,29 @@
     <script src="../js/config.js"></script>
     <script>
         // ============================================
-        // AUTH CHECK - USES BOTH sessionStorage AND localStorage
+        // AUTH
         // ============================================
-        const adminLoggedIn = sessionStorage.getItem('adminLoggedIn') || localStorage.getItem('adminLoggedIn');
-        const adminEmail = sessionStorage.getItem('adminEmail') || localStorage.getItem('adminEmail');
-        
-        if (!adminLoggedIn) {
-            console.log('❌ Not logged in, redirecting to login...');
-            window.location.href = 'index.html';
-        } else {
-            console.log('✅ Logged in as:', adminEmail);
-            const adminNameEl = document.getElementById('adminName');
-            if (adminNameEl) {
-                adminNameEl.textContent = adminEmail?.split('@')[0] || 'Admin';
-            }
+        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        if (!adminLoggedIn) { window.location.href = 'index.html'; }
+        else {
+            const el = document.getElementById('adminName');
+            if (el) el.textContent = adminEmail?.split('@')[0] || 'Admin';
         }
 
-        // ============================================
-        // LOGOUT - CLEARS BOTH STORAGES
-        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
-            sessionStorage.removeItem('adminLoggedIn');
-            sessionStorage.removeItem('adminEmail');
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
             window.location.href = 'index.html';
         });
+
+        // ============================================
+        // PHOTO STATE
+        // ============================================
+        let pendingPhotoFile = null;
 
         // ============================================
         // LOAD LEADERS
@@ -211,9 +272,7 @@
         async function loadLeaders() {
             const tbody = document.getElementById('leadersTableBody');
             if (!tbody) return;
-            
             try {
-                console.log('📤 Loading leaders...');
                 const { data, error } = await supabase
                     .from('leaders')
                     .select('*')
@@ -226,11 +285,15 @@
                     return;
                 }
 
-                console.log('✅ Found', data.length, 'leaders');
-
                 tbody.innerHTML = data.map(leader => `
                     <tr>
-                        <td><div class="photo-thumb">${leader.photo_url ? `<img src="${leader.photo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '👤'}</div></td>
+                        <td>
+                            <div class="photo-thumb">
+                                ${leader.photo_url
+                                    ? `<img src="${leader.photo_url}" style="width:100%;height:100%;object-fit:cover;">`
+                                    : '👤'}
+                            </div>
+                        </td>
                         <td><strong>${leader.name}</strong></td>
                         <td>${leader.position}</td>
                         <td>${leader.display_order || 0}</td>
@@ -242,40 +305,116 @@
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('❌ Error loading leaders:', error);
-                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading leaders: ${error.message}</td></tr>`;
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${error.message}</td></tr>`;
             }
         }
 
         // ============================================
-        // MODAL FUNCTIONS
+        // MODAL
         // ============================================
         function openAddModal() {
             document.getElementById('modalTitle').textContent = 'Add Leader';
             document.getElementById('editId').value = '';
+            document.getElementById('existingPhotoUrl').value = '';
             document.getElementById('leaderForm').reset();
             document.getElementById('leaderStatus').value = 'true';
+            pendingPhotoFile = null;
+            document.getElementById('photoPreviewBox').style.display = 'none';
+            document.getElementById('uploadAreaText').textContent = 'Click to upload a photo';
             document.getElementById('leaderModal').classList.add('show');
         }
 
         function editLeader(id) {
             document.getElementById('modalTitle').textContent = 'Edit Leader';
             document.getElementById('editId').value = id;
-            
+
             supabase.from('leaders').select('*').eq('id', id).single().then(({ data }) => {
-                if (data) {
-                    document.getElementById('leaderName').value = data.name || '';
-                    document.getElementById('leaderPosition').value = data.position || '';
-                    document.getElementById('leaderBio').value = data.biography || '';
-                    document.getElementById('leaderOrder').value = data.display_order || 0;
-                    document.getElementById('leaderStatus').value = data.is_active ? 'true' : 'false';
+                if (!data) return;
+                document.getElementById('leaderName').value = data.name || '';
+                document.getElementById('leaderPosition').value = data.position || '';
+                document.getElementById('leaderBio').value = data.biography || '';
+                document.getElementById('leaderOrder').value = data.display_order || 0;
+                document.getElementById('leaderStatus').value = data.is_active ? 'true' : 'false';
+                document.getElementById('existingPhotoUrl').value = data.photo_url || '';
+                pendingPhotoFile = null;
+
+                if (data.photo_url) {
+                    document.getElementById('photoPreviewImg').src = data.photo_url;
+                    document.getElementById('photoPreviewBox').style.display = 'block';
+                    document.getElementById('uploadAreaText').textContent = 'Click to change photo';
+                } else {
+                    document.getElementById('photoPreviewBox').style.display = 'none';
+                    document.getElementById('uploadAreaText').textContent = 'Click to upload a photo';
                 }
             });
+
             document.getElementById('leaderModal').classList.add('show');
         }
 
         function closeModal() {
             document.getElementById('leaderModal').classList.remove('show');
+            pendingPhotoFile = null;
+        }
+
+        // ============================================
+        // PHOTO HANDLERS
+        // ============================================
+        function handlePhotoSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 3 * 1024 * 1024) {
+                alert('❌ File is too large. Max 3MB allowed.');
+                event.target.value = '';
+                return;
+            }
+
+            pendingPhotoFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('photoPreviewImg').src = e.target.result;
+                document.getElementById('photoPreviewBox').style.display = 'block';
+                document.getElementById('uploadAreaText').textContent = 'Click to change photo';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removePhoto() {
+            pendingPhotoFile = null;
+            document.getElementById('existingPhotoUrl').value = '';
+            document.getElementById('leaderPhotoInput').value = '';
+            document.getElementById('photoPreviewBox').style.display = 'none';
+            document.getElementById('uploadAreaText').textContent = 'Click to upload a photo';
+        }
+
+        async function uploadPhoto(file) {
+            const timestamp = Date.now();
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${timestamp}_leader.${fileExt}`;
+            const filePath = `leaders/${fileName}`;
+
+            let uploadResult = await supabase.storage
+                .from('site-assets')
+                .upload(filePath, file, { upsert: false });
+
+            let bucketUsed = 'site-assets';
+
+            if (uploadResult.error) {
+                uploadResult = await supabase.storage
+                    .from('membership-documents')
+                    .upload(filePath, file, { upsert: false });
+                bucketUsed = 'membership-documents';
+            }
+
+            if (uploadResult.error) throw uploadResult.error;
+
+            const { data: urlData } = supabase.storage
+                .from(bucketUsed)
+                .getPublicUrl(filePath);
+
+            return urlData.publicUrl;
         }
 
         // ============================================
@@ -284,15 +423,28 @@
         document.getElementById('leaderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
-            const data = {
-                name: document.getElementById('leaderName').value,
-                position: document.getElementById('leaderPosition').value,
-                biography: document.getElementById('leaderBio').value,
-                display_order: parseInt(document.getElementById('leaderOrder').value) || 0,
-                is_active: document.getElementById('leaderStatus').value === 'true'
-            };
+            const btn = document.getElementById('saveLeaderBtn');
+            const originalText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             try {
+                // Upload new photo if selected
+                let photoUrl = document.getElementById('existingPhotoUrl').value || null;
+                if (pendingPhotoFile) {
+                    photoUrl = await uploadPhoto(pendingPhotoFile);
+                }
+
+                const data = {
+                    name: document.getElementById('leaderName').value,
+                    position: document.getElementById('leaderPosition').value,
+                    biography: document.getElementById('leaderBio').value,
+                    display_order: parseInt(document.getElementById('leaderOrder').value) || 0,
+                    is_active: document.getElementById('leaderStatus').value === 'true',
+                    photo_url: photoUrl
+                };
+
                 let result;
                 if (id) {
                     result = await supabase.from('leaders').update(data).eq('id', parseInt(id));
@@ -300,16 +452,20 @@
                     result = await supabase.from('leaders').insert([data]);
                 }
                 if (result.error) throw result.error;
+
                 closeModal();
                 loadLeaders();
                 alert(id ? '✅ Leader updated successfully!' : '✅ Leader added successfully!');
             } catch (error) {
                 alert('❌ Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
         });
 
         // ============================================
-        // DELETE LEADER
+        // DELETE
         // ============================================
         async function deleteLeader(id) {
             if (!confirm('Are you sure you want to delete this leader?')) return;
@@ -328,7 +484,6 @@
         // ============================================
         loadLeaders();
 
-        // Close modal on outside click
         document.getElementById('leaderModal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
