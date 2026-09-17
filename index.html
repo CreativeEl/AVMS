@@ -19,7 +19,7 @@
             <div class="nav-wrapper">
                 <div class="logo">
                     <a href="index.html">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232a4a7a'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='white' stroke-width='2'/%3E%3Ctext x='50' y='62' font-size='36' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%231F4E3D'/%3E%3Ccircle cx='50' cy='50' r='43' fill='none' stroke='%23C9A961' stroke-width='2.5'/%3E%3Ctext x='50' y='63' font-size='34' text-anchor='middle' fill='%23C9A961' font-family='Georgia, serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
                              alt="AVMS Logo" 
                              class="logo-img">
                         <span class="logo-text" data-footer="site-short-name">AVMS ABU</span>
@@ -56,15 +56,21 @@
     </header>
 
     <!-- ==========================================
-    HERO SECTION
+    HERO SECTION — Redesigned (bold typographic)
     ========================================== -->
     <section class="hero" data-home="hero-image">
+        <div class="hero-overlay"></div>
         <div class="container">
             <div class="hero-content">
-                <h1 class="hero-title" data-home="hero-title">Association of Veterinary Medical Students</h1>
-                <p class="hero-subtitle" data-home="hero-subtitle">Ahmadu Bello University, Zaria</p>
+                <div class="hero-eyebrow" data-home="hero-eyebrow">Ahmadu Bello University, Zaria</div>
+                <h1 class="hero-title" data-home="hero-title">
+                    <span class="hero-title-line">ADVANCING</span>
+                    <span class="hero-title-line hero-title-cursive">veterinary</span>
+                    <span class="hero-title-line">EXCELLENCE</span>
+                </h1>
+                <p class="hero-subtitle" data-home="hero-subtitle">Association of Veterinary Medical Students</p>
                 <p class="hero-description" data-home="hero-description">
-                    Advancing Veterinary Students Through Knowledge, Leadership and Service
+                    Through knowledge, leadership and service — building the next generation of veterinary professionals.
                 </p>
                 <div class="hero-buttons">
                     <a href="about.html" class="btn btn-primary" data-home="hero-btn1">
@@ -83,6 +89,7 @@
     ========================================== -->
     <section class="welcome-section">
         <div class="container">
+            <div class="welcome-accent"></div>
             <h2 class="section-title" data-home="welcome-title">Welcome to AVMS</h2>
             <div class="welcome-content">
                 <p data-home="welcome-message">
@@ -90,6 +97,21 @@
                     at Ahmadu Bello University, Zaria. We are a community of passionate veterinary students 
                     dedicated to academic excellence, professional development, and service to society.
                 </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+    PHOTO STRIP — Recently from Gallery
+    ========================================== -->
+    <section class="photo-strip-section">
+        <div class="container">
+            <div class="photo-strip-header">
+                <h3 class="photo-strip-title">Moments from AVMS</h3>
+                <a href="gallery.html" class="view-all">View Full Gallery →</a>
+            </div>
+            <div id="photoStripContainer" class="photo-strip">
+                <!-- Populated by JS from gallery_images table -->
             </div>
         </div>
     </section>
@@ -223,5 +245,43 @@
     <script src="js/main.js"></script>
     <script src="js/home.js"></script>
     <script src="js/site-loader.js"></script>
+
+    <!-- ==========================================
+    PHOTO STRIP LOADER (inline — small addition)
+    ========================================== -->
+    <script>
+        (async function loadPhotoStrip() {
+            const container = document.getElementById('photoStripContainer');
+            if (!container) return;
+
+            try {
+                // Fetch the latest 6 photos from any album
+                const { data, error } = await supabase
+                    .from('gallery_images')
+                    .select('id, image_url, caption, album_id')
+                    .order('id', { ascending: false })
+                    .limit(6);
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    // No photos yet — hide the section entirely
+                    const section = document.querySelector('.photo-strip-section');
+                    if (section) section.style.display = 'none';
+                    return;
+                }
+
+                container.innerHTML = data.map(photo => `
+                    <a href="gallery.html" class="photo-strip-item">
+                        <img src="${photo.image_url}" alt="${photo.caption || 'AVMS Photo'}" loading="lazy">
+                    </a>
+                `).join('');
+            } catch (err) {
+                console.warn('Photo strip could not load:', err);
+                const section = document.querySelector('.photo-strip-section');
+                if (section) section.style.display = 'none';
+            }
+        })();
+    </script>
 </body>
 </html>
