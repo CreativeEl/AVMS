@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About AVMS - ABU Zaria</title>
+    <title>About AVMS — Association of Veterinary Medical Students | ABU Zaria</title>
+    <meta name="description" content="Learn about the Association of Veterinary Medical Students (AVMS), Ahmadu Bello University, Zaria — our mission, vision, history, and core values.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,20 +15,40 @@
 </head>
 <body>
 
+    <!-- UTILITY BAR -->
+    <div class="utility-bar">
+        <div class="container">
+            <div class="utility-bar-inner">
+                <div class="utility-left">
+                    <span><i class="fas fa-map-marker-alt"></i> Ahmadu Bello University, Zaria</span>
+                    <span class="utility-divider">·</span>
+                    <span><i class="fas fa-envelope"></i> <a href="mailto:avms@abu.edu.ng" data-contact="email">avms@abu.edu.ng</a></span>
+                </div>
+                <div class="utility-right">
+                    <a href="cbt/login.html">Student Portal</a>
+                    <span class="utility-divider">·</span>
+                    <a href="admin/index.html" target="_blank">Admin</a>
+                    <span class="utility-divider">·</span>
+                    <a href="give.html" class="utility-cta">Support AVMS</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- HEADER / NAVIGATION -->
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
                 <div class="logo">
                     <a href="index.html">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232a4a7a'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='white' stroke-width='2'/%3E%3Ctext x='50' y='62' font-size='36' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%231F4E3D'/%3E%3Ccircle cx='50' cy='50' r='43' fill='none' stroke='%23C9A961' stroke-width='2.5'/%3E%3Ctext x='50' y='63' font-size='34' text-anchor='middle' fill='%23C9A961' font-family='Georgia, serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
                              alt="AVMS Logo" 
                              class="logo-img">
                         <span class="logo-text" data-footer="site-short-name">AVMS ABU</span>
                     </a>
                 </div>
                 
-                <button class="hamburger" id="hamburger">
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 
@@ -56,6 +80,9 @@
     <!-- PAGE HEADER -->
     <section class="page-header">
         <div class="container">
+            <div class="page-header-eyebrow">
+                <i class="fas fa-book-open"></i> About Us
+            </div>
             <h1>About AVMS</h1>
             <p>Learn about the Association of Veterinary Medical Students, ABU Zaria</p>
         </div>
@@ -66,7 +93,8 @@
         <div class="container">
             <div class="about-grid">
                 <div class="about-content">
-                    <h2 data-about="who-title">Who We Are</h2>
+                    <div class="about-eyebrow">Who We Are</div>
+                    <h2 data-about="who-title">The Voice of Veterinary Students</h2>
                     <p data-about="who-content">
                         The Association of Veterinary Medical Students (AVMS) is the official student body 
                         representing all veterinary students at Ahmadu Bello University, Zaria. 
@@ -93,6 +121,12 @@
     <!-- MISSION & VISION -->
     <section class="mission-vision">
         <div class="container">
+            <div class="section-header section-header-center">
+                <div>
+                    <h2 class="section-title section-title-center">What Drives Us</h2>
+                    <p class="section-subtitle" style="margin: 16px auto 0; text-align: center;">Our mission and vision guide everything we do.</p>
+                </div>
+            </div>
             <div class="mv-grid">
                 <div class="mv-card">
                     <div class="mv-icon"><i class="fas fa-bullseye"></i></div>
@@ -118,7 +152,12 @@
     <!-- OBJECTIVES -->
     <section class="objectives">
         <div class="container">
-            <h2 class="section-title">Our Objectives</h2>
+            <div class="section-header section-header-center">
+                <div>
+                    <h2 class="section-title section-title-center">Our Objectives</h2>
+                    <p class="section-subtitle" style="margin: 16px auto 0; text-align: center;">Six pillars we are committed to building.</p>
+                </div>
+            </div>
             <div class="objectives-grid">
                 <div class="objective-item">
                     <i class="fas fa-graduation-cap"></i>
@@ -157,8 +196,13 @@
     <!-- HISTORY -->
     <section class="history">
         <div class="container">
-            <h2 class="section-title" data-about="history-title">Our History</h2>
             <div class="history-content">
+                <div class="section-header section-header-center">
+                    <div>
+                        <h2 class="section-title section-title-center" data-about="history-title">Our History</h2>
+                        <p class="section-subtitle" style="margin: 16px auto 0; text-align: center;">A journey of growth, service, and excellence.</p>
+                    </div>
+                </div>
                 <p data-about="history-content">
                     The Association of Veterinary Medical Students (AVMS) at Ahmadu Bello University, 
                     Zaria was established to serve as the voice of veterinary students and to promote 
@@ -182,7 +226,12 @@
     <!-- ACHIEVEMENTS -->
     <section class="achievements">
         <div class="container">
-            <h2 class="section-title">Our Achievements</h2>
+            <div class="section-header section-header-center">
+                <div>
+                    <h2 class="section-title section-title-center">Our Achievements</h2>
+                    <p class="section-subtitle" style="margin: 16px auto 0; text-align: center;">By the numbers — where we stand today.</p>
+                </div>
+            </div>
             <div class="achievements-grid">
                 <div class="achievement-item">
                     <span class="achievement-number">10+</span>
@@ -207,7 +256,12 @@
     <!-- VALUES -->
     <section class="values">
         <div class="container">
-            <h2 class="section-title">Our Core Values</h2>
+            <div class="section-header section-header-center">
+                <div>
+                    <h2 class="section-title section-title-center">Our Core Values</h2>
+                    <p class="section-subtitle" style="margin: 16px auto 0; text-align: center;">The principles that shape our community.</p>
+                </div>
+            </div>
             <div class="values-grid">
                 <div class="value-item">
                     <i class="fas fa-star" data-about="value1-icon"></i>
@@ -290,11 +344,11 @@
                     <p><i class="fas fa-phone"></i> <a href="tel:+2348000000000" class="contact-phone" data-contact="phone">+234 800 000 0000</a></p>
                     <br>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                         <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
