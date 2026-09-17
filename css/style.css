@@ -2707,3 +2707,29 @@ body {
         border-radius: 8px !important;
     }
 }
+/* ============================================
+   PREVENT HORIZONTAL OVERFLOW (mobile desktop mode fix)
+   ============================================ */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Ensure full-width sections always span edge-to-edge */
+.header,
+.hero,
+.page-header,
+.join-preview,
+.announcements-section,
+.events-section,
+.leadership-preview,
+.footer {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Catch any accidental overflow from translated/animated elements */
+* {
+    min-width: 0;
+}
