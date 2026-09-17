@@ -241,7 +241,7 @@
             .album-photos-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        /* ===== SIDEBAR SECTION LABELS (NEW) ===== */
+        /* ===== SIDEBAR SECTION LABELS ===== */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
@@ -262,11 +262,9 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <!-- ===== OVERVIEW ===== -->
                 <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
-                <!-- ===== CONTENT ===== -->
                 <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
@@ -277,25 +275,21 @@
                 <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
                 <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
 
-                <!-- ===== PAGES ===== -->
                 <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
 
-                <!-- ===== CBT PORTAL ===== -->
                 <div class="sidebar-section-label">CBT Portal</div>
                 <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
                 <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
                 <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
 
-                <!-- ===== ENGAGEMENT ===== -->
                 <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
 
-                <!-- ===== SYSTEM ===== -->
                 <div class="sidebar-section-label">System</div>
                 <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -385,7 +379,6 @@
             <h2 id="photosModalTitle">Album Photos</h2>
             <div id="photosModalInfo" style="color: #666; margin-bottom: 15px;"></div>
 
-            <!-- Upload Photos -->
             <div class="image-upload-area" onclick="document.getElementById('photoInput').click()">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <p>Click to upload photos</p>
@@ -470,7 +463,6 @@
                     return;
                 }
 
-                // Get photo counts for each album
                 for (const album of allAlbums) {
                     const { count } = await supabase
                         .from('gallery_images')
@@ -648,11 +640,16 @@
                     </div>
                 `).join('');
 
-                if (currentAlbumPhotos.length > 0 && !album.cover_image) {
+                // FIXED: Look up the album from allAlbums instead of using undefined `album`
+                const currentAlbum = allAlbums.find(a => a.id === albumId);
+                if (currentAlbumPhotos.length > 0 && currentAlbum && !currentAlbum.cover_image) {
                     await supabase
                         .from('gallery_albums')
                         .update({ cover_image: currentAlbumPhotos[0].image_url })
                         .eq('id', albumId);
+
+                    // Update the local state so we don't re-trigger next time
+                    currentAlbum.cover_image = currentAlbumPhotos[0].image_url;
                 }
             } catch (error) {
                 console.error('Error loading photos:', error);
