@@ -4005,3 +4005,35 @@ html, body {
         border-radius: 12px;
     }
 }
+/* ============================================
+   PAGE HEADER — Center-aligned on all inner pages
+   (Homepage keeps its left-aligned editorial hero)
+   ============================================ */
+.page-header {
+    text-align: center;
+}
+
+.page-header .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-header-eyebrow {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-header h1 {
+    text-align: center;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page-header p {
+    text-align: center;
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+}
