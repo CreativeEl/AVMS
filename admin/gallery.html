@@ -241,7 +241,6 @@
             .album-photos-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        /* ===== SIDEBAR SECTION LABELS ===== */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
@@ -373,7 +372,7 @@
         </div>
     </div>
 
-    <!-- Album Details Modal (Photo Management) -->
+    <!-- Album Details Modal -->
     <div class="modal" id="photosModal">
         <div class="modal-content large">
             <h2 id="photosModalTitle">Album Photos</h2>
@@ -406,9 +405,7 @@
 
     <script src="../js/config.js"></script>
     <script>
-        // ============================================
-        // AUTH CHECK
-        // ============================================
+        // AUTH
         const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
         const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
         
@@ -418,16 +415,12 @@
             document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
         }
 
-        // ============================================
         // STATE
-        // ============================================
         let allAlbums = [];
         let currentAlbumId = null;
         let currentAlbumPhotos = [];
 
-        // ============================================
         // LOGOUT
-        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('adminLoggedIn');
@@ -437,9 +430,7 @@
             window.location.href = 'index.html';
         });
 
-        // ============================================
         // LOAD ALBUMS
-        // ============================================
         async function loadAlbums() {
             const grid = document.getElementById('albumsGrid');
             try {
@@ -520,9 +511,7 @@
             `).join('');
         }
 
-        // ============================================
         // ALBUM CRUD
-        // ============================================
         function openAddAlbumModal() {
             document.getElementById('albumModalTitle').textContent = 'Create Album';
             document.getElementById('albumEditId').value = '';
@@ -591,9 +580,7 @@
             }
         }
 
-        // ============================================
         // PHOTOS MANAGEMENT
-        // ============================================
         async function openPhotosModal(albumId) {
             currentAlbumId = albumId;
             const album = allAlbums.find(a => a.id === albumId);
@@ -640,7 +627,6 @@
                     </div>
                 `).join('');
 
-                // FIXED: Look up the album from allAlbums instead of using undefined `album`
                 const currentAlbum = allAlbums.find(a => a.id === albumId);
                 if (currentAlbumPhotos.length > 0 && currentAlbum && !currentAlbum.cover_image) {
                     await supabase
@@ -648,7 +634,6 @@
                         .update({ cover_image: currentAlbumPhotos[0].image_url })
                         .eq('id', albumId);
 
-                    // Update the local state so we don't re-trigger next time
                     currentAlbum.cover_image = currentAlbumPhotos[0].image_url;
                 }
             } catch (error) {
@@ -664,9 +649,7 @@
             loadAlbums();
         }
 
-        // ============================================
         // PHOTO UPLOAD
-        // ============================================
         async function handlePhotosUpload(event) {
             const files = Array.from(event.target.files);
             if (files.length === 0) return;
@@ -742,7 +725,7 @@
 
             event.target.value = '';
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 progressDiv.classList.remove('show');
                 progressFill.style.width = '0%';
                 
@@ -752,18 +735,58 @@
                     alert(`⚠️ ${uploaded - errors} photos uploaded, ${errors} failed.`);
                 }
                 
+                // If the current album has no cover yet, set one now (fresh upload)
+                await ensureAlbumHasCover(currentAlbumId);
+                
                 loadPhotos(currentAlbumId);
                 loadAlbums();
             }, 1000);
         }
 
-        // ============================================
+        // Ensure album has a valid cover — otherwise pick the first photo
+        async function ensureAlbumHasCover(albumId) {
+            try {
+                const { data: photos } = await supabase
+                    .from('gallery_images')
+                    .select('*')
+                    .eq('album_id', albumId)
+                    .order('display_order', { ascending: true })
+                    .limit(1);
+
+                const { data: album } = await supabase
+                    .from('gallery_albums')
+                    .select('cover_image')
+                    .eq('id', albumId)
+                    .single();
+
+                // If album has no cover OR the cover is broken, set to first photo
+                const firstPhoto = photos?.[0];
+                if (!firstPhoto) return;
+
+                if (!album?.cover_image) {
+                    await supabase
+                        .from('gallery_albums')
+                        .update({ cover_image: firstPhoto.image_url })
+                        .eq('id', albumId);
+                }
+            } catch (err) {
+                console.warn('Could not ensure album cover:', err);
+            }
+        }
+
         // DELETE PHOTO
-        // ============================================
         async function deletePhoto(photoId) {
             if (!confirm('Are you sure you want to delete this photo?')) return;
 
             try {
+                // First — get the photo we're deleting so we know its URL
+                const { data: deletingPhoto } = await supabase
+                    .from('gallery_images')
+                    .select('*')
+                    .eq('id', photoId)
+                    .single();
+
+                // Delete it
                 const { error } = await supabase
                     .from('gallery_images')
                     .delete()
@@ -771,16 +794,34 @@
 
                 if (error) throw error;
 
+                // Check if the deleted photo was the album cover
+                const { data: album } = await supabase
+                    .from('gallery_albums')
+                    .select('cover_image')
+                    .eq('id', currentAlbumId)
+                    .single();
+
+                if (album && deletingPhoto && album.cover_image === deletingPhoto.image_url) {
+                    // The cover was just deleted — clear it, then pick a new one
+                    await supabase
+                        .from('gallery_albums')
+                        .update({ cover_image: null })
+                        .eq('id', currentAlbumId);
+
+                    // Set a new cover from any remaining photos
+                    await ensureAlbumHasCover(currentAlbumId);
+                }
+
+                // Reload
                 await loadPhotos(currentAlbumId);
+                await loadAlbums();
                 alert('✅ Photo deleted successfully!');
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
         }
 
-        // ============================================
         // INIT
-        // ============================================
         loadAlbums();
 
         document.getElementById('albumModal').addEventListener('click', function(e) {
