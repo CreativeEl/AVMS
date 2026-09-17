@@ -3,13 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AVMS - ABU Zaria</title>
+    <title>AVMS — Association of Veterinary Medical Students | ABU Zaria</title>
+    <meta name="description" content="Official website of the Association of Veterinary Medical Students (AVMS), Ahmadu Bello University, Zaria.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
 </head>
 <body>
+
+    <!-- ==========================================
+    UTILITY BAR (slim top strip)
+    ========================================== -->
+    <div class="utility-bar">
+        <div class="container">
+            <div class="utility-bar-inner">
+                <div class="utility-left">
+                    <span><i class="fas fa-map-marker-alt"></i> Ahmadu Bello University, Zaria</span>
+                    <span class="utility-divider">·</span>
+                    <span><i class="fas fa-envelope"></i> <a href="mailto:avms@abu.edu.ng" data-contact="email">avms@abu.edu.ng</a></span>
+                </div>
+                <div class="utility-right">
+                    <a href="cbt/login.html">Student Portal</a>
+                    <span class="utility-divider">·</span>
+                    <a href="admin/index.html" target="_blank">Admin</a>
+                    <span class="utility-divider">·</span>
+                    <a href="give.html" class="utility-cta">Support AVMS</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ==========================================
     HEADER / NAVIGATION
@@ -26,7 +52,7 @@
                     </a>
                 </div>
                 
-                <button class="hamburger" id="hamburger">
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 
@@ -56,19 +82,23 @@
     </header>
 
     <!-- ==========================================
-    HERO SECTION — Redesigned (bold typographic)
+    HERO SECTION
     ========================================== -->
     <section class="hero" data-home="hero-image">
         <div class="hero-overlay"></div>
         <div class="container">
             <div class="hero-content">
-                <div class="hero-eyebrow" data-home="hero-eyebrow">Ahmadu Bello University, Zaria</div>
+                <div class="hero-eyebrow" data-home="hero-eyebrow">
+                    <i class="fas fa-map-marker-alt"></i> Ahmadu Bello University, Zaria
+                </div>
                 <h1 class="hero-title" data-home="hero-title">
                     <span class="hero-title-line">ADVANCING</span>
                     <span class="hero-title-line hero-title-cursive">veterinary</span>
                     <span class="hero-title-line">EXCELLENCE</span>
                 </h1>
-                <p class="hero-subtitle" data-home="hero-subtitle">Association of Veterinary Medical Students</p>
+                <p class="hero-subtitle" data-home="hero-subtitle">
+                    Association of Veterinary Medical Students
+                </p>
                 <p class="hero-description" data-home="hero-description">
                     Through knowledge, leadership and service — building the next generation of veterinary professionals.
                 </p>
@@ -76,8 +106,28 @@
                     <a href="about.html" class="btn btn-primary" data-home="hero-btn1">
                         <span data-home="hero-btn1-text">Learn More</span>
                     </a>
-                    <a href="join.html" class="btn btn-secondary" data-home="hero-btn2">
+                    <a href="join.html" class="btn btn-ghost" data-home="hero-btn2">
                         <span data-home="hero-btn2-text">Join AVMS</span>
+                    </a>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="hero-quicklinks">
+                    <a href="cbt/login.html" class="hero-quicklink">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>CBT Practice Portal</span>
+                    </a>
+                    <a href="leadership.html" class="hero-quicklink">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Meet Our Executive Team</span>
+                    </a>
+                    <a href="scholarships.html" class="hero-quicklink">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Scholarships &amp; Opportunities</span>
+                    </a>
+                    <a href="join.html" class="hero-quicklink">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Become a Member</span>
                     </a>
                 </div>
             </div>
@@ -102,13 +152,15 @@
     </section>
 
     <!-- ==========================================
-    PHOTO STRIP — Recently from Gallery
+    PHOTO STRIP
     ========================================== -->
     <section class="photo-strip-section">
         <div class="container">
             <div class="photo-strip-header">
                 <h3 class="photo-strip-title">Moments from AVMS</h3>
-                <a href="gallery.html" class="view-all">View Full Gallery →</a>
+                <a href="gallery.html" class="view-all">
+                    View Full Gallery <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
             <div id="photoStripContainer" class="photo-strip">
                 <!-- Populated by JS from gallery_images table -->
@@ -122,8 +174,13 @@
     <section class="announcements-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Latest Announcements</h2>
-                <a href="announcements.html" class="view-all">View All →</a>
+                <div>
+                    <h2 class="section-title">Latest Announcements</h2>
+                    <p class="section-subtitle">Stay up to date with the latest from the association.</p>
+                </div>
+                <a href="announcements.html" class="view-all">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
             <div id="announcementsContainer" class="announcements-grid">
                 <div class="loading">⏳ Loading announcements...</div>
@@ -137,8 +194,13 @@
     <section class="events-section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Upcoming Events</h2>
-                <a href="events.html" class="view-all">View All →</a>
+                <div>
+                    <h2 class="section-title">Upcoming Events</h2>
+                    <p class="section-subtitle">Mark your calendar — don't miss what's coming up.</p>
+                </div>
+                <a href="events.html" class="view-all">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
             <div id="eventsContainer" class="events-grid">
                 <div class="loading">⏳ Loading events...</div>
@@ -152,8 +214,13 @@
     <section class="leadership-preview">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Our Leadership</h2>
-                <a href="leadership.html" class="view-all">View All →</a>
+                <div>
+                    <h2 class="section-title">Our Leadership</h2>
+                    <p class="section-subtitle">The executives serving the AVMS community this session.</p>
+                </div>
+                <a href="leadership.html" class="view-all">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
             </div>
             <div id="leadersContainer" class="leaders-grid">
                 <div class="loading">⏳ Loading leaders...</div>
@@ -162,13 +229,15 @@
     </section>
 
     <!-- ==========================================
-    JOIN AVMS SECTION
+    JOIN AVMS SECTION (CTA)
     ========================================== -->
     <section class="join-preview">
         <div class="container">
             <div class="join-content">
                 <h2 data-home="join-title">Join AVMS Today</h2>
-                <p data-home="join-text">Become part of the largest veterinary student community in Northern Nigeria.</p>
+                <p data-home="join-text">
+                    Become part of the largest veterinary student community in Northern Nigeria.
+                </p>
                 <a href="join.html" class="btn btn-primary">Apply Now</a>
             </div>
         </div>
@@ -223,11 +292,11 @@
                     <p><i class="fas fa-phone"></i> <a href="tel:+2348000000000" class="contact-phone" data-contact="phone">+234 800 000 0000</a></p>
                     <br>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                         <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
@@ -247,7 +316,7 @@
     <script src="js/site-loader.js"></script>
 
     <!-- ==========================================
-    PHOTO STRIP LOADER (inline — small addition)
+    PHOTO STRIP LOADER
     ========================================== -->
     <script>
         (async function loadPhotoStrip() {
@@ -255,7 +324,6 @@
             if (!container) return;
 
             try {
-                // Fetch the latest 6 photos from any album
                 const { data, error } = await supabase
                     .from('gallery_images')
                     .select('id, image_url, caption, album_id')
@@ -265,7 +333,6 @@
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    // No photos yet — hide the section entirely
                     const section = document.querySelector('.photo-strip-section');
                     if (section) section.style.display = 'none';
                     return;
