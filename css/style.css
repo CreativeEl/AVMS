@@ -3861,3 +3861,62 @@ html, body {
         justify-content: flex-start;
     }
 }
+/* ============================================
+   FIX: Center Font Awesome icons inside circular social buttons
+   ============================================ */
+
+.footer-col .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.footer-col .social-links a {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center;
+    line-height: 1 !important;
+    padding: 0 !important;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(201, 169, 97, 0.35);
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none !important;
+    transition: all 0.28s ease;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Force the icon itself to be centered */
+.footer-col .social-links a i,
+.footer-col .social-links a::before,
+.footer-col .social-links a svg {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 16px;
+    width: auto;
+    height: auto;
+    position: static;
+    transform: none;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.footer-col .social-links a:hover {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--green-deep);
+    transform: translateY(-2px);
+}
