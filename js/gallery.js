@@ -76,7 +76,7 @@ function renderAlbums(albums, container) {
         <div class="gallery-album" onclick="openAlbumModal(${album.id})" data-album-id="${album.id}">
             <div class="album-cover">
                 ${album.cover_image ? 
-                    `<img src="${album.cover_image}" alt="${escapeHtml(album.title)}">` : 
+                    `<img src="${album.cover_image}" alt="${escapeHtml(album.title)}" onerror="handleBrokenCover(this)">` : 
                     `<i class="fas fa-images"></i>`
                 }
                 <span class="album-photo-count-badge">
@@ -97,6 +97,26 @@ function renderAlbums(albums, container) {
 }
 
 // ============================================
+// HANDLE BROKEN ALBUM COVERS (ghost thumbnails)
+// ============================================
+function handleBrokenCover(img) {
+    const cover = img.closest('.album-cover');
+    if (!cover) return;
+
+    // Hide the broken image
+    img.style.display = 'none';
+
+    // Add the fallback icon if not already there
+    if (!cover.querySelector('.cover-fallback')) {
+        const fallback = document.createElement('div');
+        fallback.className = 'cover-fallback';
+        fallback.innerHTML = '<i class="fas fa-images"></i>';
+        // Insert before the badge/hint so they stay on top
+        cover.insertBefore(fallback, cover.firstChild);
+    }
+}
+
+// ============================================
 // OPEN ALBUM MODAL — Fetch photos and display
 // ============================================
 async function openAlbumModal(albumId) {
@@ -105,7 +125,6 @@ async function openAlbumModal(albumId) {
     const metaEl = document.getElementById('albumModalMeta');
     const bodyEl = document.getElementById('albumModalBody');
 
-    // Find album in DOM (fetch fresh from Supabase for accuracy)
     try {
         const { data: album, error: albumErr } = await supabase
             .from('gallery_albums')
@@ -128,8 +147,6 @@ async function openAlbumModal(albumId) {
             </div>
         `;
         overlay.classList.add('show');
-
-        // Prevent body scroll while modal open
         document.body.style.overflow = 'hidden';
 
         // Load photos
@@ -236,8 +253,6 @@ function escapeHtml(text) {
 // ============================================
 // GLOBAL EVENT LISTENERS
 // ============================================
-
-// Close album modal when clicking the overlay (not the modal itself)
 document.addEventListener('click', function(e) {
     const overlay = document.getElementById('albumModalOverlay');
     if (e.target === overlay) closeAlbumModal();
@@ -246,7 +261,6 @@ document.addEventListener('click', function(e) {
     if (e.target === viewer) closePhotoViewer();
 });
 
-// ESC key closes topmost modal
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         const viewer = document.getElementById('photoViewerOverlay');
@@ -260,7 +274,6 @@ document.addEventListener('keydown', function(e) {
         }
     }
 
-    // Arrow keys navigate photos when viewer open
     const viewer = document.getElementById('photoViewerOverlay');
     if (viewer.classList.contains('show')) {
         if (e.key === 'ArrowLeft') photoViewerNav(-1);
