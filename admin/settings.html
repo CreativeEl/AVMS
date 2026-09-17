@@ -339,7 +339,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ===== SIDEBAR SECTION LABELS (NEW) ===== */
+        /* ===== SIDEBAR SECTION LABELS ===== */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
@@ -350,6 +350,131 @@
             user-select: none;
         }
         .sidebar-section-label:first-child { padding-top: 4px; }
+
+        /* ===== HERO SLIDESHOW SLOTS (NEW) ===== */
+        .slideshow-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .slide-slot {
+            background: #f8f9fa;
+            border: 2px solid #e0e7ef;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s;
+            position: relative;
+            aspect-ratio: 16 / 10;
+        }
+
+        .slide-slot.has-image {
+            border-color: #28a745;
+        }
+
+        .slide-slot:hover {
+            border-color: #2a4a7a;
+            box-shadow: 0 4px 15px rgba(42, 74, 122, 0.1);
+        }
+
+        .slide-slot-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(26, 42, 74, 0.9);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            z-index: 2;
+        }
+
+        .slide-slot-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+        }
+
+        .slide-slot-inner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+        }
+
+        .slide-slot-placeholder {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .slide-slot-placeholder i {
+            font-size: 28px;
+            color: #c9a961;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .slide-slot-actions {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            display: flex;
+            gap: 6px;
+            z-index: 2;
+        }
+
+        .slide-slot-remove {
+            background: rgba(220, 53, 69, 0.95);
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .slide-slot-remove:hover {
+            background: #c82333;
+        }
+
+        .slide-slot-replace {
+            position: absolute;
+            inset: 0;
+            background: rgba(26, 42, 74, 0.7);
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1;
+        }
+
+        .slide-slot:hover .slide-slot-replace {
+            display: flex;
+        }
+
+        .slide-slot-replace i {
+            font-size: 20px;
+        }
 
         @media (max-width: 768px) {
             .form-row, .form-row-3 {
@@ -375,7 +500,16 @@
                 flex-direction: column;
                 text-align: center;
             }
+            .slideshow-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .admin-sidebar .sidebar-section-label { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .slideshow-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -384,11 +518,9 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <!-- ===== OVERVIEW ===== -->
                 <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
-                <!-- ===== CONTENT ===== -->
                 <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
@@ -399,25 +531,21 @@
                 <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
                 <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
 
-                <!-- ===== PAGES ===== -->
                 <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
 
-                <!-- ===== CBT PORTAL ===== -->
                 <div class="sidebar-section-label">CBT Portal</div>
                 <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
                 <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
                 <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
 
-                <!-- ===== ENGAGEMENT ===== -->
                 <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
 
-                <!-- ===== SYSTEM ===== -->
                 <div class="sidebar-section-label">System</div>
                 <a href="settings.html" class="active"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -501,7 +629,7 @@
             </div>
 
             <!-- ============================================
-                 TAB 2: BRANDING (LOGO, FAVICON, IMAGES)
+                 TAB 2: BRANDING
                  ============================================ -->
             <div class="tab-content" id="tab-branding">
                 <div class="info-note">
@@ -559,15 +687,37 @@
                     <div class="save-message" id="faviconMessage"></div>
                 </div>
 
+                <!-- ============================================
+                     NEW: HERO SLIDESHOW
+                     ============================================ -->
                 <div class="settings-card">
-                    <h2><i class="fas fa-image"></i> Homepage Hero Image</h2>
+                    <h2><i class="fas fa-images"></i> Hero Slideshow (Homepage)</h2>
+                    <div class="info-note" style="margin-bottom: 20px;">
+                        <i class="fas fa-info-circle"></i>
+                        Upload up to <strong>6 images</strong> for the homepage hero slideshow. They'll rotate automatically every 5 seconds with left/right navigation. If no images are uploaded, the hero will show a green gradient instead.
+                    </div>
+
+                    <div class="slideshow-grid" id="slideshowGrid">
+                        <!-- 6 slots injected by JS -->
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn-save" id="saveSlideshowBtn" onclick="saveSlideshow()">
+                            <i class="fas fa-save"></i> Save Slideshow
+                        </button>
+                    </div>
+                    <div class="save-message" id="slideshowMessage"></div>
+                </div>
+
+                <div class="settings-card">
+                    <h2><i class="fas fa-image"></i> Homepage Hero Image (Legacy)</h2>
                     <div id="heroImagePreviewContainer" style="display: none; margin-bottom: 15px;">
                         <img id="heroImagePreview" style="max-width: 100%; max-height: 200px; border-radius: 10px; border: 2px solid #e0e7ef;" />
                     </div>
                     <div class="image-upload-area" onclick="document.getElementById('heroImageInput').click()">
                         <i class="fas fa-cloud-upload-alt"></i>
-                        <p>Click to upload hero image</p>
-                        <small>JPG or PNG (max 5MB) — Recommended size: 1920x1080px</small>
+                        <p>Click to upload hero background image</p>
+                        <small>JPG or PNG (max 5MB) — Used as fallback background</small>
                         <input type="file" id="heroImageInput" accept="image/*" onchange="handleHeroImageUpload(event)">
                     </div>
                     <div class="settings-actions">
@@ -1124,7 +1274,134 @@ const admins = [
         }
 
         // ============================================
-        // HERO IMAGE UPLOAD
+        // HERO SLIDESHOW (NEW)
+        // ============================================
+        const SLIDESHOW_SLOTS = 6;
+        let slideshowUrls = new Array(SLIDESHOW_SLOTS).fill('');
+        let pendingSlideFiles = new Array(SLIDESHOW_SLOTS).fill(null);
+
+        function renderSlideshowGrid() {
+            const grid = document.getElementById('slideshowGrid');
+            if (!grid) return;
+
+            grid.innerHTML = slideshowUrls.map((url, i) => {
+                const hasImage = url && url.trim() !== '';
+                const previewSrc = pendingSlideFiles[i]
+                    ? URL.createObjectURL(pendingSlideFiles[i])
+                    : url;
+
+                return `
+                    <div class="slide-slot ${hasImage || pendingSlideFiles[i] ? 'has-image' : ''}" data-index="${i}">
+                        <span class="slide-slot-number">${i + 1}</span>
+                        ${previewSrc
+                            ? `<img src="${previewSrc}" alt="Slide ${i + 1}">`
+                            : `<div class="slide-slot-inner" onclick="document.getElementById('slideInput${i}').click()">
+                                <div class="slide-slot-placeholder">
+                                    <i class="fas fa-plus-circle"></i>
+                                    <span>Click to upload</span>
+                                </div>
+                              </div>`
+                        }
+                        ${previewSrc
+                            ? `<div class="slide-slot-replace" onclick="document.getElementById('slideInput${i}').click()">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>Replace</span>
+                               </div>`
+                            : ''
+                        }
+                        ${(hasImage || pendingSlideFiles[i])
+                            ? `<div class="slide-slot-actions">
+                                <button class="slide-slot-remove" onclick="removeSlideSlot(${i})" title="Remove">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                               </div>`
+                            : ''
+                        }
+                        <input type="file" id="slideInput${i}" accept="image/*" style="display:none" onchange="handleSlideUpload(event, ${i})">
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleSlideUpload(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 4 * 1024 * 1024) {
+                showMessage('slideshowMessage', 'error', `❌ Slot ${index + 1}: File too large. Max 4MB allowed.`);
+                return;
+            }
+
+            pendingSlideFiles[index] = file;
+            renderSlideshowGrid();
+            showMessage('slideshowMessage', 'info', `📷 Slot ${index + 1}: ${file.name} selected. Click "Save Slideshow" to upload.`);
+        }
+
+        function removeSlideSlot(index) {
+            pendingSlideFiles[index] = null;
+            slideshowUrls[index] = '';
+            renderSlideshowGrid();
+            showMessage('slideshowMessage', 'info', `Slot ${index + 1} cleared. Don't forget to save.`);
+        }
+
+        async function saveSlideshow() {
+            const btn = document.getElementById('saveSlideshowBtn');
+            const original = showLoading(btn, 'Uploading...');
+
+            try {
+                // Upload any pending files first
+                for (let i = 0; i < SLIDESHOW_SLOTS; i++) {
+                    if (pendingSlideFiles[i]) {
+                        const url = await uploadImage(pendingSlideFiles[i], 'hero-slideshow');
+                        slideshowUrls[i] = url;
+                        pendingSlideFiles[i] = null;
+                    }
+                }
+
+                // Save the array as JSON
+                await saveSetting('hero_slideshow', JSON.stringify(slideshowUrls));
+
+                renderSlideshowGrid();
+                showMessage('slideshowMessage', 'success', '✅ Hero slideshow saved successfully!');
+            } catch (error) {
+                showMessage('slideshowMessage', 'error', '❌ Error: ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        }
+
+        async function loadSlideshow() {
+            try {
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('setting_value')
+                    .eq('setting_key', 'hero_slideshow')
+                    .maybeSingle();
+
+                if (error) throw error;
+
+                if (data && data.setting_value) {
+                    try {
+                        const parsed = JSON.parse(data.setting_value);
+                        if (Array.isArray(parsed)) {
+                            for (let i = 0; i < SLIDESHOW_SLOTS; i++) {
+                                slideshowUrls[i] = parsed[i] || '';
+                            }
+                        }
+                    } catch (e) {
+                        // ignore parse errors
+                    }
+                }
+
+                renderSlideshowGrid();
+            } catch (err) {
+                console.warn('Could not load slideshow:', err);
+                renderSlideshowGrid();
+            }
+        }
+
+        // ============================================
+        // HERO IMAGE UPLOAD (Legacy)
         // ============================================
         let pendingHeroImageFile = null;
 
@@ -1364,6 +1641,7 @@ const admins = [
         }
 
         loadSettings();
+        loadSlideshow();
     </script>
 </body>
 </html>
