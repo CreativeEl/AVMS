@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gallery - AVMS ABU Zaria</title>
+    <title>Gallery — Association of Veterinary Medical Students | ABU Zaria</title>
+    <meta name="description" content="Photos and moments from AVMS activities, events, and community programs at Ahmadu Bello University, Zaria.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -11,20 +15,40 @@
 </head>
 <body>
 
+    <!-- UTILITY BAR -->
+    <div class="utility-bar">
+        <div class="container">
+            <div class="utility-bar-inner">
+                <div class="utility-left">
+                    <span><i class="fas fa-map-marker-alt"></i> Ahmadu Bello University, Zaria</span>
+                    <span class="utility-divider">·</span>
+                    <span><i class="fas fa-envelope"></i> <a href="mailto:avms@abu.edu.ng" data-contact="email">avms@abu.edu.ng</a></span>
+                </div>
+                <div class="utility-right">
+                    <a href="cbt/login.html">Student Portal</a>
+                    <span class="utility-divider">·</span>
+                    <a href="admin/index.html" target="_blank">Admin</a>
+                    <span class="utility-divider">·</span>
+                    <a href="give.html" class="utility-cta">Support AVMS</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- HEADER -->
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
                 <div class="logo">
                     <a href="index.html">
-                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%232a4a7a'/%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='white' stroke-width='2'/%3E%3Ctext x='50' y='62' font-size='36' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%231F4E3D'/%3E%3Ccircle cx='50' cy='50' r='43' fill='none' stroke='%23C9A961' stroke-width='2.5'/%3E%3Ctext x='50' y='63' font-size='34' text-anchor='middle' fill='%23C9A961' font-family='Georgia, serif' font-weight='bold'%3EAV%3C/text%3E%3C/svg%3E" 
                              alt="AVMS Logo" 
                              class="logo-img">
                         <span class="logo-text" data-footer="site-short-name">AVMS ABU</span>
                     </a>
                 </div>
                 
-                <button class="hamburger" id="hamburger">
+                <button class="hamburger" id="hamburger" aria-label="Toggle menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 
@@ -56,6 +80,9 @@
     <!-- PAGE HEADER -->
     <section class="page-header">
         <div class="container">
+            <div class="page-header-eyebrow">
+                <i class="fas fa-images"></i> Photo Memories
+            </div>
             <h1>Gallery</h1>
             <p>Capturing memories and moments from AVMS activities</p>
         </div>
@@ -108,7 +135,7 @@
         <div class="photo-viewer-caption" id="photoViewerCaption"></div>
     </div>
 
-    <!-- INLINE STYLES FOR MODALS -->
+    <!-- INLINE STYLES FOR MODALS — Updated to green/gold palette -->
     <style>
         /* Album modal overlay */
         .album-modal-overlay {
@@ -118,40 +145,43 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(20, 47, 37, 0.85);
             z-index: 3000;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(4px);
         }
         .album-modal-overlay.show { display: flex; animation: albumFadeIn 0.25s ease; }
         @keyframes albumFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         .album-modal {
-            background: white;
-            border-radius: 18px;
+            background: #ffffff;
+            border-radius: 14px;
             width: 100%;
             max-width: 1000px;
             max-height: 90vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.55),
+                        0 0 0 1px rgba(201, 169, 97, 0.35);
         }
 
         .album-modal-header {
-            background: #1a2a4a;
-            color: white;
+            background: #1F4E3D;
+            color: #ffffff;
             padding: 20px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 15px;
             flex-shrink: 0;
+            border-bottom: 3px solid #C9A961;
         }
         .album-modal-title-wrap { flex: 1; min-width: 0; }
         .album-modal-header h2 {
+            font-family: Georgia, serif;
             font-size: 20px;
             margin-bottom: 4px;
             font-weight: 700;
@@ -161,15 +191,15 @@
         }
         .album-modal-header p {
             font-size: 13px;
-            color: rgba(255,255,255,0.75);
+            color: rgba(255, 255, 255, 0.75);
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .album-modal-close {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: none;
+            background: rgba(255, 255, 255, 0.12);
+            color: #C9A961;
+            border: 1px solid rgba(201, 169, 97, 0.4);
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -179,22 +209,27 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            transition: background 0.25s, transform 0.25s;
+            transition: all 0.25s ease;
         }
-        .album-modal-close:hover { background: #e8491d; transform: rotate(90deg); }
+        .album-modal-close:hover {
+            background: #C9A961;
+            color: #1F4E3D;
+            transform: rotate(90deg);
+        }
 
         .album-modal-body {
             overflow-y: auto;
             padding: 20px 25px 25px;
             flex: 1;
+            background: #FBF8EE;
         }
 
-        .album-modal-loading { text-align: center; padding: 50px 20px; color: #888; }
+        .album-modal-loading { text-align: center; padding: 50px 20px; color: #666; }
         .album-spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid #e0e7ef;
-            border-top-color: #e8491d;
+            border: 4px solid #E8EFEA;
+            border-top-color: #C9A961;
             border-radius: 50%;
             animation: albumSpin 0.8s linear infinite;
             margin: 0 auto 15px;
@@ -209,13 +244,18 @@
         .album-photo-public {
             position: relative;
             aspect-ratio: 1;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
-            background: #f0f2f5;
+            background: #F5F0DC;
             cursor: pointer;
-            transition: transform 0.25s, box-shadow 0.25s;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border: 1px solid rgba(201, 169, 97, 0.25);
         }
-        .album-photo-public:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .album-photo-public:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(31, 78, 61, 0.25);
+            border-color: #C9A961;
+        }
         .album-photo-public img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .album-photo-public .photo-caption-overlay {
             position: absolute;
@@ -223,8 +263,8 @@
             left: 0;
             right: 0;
             padding: 20px 12px 10px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.75));
-            color: white;
+            background: linear-gradient(transparent, rgba(20, 47, 37, 0.85));
+            color: #ffffff;
             font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
@@ -233,8 +273,14 @@
             transition: opacity 0.25s;
         }
         .album-photo-public:hover .photo-caption-overlay { opacity: 1; }
-        .album-no-photos { text-align: center; padding: 50px 20px; color: #888; }
-        .album-no-photos i { font-size: 50px; color: #d0d7df; margin-bottom: 15px; display: block; }
+
+        .album-no-photos { text-align: center; padding: 50px 20px; color: #666; }
+        .album-no-photos i {
+            font-size: 50px;
+            color: #C9A961;
+            margin-bottom: 15px;
+            display: block;
+        }
 
         /* Photo fullsize viewer */
         .photo-viewer-overlay {
@@ -244,7 +290,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(15, 30, 22, 0.96);
             z-index: 4000;
             align-items: center;
             justify-content: center;
@@ -256,15 +302,15 @@
             max-height: 85vh;
             border-radius: 8px;
             object-fit: contain;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.75);
         }
         .photo-viewer-close {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: none;
+            background: rgba(201, 169, 97, 0.2);
+            color: #C9A961;
+            border: 1px solid rgba(201, 169, 97, 0.5);
             width: 46px;
             height: 46px;
             border-radius: 50%;
@@ -273,16 +319,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.25s;
+            transition: all 0.25s;
         }
-        .photo-viewer-close:hover { background: #e8491d; }
+        .photo-viewer-close:hover {
+            background: #C9A961;
+            color: #1F4E3D;
+        }
         .photo-viewer-nav {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: none;
+            background: rgba(201, 169, 97, 0.2);
+            color: #C9A961;
+            border: 1px solid rgba(201, 169, 97, 0.5);
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -291,9 +340,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.25s;
+            transition: all 0.25s;
         }
-        .photo-viewer-nav:hover { background: #e8491d; }
+        .photo-viewer-nav:hover {
+            background: #C9A961;
+            color: #1F4E3D;
+        }
         .photo-viewer-prev { left: 20px; }
         .photo-viewer-next { right: 20px; }
         .photo-viewer-caption {
@@ -301,9 +353,10 @@
             bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
-            color: white;
+            color: #ffffff;
             font-size: 14px;
-            background: rgba(0,0,0,0.6);
+            background: rgba(31, 78, 61, 0.85);
+            border: 1px solid rgba(201, 169, 97, 0.4);
             padding: 8px 20px;
             border-radius: 20px;
             max-width: 80%;
@@ -314,37 +367,49 @@
         /* Gallery album cards — clickable */
         .gallery-album {
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
         }
-        .gallery-album:hover { transform: translateY(-5px); box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+        .gallery-album:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(31, 78, 61, 0.15);
+        }
+
+        /* Photo count badge on album cover */
         .album-photo-count-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(26, 42, 74, 0.9);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            z-index: 2;
-        }
-        .album-cover { position: relative; }
-        .album-view-hint {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(232, 73, 29, 0.95);
-            color: white;
+            top: 12px;
+            right: 12px;
+            background: rgba(20, 47, 37, 0.92);
+            color: #C9A961;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 2;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(201, 169, 97, 0.35);
+        }
+
+        .album-cover { position: relative; }
+
+        /* Hover hint */
+        .album-view-hint {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #C9A961;
+            color: #1F4E3D;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
             opacity: 0;
             transition: opacity 0.3s;
             white-space: nowrap;
@@ -359,7 +424,7 @@
             align-items: center;
             justify-content: center;
             font-size: 50px;
-            color: #2a4a7a;
+            color: #C9A961;
         }
 
         @media (max-width: 640px) {
@@ -423,11 +488,11 @@
                     <p><i class="fas fa-phone"></i> <a href="tel:+2348000000000" class="contact-phone" data-contact="phone">+234 800 000 0000</a></p>
                     <br>
                     <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                         <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
