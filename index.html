@@ -15,9 +15,7 @@
 </head>
 <body>
 
-    <!-- ==========================================
-    UTILITY BAR (slim top strip)
-    ========================================== -->
+    <!-- UTILITY BAR -->
     <div class="utility-bar">
         <div class="container">
             <div class="utility-bar-inner">
@@ -37,9 +35,7 @@
         </div>
     </div>
 
-    <!-- ==========================================
-    HEADER / NAVIGATION
-    ========================================== -->
+    <!-- HEADER / NAV -->
     <header class="header">
         <div class="container">
             <div class="nav-wrapper">
@@ -82,10 +78,9 @@
     </header>
 
     <!-- ==========================================
-    HERO SECTION
+    HERO — Split layout with slideshow
     ========================================== -->
-    <section class="hero" data-home="hero-image">
-        <div class="hero-overlay"></div>
+    <section class="hero" id="heroSection">
         <div class="container">
             <div class="hero-content">
                 <div class="hero-eyebrow" data-home="hero-eyebrow">
@@ -110,33 +105,25 @@
                         <span data-home="hero-btn2-text">Join AVMS</span>
                     </a>
                 </div>
+            </div>
 
-                <!-- Quick Links -->
-                <div class="hero-quicklinks">
-                    <a href="cbt/login.html" class="hero-quicklink">
+            <!-- Slideshow pane -->
+            <div class="hero-slideshow" id="heroSlideshow">
+                <!-- Slides injected by JS -->
+                <div class="hero-slide-dots" id="heroSlideDots"></div>
+                <div class="hero-slide-nav">
+                    <button class="hero-slide-btn" onclick="heroPrevSlide()" aria-label="Previous slide">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="hero-slide-btn" onclick="heroNextSlide()" aria-label="Next slide">
                         <i class="fas fa-chevron-right"></i>
-                        <span>CBT Practice Portal</span>
-                    </a>
-                    <a href="leadership.html" class="hero-quicklink">
-                        <i class="fas fa-chevron-right"></i>
-                        <span>Meet Our Executive Team</span>
-                    </a>
-                    <a href="scholarships.html" class="hero-quicklink">
-                        <i class="fas fa-chevron-right"></i>
-                        <span>Scholarships &amp; Opportunities</span>
-                    </a>
-                    <a href="join.html" class="hero-quicklink">
-                        <i class="fas fa-chevron-right"></i>
-                        <span>Become a Member</span>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ==========================================
-    WELCOME SECTION
-    ========================================== -->
+    <!-- WELCOME -->
     <section class="welcome-section">
         <div class="container">
             <div class="welcome-accent"></div>
@@ -151,9 +138,7 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    PHOTO STRIP
-    ========================================== -->
+    <!-- PHOTO STRIP -->
     <section class="photo-strip-section">
         <div class="container">
             <div class="photo-strip-header">
@@ -163,14 +148,12 @@
                 </a>
             </div>
             <div id="photoStripContainer" class="photo-strip">
-                <!-- Populated by JS from gallery_images table -->
+                <!-- Populated by JS -->
             </div>
         </div>
     </section>
 
-    <!-- ==========================================
-    ANNOUNCEMENTS
-    ========================================== -->
+    <!-- ANNOUNCEMENTS -->
     <section class="announcements-section">
         <div class="container">
             <div class="section-header">
@@ -188,9 +171,7 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    UPCOMING EVENTS
-    ========================================== -->
+    <!-- EVENTS -->
     <section class="events-section">
         <div class="container">
             <div class="section-header">
@@ -208,9 +189,7 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    LEADERSHIP PREVIEW
-    ========================================== -->
+    <!-- LEADERSHIP -->
     <section class="leadership-preview">
         <div class="container">
             <div class="section-header">
@@ -228,9 +207,7 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    JOIN AVMS SECTION (CTA)
-    ========================================== -->
+    <!-- JOIN CTA -->
     <section class="join-preview">
         <div class="container">
             <div class="join-content">
@@ -243,9 +220,7 @@
         </div>
     </section>
 
-    <!-- ==========================================
-    FOOTER
-    ========================================== -->
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
@@ -308,17 +283,150 @@
         </div>
     </footer>
 
-    <!-- ==========================================
-    JAVASCRIPT
-    ========================================== -->
+    <!-- SCRIPTS -->
     <script src="js/main.js"></script>
     <script src="js/home.js"></script>
     <script src="js/site-loader.js"></script>
 
     <!-- ==========================================
-    PHOTO STRIP LOADER
+    HERO SLIDESHOW + PHOTO STRIP LOADERS
     ========================================== -->
     <script>
+        // ============================================
+        // HERO SLIDESHOW
+        // ============================================
+        let heroSlides = [];       // array of image URLs
+        let heroCurrentIndex = 0;
+        let heroAutoplayTimer = null;
+        const HERO_AUTOPLAY_MS = 5000;
+
+        async function loadHeroSlideshow() {
+            const container = document.getElementById('heroSlideshow');
+            const dotsContainer = document.getElementById('heroSlideDots');
+            const heroSection = document.getElementById('heroSection');
+            if (!container) return;
+
+            try {
+                // Load from site_settings → hero_slideshow (JSON array of URLs)
+                const { data, error } = await supabase
+                    .from('site_settings')
+                    .select('setting_value')
+                    .eq('setting_key', 'hero_slideshow')
+                    .maybeSingle();
+
+                if (error) throw error;
+
+                if (!data || !data.setting_value) {
+                    // No slideshow images uploaded — hide pane, keep green gradient
+                    heroSection.classList.add('no-slideshow');
+                    container.innerHTML = `
+                        <div class="hero-slide-dots" id="heroSlideDots"></div>
+                        <div class="hero-slide-nav">
+                            <button class="hero-slide-btn" onclick="heroPrevSlide()" aria-label="Previous slide" style="display:none">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="hero-slide-btn" onclick="heroNextSlide()" aria-label="Next slide" style="display:none">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Parse JSON array of URLs
+                let urls = [];
+                try {
+                    urls = JSON.parse(data.setting_value);
+                    if (!Array.isArray(urls)) urls = [];
+                } catch (e) {
+                    urls = [];
+                }
+
+                // Filter to non-empty strings
+                urls = urls.filter(u => u && typeof u === 'string' && u.trim() !== '');
+
+                if (urls.length === 0) {
+                    heroSection.classList.add('no-slideshow');
+                    return;
+                }
+
+                heroSlides = urls;
+
+                // Build slides
+                const slidesHtml = heroSlides.map((url, i) => `
+                    <div class="hero-slide ${i === 0 ? 'active' : ''}" 
+                         style="background-image: url('${url}');"
+                         data-slide-index="${i}"></div>
+                `).join('');
+
+                // Build dots
+                const dotsHtml = heroSlides.map((_, i) => `
+                    <button class="hero-slide-dot ${i === 0 ? 'active' : ''}" 
+                            onclick="heroGoToSlide(${i})"
+                            aria-label="Slide ${i + 1}"></button>
+                `).join('');
+
+                // Keep the nav buttons, replace the rest
+                const navHtml = container.querySelector('.hero-slide-nav').outerHTML;
+                container.innerHTML = slidesHtml + `<div class="hero-slide-dots" id="heroSlideDots">${dotsHtml}</div>` + navHtml;
+
+                // Start autoplay
+                startHeroAutoplay();
+
+                // Pause autoplay on hover
+                container.addEventListener('mouseenter', stopHeroAutoplay);
+                container.addEventListener('mouseleave', startHeroAutoplay);
+
+            } catch (err) {
+                console.warn('Hero slideshow could not load:', err);
+                // Fail silently — keep the green gradient
+            }
+        }
+
+        function heroGoToSlide(index) {
+            if (heroSlides.length === 0) return;
+
+            // Clamp
+            if (index < 0) index = heroSlides.length - 1;
+            if (index >= heroSlides.length) index = 0;
+
+            heroCurrentIndex = index;
+
+            // Update slides
+            document.querySelectorAll('.hero-slide').forEach((el, i) => {
+                el.classList.toggle('active', i === heroCurrentIndex);
+            });
+
+            // Update dots
+            document.querySelectorAll('.hero-slide-dot').forEach((el, i) => {
+                el.classList.toggle('active', i === heroCurrentIndex);
+            });
+        }
+
+        function heroNextSlide() {
+            heroGoToSlide(heroCurrentIndex + 1);
+        }
+
+        function heroPrevSlide() {
+            heroGoToSlide(heroCurrentIndex - 1);
+        }
+
+        function startHeroAutoplay() {
+            stopHeroAutoplay();
+            if (heroSlides.length < 2) return;
+            heroAutoplayTimer = setInterval(heroNextSlide, HERO_AUTOPLAY_MS);
+        }
+
+        function stopHeroAutoplay() {
+            if (heroAutoplayTimer) {
+                clearInterval(heroAutoplayTimer);
+                heroAutoplayTimer = null;
+            }
+        }
+
+        // ============================================
+        // PHOTO STRIP
+        // ============================================
         (async function loadPhotoStrip() {
             const container = document.getElementById('photoStripContainer');
             if (!container) return;
@@ -349,6 +457,11 @@
                 if (section) section.style.display = 'none';
             }
         })();
+
+        // ============================================
+        // INIT SLIDESHOW
+        // ============================================
+        loadHeroSlideshow();
     </script>
 </body>
 </html>
