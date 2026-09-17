@@ -2707,16 +2707,18 @@ body {
         border-radius: 8px !important;
     }
 }
+
 /* ============================================
-   PREVENT HORIZONTAL OVERFLOW (mobile desktop mode fix)
+   SAFE OVERFLOW PROTECTION (mobile desktop mode fix)
+   Fixes the right-side white strip without breaking nav
    ============================================ */
+
 html, body {
     overflow-x: hidden;
-    width: 100%;
     max-width: 100%;
 }
 
-/* Ensure full-width sections always span edge-to-edge */
+/* Force full-width sections to span edge-to-edge */
 .header,
 .hero,
 .page-header,
@@ -2726,10 +2728,12 @@ html, body {
 .leadership-preview,
 .footer {
     width: 100%;
-    max-width: 100%;
 }
 
-/* Catch any accidental overflow from translated/animated elements */
-* {
-    min-width: 0;
+/* Explicitly preserve nav spacing (in case any reset tries to remove it) */
+.nav-wrapper {
+    gap: 15px;
+}
+.nav-menu ul {
+    gap: 12px;
 }
