@@ -3920,3 +3920,88 @@ html, body {
     color: var(--green-deep);
     transform: translateY(-2px);
 }
+/* ============================================
+   SLIDESHOW PANE — Curve + Shadow + Gold Border
+   ============================================ */
+
+.hero-slideshow {
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(201, 169, 97, 0.35);
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.28),
+        0 8px 20px rgba(20, 47, 37, 0.35);
+    margin: 30px 30px 30px 0;
+    min-height: 560px;
+}
+
+/* Ensure the inner gradient fallback also respects the rounded corners */
+.hero.no-slideshow .hero-slideshow {
+    border-radius: 20px;
+    border: 1px solid rgba(201, 169, 97, 0.35);
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.28),
+        0 8px 20px rgba(20, 47, 37, 0.35);
+}
+
+/* Adjust hero layout so the pane fits with margin */
+.hero > .container {
+    padding: 0 24px;
+}
+
+.hero-content {
+    padding: 110px 40px 110px 0;
+}
+
+/* Keep nav buttons inside the rounded pane */
+.hero-slide-nav {
+    bottom: 24px;
+    right: 24px;
+}
+
+.hero-slide-dots {
+    bottom: 34px;
+    left: 24px;
+}
+
+/* ============================================
+   RESPONSIVE — Slideshow Pane
+   ============================================ */
+
+@media (max-width: 1100px) {
+    .hero-slideshow {
+        margin: 24px 24px 24px 0;
+        min-height: 400px;
+        border-radius: 16px;
+    }
+    .hero-content {
+        padding: 80px 24px 40px 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-slideshow {
+        margin: 0 20px 32px 20px;
+        min-height: 320px;
+        border-radius: 14px;
+    }
+    .hero-content {
+        padding: 56px 20px 32px 20px;
+    }
+    .hero-slide-nav {
+        bottom: 16px;
+        right: 16px;
+    }
+    .hero-slide-dots {
+        bottom: 22px;
+        left: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-slideshow {
+        margin: 0 16px 28px 16px;
+        min-height: 240px;
+        border-radius: 12px;
+    }
+}
