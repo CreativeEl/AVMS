@@ -11,8 +11,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(201,169,97,0.15) 0%, transparent 45%),
+                radial-gradient(circle at 80% 80%, rgba(45,107,84,0.35) 0%, transparent 50%),
+                linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -30,25 +33,27 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: rgba(255,255,255,0.8);
+            color: rgba(255,255,255,0.85);
             text-decoration: none;
             font-size: 14px;
+            font-weight: 500;
             margin-bottom: 20px;
             padding: 8px 16px;
             border-radius: 20px;
             transition: all 0.3s;
         }
         .back-link:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
+            background: rgba(201,169,97,0.15);
+            color: #C9A961;
         }
 
         /* Main login card */
         .login-card {
-            background: white;
+            background: #FBF8EE;
             border-radius: 20px;
             padding: 40px 35px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            border-top: 4px solid #C9A961;
         }
 
         .login-header {
@@ -59,22 +64,25 @@
         .logo-circle {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #1a2a4a 0%, #2a4a7a 100%);
+            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
             font-size: 36px;
-            color: white;
-            box-shadow: 0 8px 20px rgba(26, 42, 74, 0.3);
+            color: #C9A961;
+            border: 3px solid #C9A961;
+            box-shadow: 0 8px 20px rgba(31, 78, 61, 0.3);
         }
 
         .login-header h1 {
-            color: #1a2a4a;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #1F4E3D;
             font-size: 26px;
             margin-bottom: 8px;
             font-weight: 700;
+            letter-spacing: -0.2px;
         }
 
         .login-header p {
@@ -85,17 +93,17 @@
 
         /* Welcome note */
         .welcome-note {
-            background: #e8f0fe;
-            border-left: 4px solid #2a4a7a;
+            background: #F5F0DC;
+            border-left: 4px solid #C9A961;
             padding: 15px 18px;
             border-radius: 8px;
             margin-bottom: 25px;
             font-size: 13px;
-            color: #1a3a5a;
+            color: #1F4E3D;
             line-height: 1.6;
         }
         .welcome-note i {
-            color: #2a4a7a;
+            color: #C9A961;
             margin-right: 6px;
         }
 
@@ -107,13 +115,13 @@
         .form-group label {
             display: block;
             font-weight: 600;
-            color: #1a2a4a;
+            color: #1F4E3D;
             margin-bottom: 8px;
             font-size: 14px;
         }
 
         .form-group label i {
-            color: #2a4a7a;
+            color: #2D6B54;
             margin-right: 6px;
             width: 16px;
         }
@@ -125,19 +133,20 @@
         .form-group input {
             width: 100%;
             padding: 14px 45px 14px 15px;
-            border: 2px solid #e0e7ef;
+            border: 1.5px solid #e3e0d2;
             border-radius: 10px;
             font-size: 15px;
             font-family: inherit;
             transition: all 0.3s;
-            background: #fafbfc;
+            background: white;
+            color: #1a1a1a;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #2a4a7a;
+            border-color: #C9A961;
             background: white;
-            box-shadow: 0 0 0 4px rgba(42, 74, 122, 0.1);
+            box-shadow: 0 0 0 3px rgba(201,169,97,0.18);
         }
 
         .input-wrapper .toggle-visibility {
@@ -151,10 +160,11 @@
             cursor: pointer;
             font-size: 16px;
             padding: 5px;
+            transition: color 0.2s;
         }
 
         .input-wrapper .toggle-visibility:hover {
-            color: #2a4a7a;
+            color: #2D6B54;
         }
 
         .form-hint {
@@ -165,7 +175,7 @@
         }
 
         .form-hint.warning {
-            color: #e8491d;
+            color: #8B1A1A;
             font-weight: 600;
         }
 
@@ -194,7 +204,7 @@
         .btn-login {
             width: 100%;
             padding: 15px;
-            background: #e8491d;
+            background: #2D6B54;
             color: white;
             border: none;
             border-radius: 30px;
@@ -207,12 +217,13 @@
             justify-content: center;
             gap: 10px;
             margin-top: 10px;
+            letter-spacing: 0.3px;
         }
 
         .btn-login:hover:not(:disabled) {
-            background: #c73d17;
+            background: #1F4E3D;
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(232, 73, 29, 0.4);
+            box-shadow: 0 8px 20px rgba(31, 78, 61, 0.35);
         }
 
         .btn-login:disabled {
@@ -239,13 +250,17 @@
             text-align: center;
             margin-top: 25px;
             padding-top: 20px;
-            border-top: 1px solid #e0e7ef;
+            border-top: 1px solid #e3e0d2;
             font-size: 13px;
             color: #888;
             line-height: 1.6;
         }
+        .login-footer i {
+            color: #C9A961;
+            margin-right: 4px;
+        }
         .login-footer a {
-            color: #2a4a7a;
+            color: #2D6B54;
             text-decoration: none;
             font-weight: 600;
         }
