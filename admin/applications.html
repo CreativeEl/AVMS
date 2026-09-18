@@ -9,53 +9,64 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+
         .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .filter-btn { padding: 8px 20px; border: 2px solid #e0e7ef; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
-        .filter-btn:hover { border-color: #2a4a7a; }
-        .filter-btn.active { background: #1a2a4a; color: white; border-color: #1a2a4a; }
-        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .filter-btn { padding: 8px 20px; border: 2px solid #e3e0d2; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 13px; color: #555; }
+        .filter-btn:hover { border-color: #C9A961; color: #1F4E3D; }
+        .filter-btn.active { background: #1F4E3D; color: white; border-color: #1F4E3D; }
+
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; border: 1px solid #f0ede0; box-shadow: 0 1px 3px rgba(31,78,61,0.04); }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #f8f9fa; padding: 12px 15px; text-align: left; font-weight: 600; color: #1a2a4a; border-bottom: 2px solid #e0e7ef; font-size: 14px; }
-        td { padding: 12px 15px; border-bottom: 1px solid #e0e7ef; font-size: 14px; }
-        tr:hover { background: #f8f9fa; }
-        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        th { background: #FBF8EE; padding: 14px 15px; text-align: left; font-weight: 700; color: #1F4E3D; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #C9A961; }
+        td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; }
+        tr:hover { background: #FBF8EE; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-pending { background: #fff3cd; color: #856404; }
         .badge-approved { background: #d4edda; color: #155724; }
         .badge-rejected { background: #f8d7da; color: #721c24; }
-        .btn-view { background: #2a4a7a; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; }
-        .btn-approve { background: #28a745; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; }
-        .btn-reject { background: #dc3545; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
-        .btn-view:hover { background: #1a3a5a; }
+
+        .btn-view { background: #2D6B54; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-view:hover { background: #1F4E3D; }
+        .btn-approve { background: #28a745; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; }
         .btn-approve:hover { background: #218838; }
+        .btn-reject { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
         .btn-reject:hover { background: #c82333; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20,47,37,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-content h2 { margin-bottom: 20px; color: #1a2a4a; }
-        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e0e7ef; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .modal-content h2 { font-family: Georgia, serif; margin-bottom: 20px; color: #1F4E3D; padding-bottom: 10px; border-bottom: 2px solid #C9A961; font-weight: 700; }
+
+        .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0ede0; }
         .detail-row:last-child { border-bottom: none; }
         .detail-label { color: #666; font-weight: 600; }
-        .detail-value { color: #1a2a4a; font-weight: 500; }
-        .document-links { margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px; }
-        .document-links h4 { color: #1a2a4a; margin-bottom: 10px; }
-        .document-links a { display: inline-block; margin: 5px 10px 5px 0; padding: 8px 15px; background: #2a4a7a; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; }
-        .document-links a:hover { background: #1a3a5a; }
-        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-        .btn-close { background: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-close:hover { background: #5a6268; }
-        .empty-state { text-align: center; padding: 40px; color: #888; }
-        .search-box { padding: 10px 15px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; width: 250px; }
-        .search-box:focus { outline: none; border-color: #2a4a7a; }
+        .detail-value { color: #1F4E3D; font-weight: 500; }
 
-        /* ===== SIDEBAR SECTION LABELS (NEW) ===== */
+        .document-links { margin-top: 15px; padding: 15px; background: #FBF8EE; border-radius: 10px; border: 1px solid #f0ede0; }
+        .document-links h4 { color: #1F4E3D; margin-bottom: 10px; font-family: Georgia, serif; }
+        .document-links a { display: inline-block; margin: 5px 10px 5px 0; padding: 8px 15px; background: #2D6B54; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: 600; transition: background 0.2s; }
+        .document-links a:hover { background: #1F4E3D; }
+
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-close { background: transparent; color: #555; padding: 11px 24px; border: 2px solid #e3e0d2; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .btn-close:hover { background: #FBF8EE; border-color: #888; }
+
+        .empty-state { text-align: center; padding: 40px; color: #888; font-size: 14px; }
+        .search-box { padding: 10px 15px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; width: 250px; transition: all 0.2s; }
+        .search-box:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
+
+        /* ===== SIDEBAR SECTION LABELS ===== */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
+            color: #C9A961;
             padding: 18px 20px 6px 20px;
             user-select: none;
+            opacity: 0.85;
         }
         .sidebar-section-label:first-child { padding-top: 4px; }
         @media (max-width: 768px) {
@@ -163,19 +174,28 @@
 
     <script src="../js/config.js"></script>
     <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
         const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
         const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-        
+
         if (!adminLoggedIn) {
             window.location.href = 'index.html';
         } else {
             document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
         }
 
+        // ============================================
+        // STATE
+        // ============================================
         let allApplications = [];
         let currentFilter = 'all';
         let currentSearch = '';
 
+        // ============================================
+        // LOGOUT
+        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('adminLoggedIn');
@@ -185,6 +205,9 @@
             window.location.href = 'index.html';
         });
 
+        // ============================================
+        // LOAD APPLICATIONS
+        // ============================================
         async function loadApplications() {
             const tbody = document.getElementById('applicationsTableBody');
             try {
@@ -203,6 +226,9 @@
             }
         }
 
+        // ============================================
+        // DISPLAY APPLICATIONS
+        // ============================================
         function displayApplications() {
             const tbody = document.getElementById('applicationsTableBody');
             let filtered = allApplications;
@@ -213,7 +239,7 @@
 
             if (currentSearch) {
                 const search = currentSearch.toLowerCase();
-                filtered = filtered.filter(app => 
+                filtered = filtered.filter(app =>
                     (app.first_name + ' ' + app.surname).toLowerCase().includes(search) ||
                     (app.email || '').toLowerCase().includes(search) ||
                     (app.reg_number || '').toLowerCase().includes(search)
@@ -244,6 +270,9 @@
             `).join('');
         }
 
+        // ============================================
+        // FILTER / SEARCH
+        // ============================================
         function filterApplications(filter, btn) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -256,6 +285,9 @@
             displayApplications();
         }
 
+        // ============================================
+        // VIEW APPLICATION
+        // ============================================
         function viewApplication(id) {
             const app = allApplications.find(a => a.id === id);
             if (!app) return;
@@ -274,7 +306,7 @@
                 <div class="detail-row"><span class="detail-label">Home Address:</span><span class="detail-value">${app.home_address || '-'}</span></div>
                 <div class="detail-row"><span class="detail-label">Applied Date:</span><span class="detail-value">${new Date(app.applied_at).toLocaleString()}</span></div>
                 <div class="detail-row"><span class="detail-label">Status:</span><span class="badge badge-${app.status}">${app.status}</span></div>
-                
+
                 <div class="document-links">
                     <h4>📎 Uploaded Documents</h4>
                     ${app.passport_photo_url ? `<a href="${app.passport_photo_url}" target="_blank"><i class="fas fa-image"></i> Passport Photo</a>` : '<p style="color: #888; font-size: 13px;">No passport photo</p>'}
@@ -286,6 +318,9 @@
             document.getElementById('applicationModal').classList.add('show');
         }
 
+        // ============================================
+        // UPDATE STATUS
+        // ============================================
         async function updateStatus(id, status) {
             if (!confirm(`Are you sure you want to ${status} this application?`)) return;
             try {
@@ -301,10 +336,16 @@
             }
         }
 
+        // ============================================
+        // MODAL
+        // ============================================
         function closeModal() {
             document.getElementById('applicationModal').classList.remove('show');
         }
 
+        // ============================================
+        // INIT
+        // ============================================
         loadApplications();
 
         document.getElementById('applicationModal').addEventListener('click', function(e) {
