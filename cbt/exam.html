@@ -11,18 +11,18 @@
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            color: #333;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #F5F0DC;
+            color: #1a1a1a;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
         /* ============================================
-           EXAM TOP BAR (different accent color)
+           EXAM TOP BAR — deep green with RED accent
            ============================================ */
         .test-topbar {
-            background: #0d1a2e;
+            background: #163829;
             color: white;
             padding: 12px 20px;
             display: flex;
@@ -33,8 +33,8 @@
             position: sticky;
             top: 0;
             z-index: 500;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.3);
-            border-bottom: 3px solid #e8491d;
+            box-shadow: 0 2px 15px rgba(31,78,61,0.35);
+            border-bottom: 3px solid #8B1A1A;
         }
         .test-topbar .left {
             display: flex;
@@ -43,17 +43,18 @@
             flex-wrap: wrap;
         }
         .test-title {
+            font-family: Georgia, 'Times New Roman', serif;
             font-weight: 700;
             font-size: 15px;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .test-title i { color: #e8491d; }
+        .test-title i { color: #C9A961; }
 
         .timer-box {
-            background: rgba(232, 73, 29, 0.2);
-            border: 2px solid #e8491d;
+            background: rgba(139,26,26,0.25);
+            border: 2px solid #8B1A1A;
             padding: 8px 16px;
             border-radius: 25px;
             font-weight: 700;
@@ -65,15 +66,15 @@
             transition: all 0.3s;
             font-variant-numeric: tabular-nums;
         }
-        .timer-box i { color: #e8491d; }
+        .timer-box i { color: #E4B0B0; }
         .timer-box.warning {
-            background: #e8491d;
+            background: #8B1A1A;
             animation: pulse 1s infinite;
         }
         .timer-box.warning i { color: white; }
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(232, 73, 29, 0.7); }
-            50% { box-shadow: 0 0 0 10px rgba(232, 73, 29, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 26, 26, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(139, 26, 26, 0); }
         }
 
         .progress-info {
@@ -86,7 +87,7 @@
            WARNING BANNER
            ============================================ */
         .warning-banner {
-            background: #dc3545;
+            background: #8B1A1A;
             color: white;
             padding: 12px 20px;
             text-align: center;
@@ -118,14 +119,15 @@
         }
 
         /* ============================================
-           QUESTION PANEL
+           QUESTION PANEL — red top border for exam
            ============================================ */
         .question-panel {
             background: white;
             border-radius: 15px;
             padding: 35px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-            border-top: 4px solid #e8491d;
+            border: 1px solid #e3e0d2;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.05);
+            border-top: 4px solid #8B1A1A;
         }
 
         .question-header {
@@ -133,15 +135,15 @@
             justify-content: space-between;
             align-items: center;
             padding-bottom: 15px;
-            border-bottom: 2px solid #e0e7ef;
+            border-bottom: 2px solid #f0ede0;
             margin-bottom: 25px;
             flex-wrap: wrap;
             gap: 10px;
         }
         .question-number {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
-            color: #0d1a2e;
+            color: #8B1A1A;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -151,15 +153,17 @@
             font-size: 11px;
             font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         .difficulty-badge.easy { background: #d4edda; color: #155724; }
         .difficulty-badge.medium { background: #fff3cd; color: #856404; }
         .difficulty-badge.hard { background: #f8d7da; color: #721c24; }
 
         .question-text {
-            font-size: 18px;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 19px;
             font-weight: 600;
-            color: #0d1a2e;
+            color: #1F4E3D;
             line-height: 1.6;
             margin-bottom: 25px;
         }
@@ -175,26 +179,26 @@
             align-items: center;
             gap: 15px;
             padding: 16px 20px;
-            background: #f8f9fa;
-            border: 2px solid #e0e7ef;
+            background: #FBF8EE;
+            border: 2px solid #e3e0d2;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s;
         }
         .option-item:hover {
-            border-color: #0d1a2e;
-            background: #f0f4f8;
+            border-color: #8B1A1A;
+            background: #F5F0DC;
         }
         .option-item.selected {
-            border-color: #e8491d;
-            background: #fff5f2;
-            box-shadow: 0 0 0 3px rgba(232, 73, 29, 0.1);
+            border-color: #8B1A1A;
+            background: #F5F0DC;
+            box-shadow: 0 0 0 3px rgba(139, 26, 26, 0.15);
         }
         .option-letter {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #e0e7ef;
+            background: #e3e0d2;
             color: #555;
             display: flex;
             align-items: center;
@@ -205,12 +209,12 @@
             transition: all 0.2s;
         }
         .option-item.selected .option-letter {
-            background: #e8491d;
+            background: #8B1A1A;
             color: white;
         }
         .option-text {
             font-size: 15px;
-            color: #333;
+            color: #1a1a1a;
             line-height: 1.5;
             flex-grow: 1;
         }
@@ -222,7 +226,7 @@
             gap: 12px;
             margin-top: 30px;
             padding-top: 25px;
-            border-top: 2px solid #e0e7ef;
+            border-top: 2px solid #f0ede0;
         }
         .btn-nav {
             padding: 12px 25px;
@@ -238,28 +242,37 @@
             font-family: inherit;
         }
         .btn-prev {
-            background: #e0e7ef;
+            background: #FBF8EE;
             color: #555;
+            border: 2px solid #e3e0d2;
         }
-        .btn-prev:hover:not(:disabled) { background: #d0d7df; }
+        .btn-prev:hover:not(:disabled) {
+            background: #F5F0DC;
+            border-color: #8B1A1A;
+            color: #8B1A1A;
+        }
         .btn-next {
-            background: #0d1a2e;
+            background: #8B1A1A;
             color: white;
         }
         .btn-next:hover:not(:disabled) {
-            background: #1a2a4a;
+            background: #6F1414;
             transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(139,26,26,0.25);
         }
         .btn-nav:disabled {
             opacity: 0.4;
             cursor: not-allowed;
         }
         .btn-submit {
-            background: #28a745;
+            background: #2D6B54;
             color: white;
             padding: 12px 30px;
         }
-        .btn-submit:hover { background: #218838; }
+        .btn-submit:hover {
+            background: #1F4E3D;
+            box-shadow: 0 4px 12px rgba(31,78,61,0.2);
+        }
 
         /* ============================================
            SIDEBAR — NAVIGATOR
@@ -276,12 +289,13 @@
             background: white;
             border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e3e0d2;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.05);
         }
         .navigator-card h3 {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
-            color: #0d1a2e;
+            color: #1F4E3D;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 15px;
@@ -289,7 +303,7 @@
             align-items: center;
             gap: 8px;
         }
-        .navigator-card h3 i { color: #e8491d; }
+        .navigator-card h3 i { color: #8B1A1A; }
 
         .navigator-grid {
             display: grid;
@@ -298,7 +312,7 @@
         }
         .nav-btn {
             aspect-ratio: 1;
-            border: 2px solid #e0e7ef;
+            border: 2px solid #e3e0d2;
             background: white;
             border-radius: 8px;
             font-size: 13px;
@@ -311,18 +325,21 @@
             align-items: center;
             justify-content: center;
         }
-        .nav-btn:hover { border-color: #0d1a2e; }
+        .nav-btn:hover {
+            border-color: #8B1A1A;
+            color: #8B1A1A;
+        }
         .nav-btn.answered {
-            background: #28a745;
-            border-color: #28a745;
+            background: #2D6B54;
+            border-color: #2D6B54;
             color: white;
         }
         .nav-btn.current {
-            background: #e8491d;
-            border-color: #e8491d;
+            background: #8B1A1A;
+            border-color: #8B1A1A;
             color: white;
             transform: scale(1.1);
-            box-shadow: 0 4px 10px rgba(232, 73, 29, 0.3);
+            box-shadow: 0 4px 10px rgba(139,26,26,0.35);
         }
 
         .legend {
@@ -331,7 +348,7 @@
             gap: 8px;
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 1px solid #e0e7ef;
+            border-top: 1px solid #f0ede0;
             font-size: 12px;
             color: #666;
         }
@@ -344,10 +361,16 @@
             width: 16px;
             height: 16px;
             border-radius: 4px;
-            border: 2px solid #e0e7ef;
+            border: 2px solid #e3e0d2;
         }
-        .legend-dot.answered { background: #28a745; border-color: #28a745; }
-        .legend-dot.current { background: #e8491d; border-color: #e8491d; }
+        .legend-dot.answered {
+            background: #2D6B54;
+            border-color: #2D6B54;
+        }
+        .legend-dot.current {
+            background: #8B1A1A;
+            border-color: #8B1A1A;
+        }
         .legend-dot.unanswered { background: white; }
 
         .stat-row {
@@ -357,7 +380,7 @@
             font-size: 13px;
             color: #666;
         }
-        .stat-row strong { color: #0d1a2e; }
+        .stat-row strong { color: #1F4E3D; }
 
         /* ============================================
            CALCULATOR
@@ -369,12 +392,12 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #0d1a2e;
+            background: #1F4E3D;
             color: white;
-            border: none;
+            border: 2px solid #8B1A1A;
             font-size: 24px;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(13, 26, 46, 0.4);
+            box-shadow: 0 6px 20px rgba(31, 78, 61, 0.4);
             z-index: 900;
             display: flex;
             align-items: center;
@@ -382,7 +405,7 @@
             transition: all 0.3s;
         }
         .calc-btn:hover {
-            background: #1a2a4a;
+            background: #163829;
             transform: scale(1.1);
         }
 
@@ -391,14 +414,14 @@
             bottom: 25px;
             right: 25px;
             width: 300px;
-            background: #0d1a2e;
+            background: #1F4E3D;
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             z-index: 1000;
             display: none;
             overflow: hidden;
             color: white;
-            border: 2px solid #e8491d;
+            border: 2px solid #8B1A1A;
         }
         .calculator.show { display: block; }
 
@@ -407,9 +430,10 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 15px;
-            background: #000814;
+            background: #163829;
             cursor: move;
             user-select: none;
+            border-bottom: 1px solid rgba(139,26,26,0.4);
         }
         .calc-header span {
             font-size: 13px;
@@ -418,7 +442,7 @@
             align-items: center;
             gap: 8px;
         }
-        .calc-header span i { color: #e8491d; }
+        .calc-header span i { color: #E4B0B0; }
         .calc-header .calc-close {
             background: none;
             border: none;
@@ -427,10 +451,10 @@
             cursor: pointer;
             padding: 0 5px;
         }
-        .calc-header .calc-close:hover { color: white; }
+        .calc-header .calc-close:hover { color: #E4B0B0; }
 
         .calc-display {
-            background: #000814;
+            background: #163829;
             padding: 20px 15px;
             text-align: right;
             font-size: 26px;
@@ -442,19 +466,20 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            color: #fff;
+            color: #F5D8D8;
             letter-spacing: 1px;
+            border-bottom: 1px solid rgba(139,26,26,0.4);
         }
 
         .calc-keys {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1px;
-            background: #0d1a2e;
+            background: #1F4E3D;
             padding: 1px;
         }
         .calc-key {
-            background: #0d1a2e;
+            background: #1F4E3D;
             color: white;
             border: none;
             padding: 18px 0;
@@ -464,17 +489,24 @@
             transition: background 0.15s;
             font-family: inherit;
         }
-        .calc-key:hover { background: #1a2a4a; }
-        .calc-key.operator { background: #1a2a4a; color: white; }
-        .calc-key.operator:hover { background: #2a4a7a; }
+        .calc-key:hover { background: #2D6B54; }
+        .calc-key.operator {
+            background: #2D6B54;
+            color: white;
+        }
+        .calc-key.operator:hover { background: #3d8068; }
         .calc-key.equals {
-            background: #e8491d;
+            background: #8B1A1A;
             color: white;
             grid-row: span 2;
+            font-weight: 700;
         }
-        .calc-key.equals:hover { background: #c73d17; }
-        .calc-key.clear { background: #dc3545; color: white; }
-        .calc-key.clear:hover { background: #c82333; }
+        .calc-key.equals:hover { background: #6F1414; }
+        .calc-key.clear {
+            background: #8B1A1A;
+            color: white;
+        }
+        .calc-key.clear:hover { background: #6F1414; }
         .calc-key.zero { grid-column: span 2; }
 
         /* ============================================
@@ -487,7 +519,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(20,47,37,0.6);
+            backdrop-filter: blur(3px);
             z-index: 2000;
             align-items: center;
             justify-content: center;
@@ -502,21 +535,25 @@
             max-width: 420px;
             width: 100%;
             text-align: center;
+            border-top: 4px solid #8B1A1A;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
         }
         .modal-box .icon {
             width: 70px;
             height: 70px;
-            background: #fff3cd;
+            background: #F5F0DC;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 15px;
             font-size: 30px;
-            color: #856404;
+            color: #8B1A1A;
+            border: 2px solid #8B1A1A;
         }
         .modal-box h3 {
-            color: #0d1a2e;
+            font-family: Georgia, 'Times New Roman', serif;
+            color: #1F4E3D;
             font-size: 20px;
             margin-bottom: 10px;
         }
@@ -539,10 +576,22 @@
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
+            transition: all 0.2s;
         }
-        .modal-box .btn-cancel { background: #e0e7ef; color: #555; }
-        .modal-box .btn-confirm { background: #28a745; color: white; }
-        .modal-box .btn-confirm:hover { background: #218838; }
+        .modal-box .btn-cancel {
+            background: transparent;
+            color: #555;
+            border: 2px solid #e3e0d2;
+        }
+        .modal-box .btn-cancel:hover {
+            background: #FBF8EE;
+            border-color: #888;
+        }
+        .modal-box .btn-confirm {
+            background: #2D6B54;
+            color: white;
+        }
+        .modal-box .btn-confirm:hover { background: #1F4E3D; }
         .modal-box .btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
 
         /* ============================================
@@ -553,7 +602,7 @@
             .sidebar-panel { position: static; order: -1; }
             .navigator-grid { grid-template-columns: repeat(10, 1fr); }
             .question-panel { padding: 25px 20px; }
-            .question-text { font-size: 16px; }
+            .question-text { font-size: 17px; }
             .calculator { width: 280px; }
         }
         @media (max-width: 500px) {
@@ -627,7 +676,7 @@
                         <span>Not answered</span>
                     </div>
                 </div>
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e7ef;">
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0ede0;">
                     <div class="stat-row">
                         <span>Answered:</span>
                         <strong id="answeredStat">0</strong>
@@ -809,28 +858,39 @@
                 const shuffled = shuffleArray(data);
                 const selected = shuffled.slice(0, modeConfig.question_count);
 
+                // ============================================
+                // FIX: Shuffle options AND relabel A/B/C/D by position
+                // ============================================
                 questions = selected.map(q => {
-                    const options = [
-                        { letter: 'A', text: q.option_a },
-                        { letter: 'B', text: q.option_b },
-                        { letter: 'C', text: q.option_c },
-                        { letter: 'D', text: q.option_d }
+                    const rawOptions = [
+                        { text: q.option_a, wasCorrect: q.correct_answer === 'A' },
+                        { text: q.option_b, wasCorrect: q.correct_answer === 'B' },
+                        { text: q.option_c, wasCorrect: q.correct_answer === 'C' },
+                        { text: q.option_d, wasCorrect: q.correct_answer === 'D' }
                     ];
-                    const shuffledOptions = shuffleArray(options);
-                    const correctOriginalText = q[`option_${q.correct_answer.toLowerCase()}`];
-                    const newCorrectLetter = shuffledOptions.find(o => o.text === correctOriginalText).letter;
+
+                    const shuffledContent = shuffleArray(rawOptions);
+
+                    const letters = ['A', 'B', 'C', 'D'];
+                    const newOptions = shuffledContent.map((opt, i) => ({
+                        letter: letters[i],
+                        text: opt.text,
+                        isCorrect: opt.wasCorrect
+                    }));
+
+                    const newCorrectLetter = newOptions.find(o => o.isCorrect).letter;
 
                     return {
                         id: q.id,
                         text: q.question_text,
-                        options: shuffledOptions,
+                        options: newOptions.map(o => ({ letter: o.letter, text: o.text })),
                         correct: newCorrectLetter,
                         solution: q.solution || '',
                         difficulty: q.difficulty || 'medium'
                     };
                 });
 
-                console.log('✅ Loaded', questions.length, 'questions');
+                console.log('✅ Loaded', questions.length, 'questions with corrected labels');
 
                 restoreProgress();
                 renderNavigator();
