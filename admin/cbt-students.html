@@ -9,21 +9,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .btn-add { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-add:hover { background: #218838; }
-        .btn-bulk { background: #2a4a7a; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-bulk:hover { background: #1a3a5a; }
+
+        .btn-add { background: #2D6B54; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s; }
+        .btn-add:hover { background: #1F4E3D; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(31,78,61,0.2); }
+        .btn-bulk { background: #C9A961; color: #1F4E3D; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s; }
+        .btn-bulk:hover { background: #A88943; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,169,97,0.25); }
 
         .info-box {
-            background: #e8f0fe;
-            color: #1a3a5a;
+            background: #FBF8EE;
+            color: #1F4E3D;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #2a4a7a;
+            border-left: 4px solid #C9A961;
             font-size: 14px;
         }
-        .info-box i { margin-right: 8px; }
+        .info-box i { margin-right: 8px; color: #C9A961; }
 
         .stats-row {
             display: grid;
@@ -35,81 +36,98 @@
             background: white;
             padding: 15px 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #f0ede0;
+            border-top: 3px solid #C9A961;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.04);
             display: flex;
             align-items: center;
             gap: 15px;
+            transition: all 0.28s;
         }
+        .stat-mini:hover { box-shadow: 0 6px 20px rgba(31,78,61,0.08); transform: translateY(-2px); }
         .stat-mini i {
             font-size: 28px;
-            color: #e8491d;
+            color: #2D6B54;
         }
         .stat-mini h3 {
-            color: #1a2a4a;
+            font-family: Georgia, serif;
+            color: #1F4E3D;
             font-size: 22px;
             margin-bottom: 2px;
+            font-weight: 700;
         }
         .stat-mini p {
             color: #888;
             font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
         }
 
-        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; border: 1px solid #f0ede0; box-shadow: 0 1px 3px rgba(31,78,61,0.04); }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
-        th { background: #f8f9fa; padding: 12px 15px; text-align: left; font-weight: 600; color: #1a2a4a; border-bottom: 2px solid #e0e7ef; font-size: 14px; }
-        td { padding: 12px 15px; border-bottom: 1px solid #e0e7ef; font-size: 14px; }
-        tr:hover { background: #f8f9fa; }
-        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        th { background: #FBF8EE; padding: 14px 15px; text-align: left; font-weight: 700; color: #1F4E3D; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #C9A961; }
+        td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; }
+        tr:hover { background: #FBF8EE; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-active { background: #d4edda; color: #155724; }
         .badge-inactive { background: #f8d7da; color: #721c24; }
-        .btn-edit { background: #2a4a7a; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; }
-        .btn-delete { background: #dc3545; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
-        .btn-edit:hover { background: #1a3a5a; }
-        .btn-delete:hover { background: #c82333; }
-        .btn-toggle { background: #6c757d; color: white; padding: 5px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; margin-right: 5px; }
-        .btn-toggle:hover { background: #5a6268; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .btn-edit { background: #2D6B54; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-edit:hover { background: #1F4E3D; }
+        .btn-delete { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-delete:hover { background: #c82333; }
+        .btn-toggle { background: #888; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; margin-right: 5px; transition: background 0.2s; }
+        .btn-toggle:hover { background: #666; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20,47,37,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-content h2 { margin-bottom: 20px; color: #1a2a4a; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .modal-content h2 { font-family: Georgia, serif; margin-bottom: 20px; color: #1F4E3D; padding-bottom: 10px; border-bottom: 2px solid #C9A961; font-weight: 700; }
         .modal-content .form-group { margin-bottom: 15px; }
-        .modal-content label { display: block; font-weight: 600; margin-bottom: 5px; color: #1a2a4a; font-size: 14px; }
-        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 10px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; font-family: inherit; }
-        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #2a4a7a; }
+        .modal-content label { display: block; font-weight: 600; margin-bottom: 6px; color: #1F4E3D; font-size: 13.5px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; font-family: inherit; background: white; color: #1a1a1a; transition: all 0.2s; }
+        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
         .modal-content textarea { resize: vertical; min-height: 100px; font-family: monospace; }
         .modal-content small { display: block; color: #888; font-size: 12px; margin-top: 4px; }
+
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .checkbox-group { display: flex; align-items: center; gap: 8px; }
         .checkbox-group input[type="checkbox"] { width: auto; }
+
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-        .btn-save { background: #28a745; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-cancel { background: #6c757d; color: white; padding: 10px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .btn-save:hover { background: #218838; }
-        .btn-cancel:hover { background: #5a6268; }
+        .btn-save { background: #2D6B54; color: white; padding: 11px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.28s; }
+        .btn-save:hover { background: #1F4E3D; }
         .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
-        .empty-state { text-align: center; padding: 40px; color: #888; }
-        .search-box { padding: 10px 15px; border: 2px solid #e0e7ef; border-radius: 8px; font-size: 14px; width: 280px; }
-        .search-box:focus { outline: none; border-color: #2a4a7a; }
+        .btn-cancel { background: transparent; color: #555; padding: 11px 24px; border: 2px solid #e3e0d2; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .btn-cancel:hover { background: #FBF8EE; border-color: #888; }
+
+        .empty-state { text-align: center; padding: 40px; color: #888; font-size: 14px; }
+
+        .search-box { padding: 10px 15px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; width: 280px; transition: all 0.2s; }
+        .search-box:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
+
         .filter-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
-        .filter-btn { padding: 8px 20px; border: 2px solid #e0e7ef; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 14px; }
-        .filter-btn:hover { border-color: #2a4a7a; }
-        .filter-btn.active { background: #1a2a4a; color: white; border-color: #1a2a4a; }
+        .filter-btn { padding: 8px 20px; border: 2px solid #e3e0d2; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 13px; color: #555; }
+        .filter-btn:hover { border-color: #C9A961; color: #1F4E3D; }
+        .filter-btn.active { background: #1F4E3D; color: white; border-color: #1F4E3D; }
 
         .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s ease-in-out infinite; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .bulk-info {
-            background: #fff3cd;
-            color: #856404;
+            background: #FBF8EE;
+            color: #1F4E3D;
             padding: 12px 15px;
             border-radius: 8px;
             margin-bottom: 15px;
             font-size: 13px;
-            border-left: 4px solid #ffc107;
+            border-left: 4px solid #C9A961;
         }
         .csv-example {
-            background: #1a2a4a;
+            background: #1F4E3D;
             color: #fff;
             padding: 12px;
             border-radius: 6px;
@@ -126,9 +144,10 @@
             font-weight: 700;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
+            color: #C9A961;
             padding: 18px 20px 6px 20px;
             user-select: none;
+            opacity: 0.85;
         }
         .sidebar-section-label:first-child { padding-top: 4px; }
         @media (max-width: 768px) {
@@ -392,6 +411,9 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             }
         }
 
+        // ============================================
+        // STATS
+        // ============================================
         function updateStats() {
             const total = allStudents.length;
             const active = allStudents.filter(s => s.is_active).length;
@@ -433,7 +455,7 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
                 <tr>
                     <td><strong>${s.reg_no}</strong></td>
                     <td>${s.full_name}</td>
-                    <td><code style="background: #f0f4f8; padding: 3px 8px; border-radius: 4px; color: #2a4a7a; font-size: 13px;">${s.state_of_origin}</code></td>
+                    <td><code style="background: #FBF8EE; padding: 3px 8px; border-radius: 4px; color: #2D6B54; font-size: 13px; border: 1px solid #f0ede0;">${s.state_of_origin}</code></td>
                     <td>${s.department || '-'}</td>
                     <td>${s.level || '-'}</td>
                     <td><span class="badge ${s.is_active ? 'badge-active' : 'badge-inactive'}">${s.is_active ? 'Active' : 'Inactive'}</span></td>
@@ -448,6 +470,9 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             `).join('');
         }
 
+        // ============================================
+        // FILTER / SEARCH
+        // ============================================
         function filterStudents(filter, btn) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
