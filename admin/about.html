@@ -9,16 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .info-box {
-            background: #e8f0fe;
-            color: #1a3a5a;
+            background: #FBF8EE;
+            color: #1F4E3D;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #2a4a7a;
+            border-left: 4px solid #C9A961;
             font-size: 14px;
         }
-        .info-box i { margin-right: 8px; }
-        
+        .info-box i { margin-right: 8px; color: #C9A961; }
+
         .section-tabs {
             display: flex;
             gap: 10px;
@@ -27,7 +27,8 @@
             background: white;
             padding: 10px;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #f0ede0;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.04);
         }
         .section-tab {
             padding: 10px 20px;
@@ -37,62 +38,68 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
-            color: #666;
+            color: #555;
             transition: all 0.3s;
         }
-        .section-tab:hover { background: #f0f2f5; color: #1a2a4a; }
-        .section-tab.active { background: #1a2a4a; color: white; }
-        
+        .section-tab:hover { background: #FBF8EE; color: #1F4E3D; }
+        .section-tab.active { background: #1F4E3D; color: white; }
+
         .section-content { display: none; }
         .section-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .settings-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #f0ede0;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.04);
             margin-bottom: 25px;
         }
         .settings-card h2 {
-            color: #1a2a4a;
+            font-family: Georgia, serif;
+            color: #1F4E3D;
             font-size: 20px;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #e8491d;
+            border-bottom: 2px solid #C9A961;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-weight: 700;
         }
-        .settings-card h2 i { color: #e8491d; }
-        
+        .settings-card h2 i { color: #C9A961; }
+
         .form-group { margin-bottom: 18px; }
         .form-group label {
             display: block;
             font-weight: 600;
-            color: #1a2a4a;
-            margin-bottom: 5px;
-            font-size: 14px;
+            color: #1F4E3D;
+            margin-bottom: 6px;
+            font-size: 13.5px;
         }
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid #e0e7ef;
+            border: 1.5px solid #e3e0d2;
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-            transition: border-color 0.3s;
+            background: white;
+            color: #1a1a1a;
+            transition: all 0.2s;
         }
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: #2a4a7a;
-            box-shadow: 0 0 0 3px rgba(42, 74, 122, 0.1);
+            border-color: #C9A961;
+            box-shadow: 0 0 0 3px rgba(201,169,97,0.15);
         }
         .form-group textarea {
             resize: vertical;
@@ -105,32 +112,32 @@
             font-size: 12px;
             margin-top: 5px;
         }
-        
+
         .btn-save {
-            background: #28a745;
+            background: #2D6B54;
             color: white;
-            padding: 12px 30px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 30px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 15px;
-            transition: all 0.3s;
+            font-size: 14px;
+            transition: all 0.28s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
         .btn-save:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            background: #1F4E3D;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(31,78,61,0.2);
         }
         .btn-save:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         .save-message {
             margin-top: 15px;
             padding: 12px 20px;
@@ -141,14 +148,14 @@
         .save-message.show { display: block; animation: fadeIn 0.3s ease; }
         .save-message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
         .save-message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
-        .save-message.info { background: #cce5ff; color: #004085; border-left: 4px solid #007bff; }
-        
+        .save-message.info { background: #FBF8EE; color: #1F4E3D; border-left: 4px solid #C9A961; }
+
         .settings-actions {
             display: flex;
             justify-content: flex-end;
             margin-top: 20px;
         }
-        
+
         .spinner {
             display: inline-block;
             width: 16px;
@@ -160,28 +167,28 @@
             margin-right: 8px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
+
         .image-upload-area {
-            border: 3px dashed #d0d7df;
-            border-radius: 12px;
+            border: 2px dashed #C9A961;
+            border-radius: 10px;
             padding: 30px;
             text-align: center;
             transition: all 0.3s;
             cursor: pointer;
-            background: #fafbfc;
+            background: #FBF8EE;
         }
-        .image-upload-area:hover { border-color: #2a4a7a; background: #f0f4f8; }
-        .image-upload-area i { font-size: 48px; color: #2a4a7a; margin-bottom: 15px; display: block; }
-        .image-upload-area p { color: #666; margin-bottom: 5px; font-size: 15px; }
+        .image-upload-area:hover { border-color: #A88943; background: #F5F0DC; }
+        .image-upload-area i { font-size: 48px; color: #2D6B54; margin-bottom: 15px; display: block; }
+        .image-upload-area p { color: #555; margin-bottom: 5px; font-size: 15px; font-weight: 600; }
         .image-upload-area small { color: #888; font-size: 12px; }
         .image-upload-area input[type="file"] { display: none; }
-        
+
         .image-preview-box {
             margin-bottom: 15px;
             border-radius: 12px;
             overflow: hidden;
-            border: 2px solid #e0e7ef;
-            background: #f8f9fa;
+            border: 2px solid #C9A961;
+            background: #FBF8EE;
             text-align: center;
             padding: 20px;
         }
@@ -190,22 +197,23 @@
             max-height: 300px;
             border-radius: 8px;
         }
-        
+
         @media (max-width: 768px) {
             .settings-card { padding: 20px; }
             .section-tabs { overflow-x: auto; flex-wrap: nowrap; }
             .section-tab { white-space: nowrap; font-size: 13px; padding: 10px 15px; }
         }
 
-        /* ===== SIDEBAR SECTION LABELS (NEW) ===== */
+        /* ===== SIDEBAR SECTION LABELS ===== */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
+            color: #C9A961;
             padding: 18px 20px 6px 20px;
             user-select: none;
+            opacity: 0.85;
         }
         .sidebar-section-label:first-child { padding-top: 4px; }
         @media (max-width: 768px) {
@@ -384,7 +392,7 @@
                     <h2><i class="fas fa-star"></i> Core Values</h2>
                     <p style="color: #666; margin-bottom: 20px;">These are the 6 core values displayed on the About page. Edit each one below.</p>
                     <form id="valuesForm">
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <div style="background: #FBF8EE; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #f0ede0;">
                             <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -400,7 +408,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <div style="background: #FBF8EE; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #f0ede0;">
                             <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -416,7 +424,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <div style="background: #FBF8EE; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #f0ede0;">
                             <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -432,7 +440,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <div style="background: #FBF8EE; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #f0ede0;">
                             <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -448,7 +456,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <div style="background: #FBF8EE; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #f0ede0;">
                             <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -464,7 +472,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                        <div style="background: #FBF8EE; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #f0ede0;">
                             <div style="display: grid; grid-template-columns: 80px 1fr 2fr; gap: 15px; align-items: start;">
                                 <div class="form-group" style="margin: 0;">
                                     <label>Icon</label>
@@ -521,17 +529,26 @@
 
     <script src="../js/config.js"></script>
     <script>
+        // ============================================
+        // AUTH CHECK
+        // ============================================
         const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
         const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-        
+
         if (!adminLoggedIn) {
             window.location.href = 'index.html';
         } else {
             document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
         }
 
+        // ============================================
+        // STATE
+        // ============================================
         let pendingAboutImage = null;
 
+        // ============================================
+        // LOGOUT
+        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function(e) {
             e.preventDefault();
             localStorage.removeItem('adminLoggedIn');
@@ -541,14 +558,20 @@
             window.location.href = 'index.html';
         });
 
+        // ============================================
+        // TAB SWITCHING
+        // ============================================
         function switchSection(section, btn) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
-            
+
             document.getElementById('section-' + section).classList.add('active');
             btn.classList.add('active');
         }
 
+        // ============================================
+        // HELPERS
+        // ============================================
         async function saveSetting(key, value) {
             const { error } = await supabase
                 .from('site_settings')
@@ -563,8 +586,8 @@
             const el = document.getElementById(elementId);
             el.className = 'save-message show ' + type;
             el.innerHTML = text;
-            setTimeout(() => { 
-                el.className = 'save-message'; 
+            setTimeout(() => {
+                el.className = 'save-message';
                 el.innerHTML = '';
             }, 5000);
         }
@@ -581,7 +604,9 @@
             btn.innerHTML = original;
         }
 
+        // ============================================
         // WHO WE ARE
+        // ============================================
         document.getElementById('whoForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveWhoBtn');
@@ -597,7 +622,9 @@
             }
         });
 
+        // ============================================
         // MISSION
+        // ============================================
         document.getElementById('missionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveMissionBtn');
@@ -613,7 +640,9 @@
             }
         });
 
+        // ============================================
         // VISION
+        // ============================================
         document.getElementById('visionForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveVisionBtn');
@@ -629,7 +658,9 @@
             }
         });
 
+        // ============================================
         // HISTORY
+        // ============================================
         document.getElementById('historyForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveHistoryBtn');
@@ -645,7 +676,9 @@
             }
         });
 
+        // ============================================
         // VALUES
+        // ============================================
         document.getElementById('valuesForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveValuesBtn');
@@ -664,7 +697,9 @@
             }
         });
 
+        // ============================================
         // ABOUT IMAGE UPLOAD
+        // ============================================
         function handleAboutImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -676,7 +711,7 @@
             pendingAboutImage = file;
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('aboutImagePreview').innerHTML = 
+                document.getElementById('aboutImagePreview').innerHTML =
                     `<img src="${e.target.result}" alt="About preview">`;
                 showMessage('aboutImageMessage', 'info', `📷 Selected: ${file.name}. Click "Save Image" to upload.`);
             };
@@ -726,7 +761,9 @@
             }
         }
 
+        // ============================================
         // LOAD SETTINGS
+        // ============================================
         async function loadSettings() {
             try {
                 const { data, error } = await supabase.from('site_settings').select('*');
@@ -751,7 +788,7 @@
                 }
 
                 if (settings.about_image) {
-                    document.getElementById('aboutImagePreview').innerHTML = 
+                    document.getElementById('aboutImagePreview').innerHTML =
                         `<img src="${settings.about_image}" alt="About image">`;
                 }
 
