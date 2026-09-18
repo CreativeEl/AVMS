@@ -9,16 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .info-box {
-            background: #e8f0fe;
-            color: #1a3a5a;
+            background: #FBF8EE;
+            color: #1F4E3D;
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #2a4a7a;
+            border-left: 4px solid #C9A961;
             font-size: 14px;
         }
-        .info-box i { margin-right: 8px; }
-        
+        .info-box i { margin-right: 8px; color: #C9A961; }
+
         .section-tabs {
             display: flex;
             gap: 10px;
@@ -27,7 +27,8 @@
             background: white;
             padding: 10px;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #f0ede0;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.04);
         }
         .section-tab {
             padding: 10px 20px;
@@ -37,62 +38,68 @@
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
-            color: #666;
+            color: #555;
             transition: all 0.3s;
         }
-        .section-tab:hover { background: #f0f2f5; color: #1a2a4a; }
-        .section-tab.active { background: #1a2a4a; color: white; }
-        
+        .section-tab:hover { background: #FBF8EE; color: #1F4E3D; }
+        .section-tab.active { background: #1F4E3D; color: white; }
+
         .section-content { display: none; }
         .section-content.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         .settings-card {
             background: white;
-            border-radius: 15px;
+            border-radius: 12px;
             padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #f0ede0;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.04);
             margin-bottom: 25px;
         }
         .settings-card h2 {
-            color: #1a2a4a;
+            font-family: Georgia, serif;
+            color: #1F4E3D;
             font-size: 20px;
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #e8491d;
+            border-bottom: 2px solid #C9A961;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-weight: 700;
         }
-        .settings-card h2 i { color: #e8491d; }
-        
+        .settings-card h2 i { color: #C9A961; }
+
         .form-group { margin-bottom: 18px; }
         .form-group label {
             display: block;
             font-weight: 600;
-            color: #1a2a4a;
-            margin-bottom: 5px;
-            font-size: 14px;
+            color: #1F4E3D;
+            margin-bottom: 6px;
+            font-size: 13.5px;
         }
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid #e0e7ef;
+            border: 1.5px solid #e3e0d2;
             border-radius: 8px;
             font-size: 14px;
             font-family: inherit;
-            transition: border-color 0.3s;
+            background: white;
+            color: #1a1a1a;
+            transition: all 0.2s;
         }
         .form-group input:focus,
-        .form-group textarea:focus {
+        .form-group textarea:focus,
+        .form-group select:focus {
             outline: none;
-            border-color: #2a4a7a;
-            box-shadow: 0 0 0 3px rgba(42, 74, 122, 0.1);
+            border-color: #C9A961;
+            box-shadow: 0 0 0 3px rgba(201,169,97,0.15);
         }
         .form-group textarea {
             resize: vertical;
@@ -110,32 +117,32 @@
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
-        
+
         .btn-save {
-            background: #28a745;
+            background: #2D6B54;
             color: white;
-            padding: 12px 30px;
+            padding: 12px 28px;
             border: none;
-            border-radius: 30px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 15px;
-            transition: all 0.3s;
+            font-size: 14px;
+            transition: all 0.28s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
         }
         .btn-save:hover {
-            background: #218838;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            background: #1F4E3D;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(31,78,61,0.2);
         }
         .btn-save:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-        
+
         .save-message {
             margin-top: 15px;
             padding: 12px 20px;
@@ -146,14 +153,14 @@
         .save-message.show { display: block; animation: fadeIn 0.3s ease; }
         .save-message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
         .save-message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
-        .save-message.info { background: #cce5ff; color: #004085; border-left: 4px solid #007bff; }
-        
+        .save-message.info { background: #FBF8EE; color: #1F4E3D; border-left: 4px solid #C9A961; }
+
         .settings-actions {
             display: flex;
             justify-content: flex-end;
             margin-top: 20px;
         }
-        
+
         .spinner {
             display: inline-block;
             width: 16px;
@@ -165,14 +172,15 @@
             margin-right: 8px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
+
         .dynamic-item {
-            background: #f8f9fa;
+            background: #FBF8EE;
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 12px;
             position: relative;
-            border-left: 4px solid #2a4a7a;
+            border: 1px solid #f0ede0;
+            border-left: 4px solid #C9A961;
         }
         .dynamic-item .item-header {
             display: flex;
@@ -181,7 +189,7 @@
             margin-bottom: 10px;
         }
         .dynamic-item .item-number {
-            background: #2a4a7a;
+            background: #1F4E3D;
             color: white;
             width: 24px;
             height: 24px;
@@ -192,7 +200,7 @@
             font-size: 12px;
             font-weight: 600;
         }
-        
+
         @media (max-width: 768px) {
             .settings-card { padding: 20px; }
             .section-tabs { overflow-x: auto; flex-wrap: nowrap; }
@@ -200,15 +208,16 @@
             .form-row { grid-template-columns: 1fr; }
         }
 
-        /* ===== SIDEBAR SECTION LABELS (NEW) ===== */
+        /* ===== SIDEBAR SECTION LABELS ===== */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
+            color: #C9A961;
             padding: 18px 20px 6px 20px;
             user-select: none;
+            opacity: 0.85;
         }
         .sidebar-section-label:first-child { padding-top: 4px; }
         @media (max-width: 768px) {
@@ -353,7 +362,7 @@
                             <input type="text" id="benefitsTitle" placeholder="e.g., Membership Benefits">
                         </div>
 
-                        <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">Benefits (6 items)</h3>
+                        <h3 style="color: #1F4E3D; font-size: 16px; margin: 25px 0 15px;">Benefits (6 items)</h3>
 
                         <!-- Benefit 1 -->
                         <div class="dynamic-item">
@@ -543,7 +552,7 @@
                             <input type="text" id="faqTitle" placeholder="e.g., Frequently Asked Questions">
                         </div>
 
-                        <h3 style="color: #1a2a4a; font-size: 16px; margin: 25px 0 15px;">FAQ Items (5 questions)</h3>
+                        <h3 style="color: #1F4E3D; font-size: 16px; margin: 25px 0 15px;">FAQ Items (5 questions)</h3>
 
                         <!-- FAQ 1 -->
                         <div class="dynamic-item">
@@ -630,7 +639,7 @@
         // ============================================
         const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
         const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-        
+
         if (!adminLoggedIn) {
             window.location.href = 'index.html';
         } else {
@@ -655,7 +664,7 @@
         function switchSection(section, btn) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
-            
+
             document.getElementById('section-' + section).classList.add('active');
             btn.classList.add('active');
         }
@@ -677,8 +686,8 @@
             const el = document.getElementById(elementId);
             el.className = 'save-message show ' + type;
             el.innerHTML = text;
-            setTimeout(() => { 
-                el.className = 'save-message'; 
+            setTimeout(() => {
+                el.className = 'save-message';
                 el.innerHTML = '';
             }, 5000);
         }
