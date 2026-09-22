@@ -153,8 +153,8 @@ function loadNewsTicker() {
             });
         });
 
-        // Build the item HTML (used twice for seamless loop)
-        const itemHtml = items.map(function(item) {
+        // Build ONE set of items as HTML
+        const oneSetHtml = items.map(function(item) {
             const badgeClass = item.type === 'event' ? 'news-ticker-tag news-ticker-tag--event' : 'news-ticker-tag news-ticker-tag--news';
             const safeTitle = escapeTickerText(item.title);
             return `<a class="news-ticker-item" href="${item.href}">
@@ -163,43 +163,37 @@ function loadNewsTicker() {
             </a>`;
         }).join('');
 
-        // Duplicate the row for the seamless loop
-        track.innerHTML = itemHtml + itemHtml;
+        // Seed the track with one set so we can measure its width
+        track.innerHTML = oneSetHtml;
+        const oneSetWidth = track.scrollWidth;
 
-        // Measure + apply speed
-        applyTickerSpeed(track, items.length);
+        // How wide is the visible ticker bar?
+        const viewport = track.parentElement;
+        const viewportWidth = viewport ? viewport.clientWidth : window.innerWidth;
+
+        // We need enough copies that HALF the track is at least as wide
+        // as the viewport (so translateX(-50%) never reveals empty space).
+        // Always an even number of sets → -50% lands exactly on a set boundary.
+        const minSets = Math.max(2, Math.ceil(viewportWidth / Math.max(oneSetWidth, 1)) * 2);
+        const setsNeeded = minSets % 2 === 0 ? minSets : minSets + 1;
+
+        // Build the full track
+        track.innerHTML = oneSetHtml.repeat(setsNeeded);
+
+        // Speed: seconds per full loop. Lower = faster.
+        // 10s is the pace you approved previously; tweak this one number only.
+        const durationSeconds = 10;
+
+        // Reset then apply the animation so the duration always takes effect
+        track.style.animation = 'none';
+        void track.offsetWidth;
+        track.style.animation = 'news-ticker-scroll ' + durationSeconds + 's linear infinite';
+
+        console.log('[NewsTicker] oneSet=' + oneSetWidth + 'px, viewport=' + viewportWidth + 'px, sets=' + setsNeeded + ', duration=' + durationSeconds + 's');
     })
     .catch(function(err) {
         console.warn('[NewsTicker] Failed to load ticker data:', err);
         ticker.style.display = 'none';
-    });
-}
-
-
-function applyTickerSpeed(track, itemCount) {
-    // Wait one frame so the browser has laid out the injected HTML.
-    requestAnimationFrame(function() {
-        // Total track scrollWidth = two copies of the item set.
-        // One loop travels exactly half → translateX(-50%).
-        const oneSetWidth = track.scrollWidth / 2;
-
-        // If measurement failed (0), fall back to a per-item estimate.
-        const width = oneSetWidth > 0 ? oneSetWidth : (itemCount * 400);
-
-        // ~180px/sec = brisk news-bar pace. Bump this number to go faster.
-        const speedPxPerSec = 180;
-        // Floor of 5s only kicks in for very short tracks; otherwise real math wins.
-        const durationSeconds = Math.max(5, width / speedPxPerSec);
-
-        // Kill any running animation first so the new duration takes effect cleanly.
-        track.style.animation = 'none';
-        // Force reflow to flush the reset.
-        void track.offsetWidth;
-        // Apply new duration inline (overrides the CSS shorthand).
-        track.style.animation = 'news-ticker-scroll ' + durationSeconds + 's linear infinite';
-
-        // Diagnostic — safe to leave in, remove later if you want.
-        console.log('[NewsTicker] width=' + width + 'px, duration=' + durationSeconds.toFixed(1) + 's, speed=' + speedPxPerSec + 'px/s');
     });
 }
 
