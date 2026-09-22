@@ -3259,9 +3259,10 @@ html, body {
 /* ============================================
    RESPONSIVE — NAV TIGHTENING (laptops keep full row)
    Strategy:
-     ≥1101px  → default comfortable spacing
-     1001–1100px → tighten nav spacing (fit 13 items on 1366px)
-     901–1000px  → tighten further (fit 13 items on ~980px)
+     ≥1401px     → default comfortable spacing
+     1201–1400px → light pre-tightening (1080p + scaling safety net)
+     1001–1200px → strong tightening (125% scaled laptops)
+     901–1000px  → extra tightening (phone-desktop-mode widths)
      ≤900px      → hamburger menu
    ============================================ */
 
