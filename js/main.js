@@ -163,23 +163,43 @@ function loadNewsTicker() {
             </a>`;
         }).join('');
 
-        // Duplicate the item row so translateX(-50%) produces a seamless loop
+        // Duplicate the row for the seamless loop
         track.innerHTML = itemHtml + itemHtml;
 
-        // Measure the actual rendered width of ONE full set of items
-        // (track contains items twice; translateX(-50%) moves exactly one set)
-        // Use requestAnimationFrame to ensure layout is complete.
-        requestAnimationFrame(function() {
-            const oneSetWidth = track.scrollWidth / 2;
-            // Target speed: ~90px/sec — readable but not sluggish
-            const speedPxPerSec = 90;
-            const durationSeconds = Math.max(12, oneSetWidth / speedPxPerSec);
-            track.style.animationDuration = durationSeconds + 's';
-        });
+        // Measure + apply speed
+        applyTickerSpeed(track, items.length);
     })
     .catch(function(err) {
         console.warn('[NewsTicker] Failed to load ticker data:', err);
         ticker.style.display = 'none';
+    });
+}
+
+
+function applyTickerSpeed(track, itemCount) {
+    // Wait one frame so the browser has laid out the injected HTML.
+    requestAnimationFrame(function() {
+        // Total track scrollWidth = two copies of the item set.
+        // One loop travels exactly half → translateX(-50%).
+        const oneSetWidth = track.scrollWidth / 2;
+
+        // If measurement failed (0), fall back to a per-item estimate.
+        const width = oneSetWidth > 0 ? oneSetWidth : (itemCount * 400);
+
+        // ~180px/sec = brisk news-bar pace. Bump this number to go faster.
+        const speedPxPerSec = 180;
+        // Floor of 5s only kicks in for very short tracks; otherwise real math wins.
+        const durationSeconds = Math.max(5, width / speedPxPerSec);
+
+        // Kill any running animation first so the new duration takes effect cleanly.
+        track.style.animation = 'none';
+        // Force reflow to flush the reset.
+        void track.offsetWidth;
+        // Apply new duration inline (overrides the CSS shorthand).
+        track.style.animation = 'news-ticker-scroll ' + durationSeconds + 's linear infinite';
+
+        // Diagnostic — safe to leave in, remove later if you want.
+        console.log('[NewsTicker] width=' + width + 'px, duration=' + durationSeconds.toFixed(1) + 's, speed=' + speedPxPerSec + 'px/s');
     });
 }
 
