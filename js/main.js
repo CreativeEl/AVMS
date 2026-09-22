@@ -164,7 +164,6 @@ function loadNewsTicker() {
         }).join('');
 
         // Put ONE set in the track — no duplication.
-        // The animation scrolls it fully off-screen, then a gap, then restarts.
         track.innerHTML = oneSetHtml;
 
         // Measure after layout
@@ -172,35 +171,22 @@ function loadNewsTicker() {
             const trackWidth = track.scrollWidth;
             const viewportWidth = track.parentElement ? track.parentElement.clientWidth : window.innerWidth;
 
-            // Total distance the track travels:
-            //   from right edge (start position: translateX(viewportWidth))
-            //   to fully off the left (end: translateX(-trackWidth))
-            // So distance = viewportWidth + trackWidth.
-            // Blank gap after last item = one viewport width of empty space
-            // (achieved by including the viewportWidth in the travel distance).
+            // Total distance travelled per wave
             const travelDistance = viewportWidth + trackWidth;
 
-            // Speed in px/sec. Lower = slower. This is the pace knob.
-            const speedPxPerSec = 120;
+            // Speed in px/sec. Lower = slower.
+            const speedPxPerSec = 140;
 
-            // How long a full scroll-through takes
+            // Scroll time = distance / speed
             const scrollDuration = travelDistance / speedPxPerSec;
 
-            // Blank pause after the last headline finishes before restart
-            // (in seconds). Bump this to leave the bar empty longer.
-            const gapDuration = 1.5;
+            // Blank pause after the last headline leaves, before restart.
+            // 0.4s = brief beat. Bump up for a longer pause, down for none.
+            const gapDuration = 0.4;
 
-            // Total cycle = scroll time + pause time
             const cycleDuration = scrollDuration + gapDuration;
 
-            // The CSS animation must use percentages of the total cycle.
-            // Start: off-screen right (translateX(viewportWidth))
-            // End:   off-screen left  (translateX(-trackWidth))
-            // We express both relative to the track's own width so the
-            // keyframes are size-agnostic.
-            //
-            // We inject a <style> block so the keyframes are dynamic per
-            // track width (since viewportWidth / trackWidth vary per page).
+            // Inject dynamic keyframes sized to this track
             const styleId = 'newsTickerKeyframes';
             let styleEl = document.getElementById(styleId);
             if (!styleEl) {
@@ -209,14 +195,9 @@ function loadNewsTicker() {
                 document.head.appendChild(styleEl);
             }
 
-            // Percentages of the FULL cycle:
             const scrollPct = (scrollDuration / cycleDuration) * 100;
-
-            // Convert pixel start/end positions to translateX values.
-            // Start: pushed off to the right by viewportWidth.
-            // End:   pushed off to the left by trackWidth.
-            const startX = viewportWidth;      // px, positive → off right
-            const endX = -trackWidth;          // px, negative → off left
+            const startX = viewportWidth;
+            const endX = -trackWidth;
 
             styleEl.textContent = `
                 @keyframes news-ticker-scroll {
@@ -226,7 +207,6 @@ function loadNewsTicker() {
                 }
             `;
 
-            // Kill any prior animation, force reflow, then apply the new one
             track.style.animation = 'none';
             void track.offsetWidth;
             track.style.animation = 'news-ticker-scroll ' + cycleDuration.toFixed(2) + 's linear infinite';
