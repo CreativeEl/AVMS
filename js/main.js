@@ -166,10 +166,16 @@ function loadNewsTicker() {
         // Duplicate the item row so translateX(-50%) produces a seamless loop
         track.innerHTML = itemHtml + itemHtml;
 
-        // Scale animation duration to item count for consistent speed (~60-80px/s)
-        // Rough estimate: ~250px per item → for N items, duration = (N*250)/70 seconds
-        const durationSeconds = Math.max(20, (items.length * 250) / 70);
-        track.style.animationDuration = durationSeconds + 's';
+        // Measure the actual rendered width of ONE full set of items
+        // (track contains items twice; translateX(-50%) moves exactly one set)
+        // Use requestAnimationFrame to ensure layout is complete.
+        requestAnimationFrame(function() {
+            const oneSetWidth = track.scrollWidth / 2;
+            // Target speed: ~90px/sec — readable but not sluggish
+            const speedPxPerSec = 90;
+            const durationSeconds = Math.max(12, oneSetWidth / speedPxPerSec);
+            track.style.animationDuration = durationSeconds + 's';
+        });
     })
     .catch(function(err) {
         console.warn('[NewsTicker] Failed to load ticker data:', err);
