@@ -3265,6 +3265,64 @@ html, body {
      ≤900px      → hamburger menu
    ============================================ */
 
+/* --- Laptop tier 0a: pre-tightening for 1080p+scaling --- */
+@media (max-width: 1400px) {
+    .nav-wrapper {
+        gap: 14px;
+    }
+    .nav-menu ul {
+        gap: 4px;
+    }
+    .nav-menu a {
+        font-size: 13px;
+        padding: 9px 10px;
+    }
+    .nav-cbt-btn {
+        padding: 9px 16px !important;
+        font-size: 12px !important;
+    }
+    .nav-cbt-item {
+        margin-left: 6px;
+    }
+}
+
+/* --- Laptop tier 0b: strong tightening for 125% scaled laptops --- */
+@media (max-width: 1200px) {
+    .nav-wrapper {
+        gap: 12px;
+    }
+    .logo-img {
+        width: 46px;
+        height: 46px;
+    }
+    .logo-text {
+        font-size: 19px;
+    }
+    .nav-menu ul {
+        gap: 3px;
+    }
+    .nav-menu a {
+        font-size: 12px;
+        padding: 8px 8px;
+        letter-spacing: 0.1px;
+    }
+    .nav-menu a::after {
+        left: 8px;
+        right: 8px;
+    }
+    .nav-cbt-item {
+        margin-left: 5px;
+    }
+    .nav-cbt-btn {
+        padding: 8px 13px !important;
+        font-size: 11px !important;
+        gap: 5px;
+    }
+    .nav-cbt-btn i {
+        font-size: 11px;
+    }
+}
+
 /* --- Laptop tier 1: slight tightening --- */
 @media (max-width: 1100px) {
     .hero-title {
