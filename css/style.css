@@ -3323,7 +3323,13 @@ html, body {
     }
 }
 
-@media (max-width: 768px) {
+/* ============================================
+   NAV COLLAPSE — laptops and below
+   Fixes nav cutoff at 1024–1440px widths.
+   Nav becomes a hamburger menu instead of a
+   cramped single row of 13 items.
+   ============================================ */
+@media (max-width: 1024px) {
     .utility-bar {
         display: none;
     }
@@ -3376,7 +3382,9 @@ html, body {
         padding: 14px 20px !important;
         font-size: 13.5px !important;
     }
+}
 
+@media (max-width: 768px) {
     .hero {
         padding: 70px 0 60px;
     }
@@ -3567,11 +3575,11 @@ html, body {
         padding: 24px 18px;
     }
 }
+
 /* ============================================
    HERO SPLIT LAYOUT + SLIDESHOW
    ============================================ */
 
-/* Hero becomes a split layout: text left, slideshow right */
 .hero {
     padding: 0;
     min-height: 640px;
@@ -3600,7 +3608,6 @@ html, body {
     z-index: 1;
 }
 
-/* Slideshow pane on the right */
 .hero-slideshow {
     position: relative;
     overflow: hidden;
@@ -3608,7 +3615,6 @@ html, body {
     min-height: 640px;
 }
 
-/* Individual slides */
 .hero-slide {
     position: absolute;
     inset: 0;
@@ -3625,7 +3631,6 @@ html, body {
     z-index: 1;
 }
 
-/* Soft green tint overlay for consistency */
 .hero-slideshow::after {
     content: '';
     position: absolute;
@@ -3640,7 +3645,6 @@ html, body {
     z-index: 2;
 }
 
-/* Navigation arrows */
 .hero-slide-nav {
     position: absolute;
     bottom: 32px;
@@ -3674,7 +3678,6 @@ html, body {
     transform: scale(1.08);
 }
 
-/* Dot indicators */
 .hero-slide-dots {
     position: absolute;
     bottom: 42px;
@@ -3705,7 +3708,6 @@ html, body {
     border-radius: 5px;
 }
 
-/* Hide slideshow when no images */
 .hero.no-slideshow .hero-slideshow {
     background: linear-gradient(135deg, #142f25 0%, var(--green-deep) 60%, var(--green-mid) 100%);
 }
@@ -3715,9 +3717,11 @@ html, body {
     display: none;
 }
 
-/* --- Responsive --- */
-
-@media (max-width: 1100px) {
+/* --- Hero stacking breakpoint: now 900px instead of 1100px ---
+   This keeps the side-by-side layout down to 900px,
+   which covers small laptops and phone-desktop-mode (~980px).
+   Below 900px, the hero stacks. */
+@media (max-width: 900px) {
     .hero > .container {
         grid-template-columns: 1fr;
     }
@@ -3766,11 +3770,11 @@ html, body {
         min-height: 240px;
     }
 }
+
 /* ============================================
    FOOTER FIXES — Admin button + Social icons
    ============================================ */
 
-/* Fix admin login button — flex layout, proper spacing */
 .footer-col ul .admin-link-item {
     margin-top: 16px;
     padding: 0;
@@ -3810,7 +3814,6 @@ html, body {
     color: var(--green-deep) !important;
 }
 
-/* Fix social icons wrapping — allow them to sit in one row */
 .footer-col .social-links {
     display: flex;
     flex-wrap: wrap;
@@ -3841,12 +3844,10 @@ html, body {
     transform: translateY(-2px);
 }
 
-/* Widen the Contact column so 6 icons fit on one row */
 .footer-grid {
     grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
 }
 
-/* Responsive tweaks */
 @media (max-width: 900px) {
     .footer-grid {
         grid-template-columns: 1fr 1fr;
@@ -3861,6 +3862,7 @@ html, body {
         justify-content: flex-start;
     }
 }
+
 /* ============================================
    FIX: Center Font Awesome icons inside circular social buttons
    ============================================ */
@@ -3895,7 +3897,6 @@ html, body {
     overflow: hidden;
 }
 
-/* Force the icon itself to be centered */
 .footer-col .social-links a i,
 .footer-col .social-links a::before,
 .footer-col .social-links a svg {
@@ -3920,6 +3921,7 @@ html, body {
     color: var(--green-deep);
     transform: translateY(-2px);
 }
+
 /* ============================================
    SLIDESHOW PANE — Curve + Shadow + Gold Border
    ============================================ */
@@ -3935,7 +3937,6 @@ html, body {
     min-height: 560px;
 }
 
-/* Ensure the inner gradient fallback also respects the rounded corners */
 .hero.no-slideshow .hero-slideshow {
     border-radius: 20px;
     border: 1px solid rgba(201, 169, 97, 0.35);
@@ -3944,7 +3945,6 @@ html, body {
         0 8px 20px rgba(20, 47, 37, 0.35);
 }
 
-/* Adjust hero layout so the pane fits with margin */
 .hero > .container {
     padding: 0 24px;
 }
@@ -3953,7 +3953,6 @@ html, body {
     padding: 110px 40px 110px 0;
 }
 
-/* Keep nav buttons inside the rounded pane */
 .hero-slide-nav {
     bottom: 24px;
     right: 24px;
@@ -3963,10 +3962,6 @@ html, body {
     bottom: 34px;
     left: 24px;
 }
-
-/* ============================================
-   RESPONSIVE — Slideshow Pane
-   ============================================ */
 
 @media (max-width: 1100px) {
     .hero-slideshow {
@@ -4005,9 +4000,9 @@ html, body {
         border-radius: 12px;
     }
 }
+
 /* ============================================
    PAGE HEADER — Center-aligned on all inner pages
-   (Homepage keeps its left-aligned editorial hero)
    ============================================ */
 .page-header {
     text-align: center;
@@ -4037,10 +4032,9 @@ html, body {
     margin-left: auto;
     margin-right: auto;
 }
+
 /* ============================================
    FEATURED BADGE — Events page
-   (the annonucement variant is already styled;
-    this extends it to event cards too)
    ============================================ */
 .event-card-full {
     position: relative;
@@ -4064,8 +4058,6 @@ html, body {
 
 /* ============================================
    EVENTS SECTION TITLES — Clean look
-   (removes the browser default emoji spacing
-    and gives a nicer inline alignment)
    ============================================ */
 .events-section-title {
     display: flex;
@@ -4082,6 +4074,7 @@ html, body {
 .events-section-title:first-of-type {
     margin-top: 0;
 }
+
 /* ============================================
    FEATURED BADGE — News page
    ============================================ */
@@ -4107,9 +4100,6 @@ html, body {
 
 /* ============================================
    MAP SECTION — Contact Page (reusable)
-   Shared map component for "Find Us" blocks.
-   Used on: contact.html (and can be reused on
-   any page that needs a location/directions card)
    ============================================ */
 .map-section {
     padding: 70px 0;
