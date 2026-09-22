@@ -3261,53 +3261,53 @@ html, body {
 @media (min-width: 901px) {
     /* Wrapper gap: 20px max → 8px min */
     .nav-wrapper {
-        gap: clamp(8px, 1.2vw, 20px);
+        gap: clamp(6px, 0.7vw, 18px);
     }
 
     /* Logo image: 52px max → 38px min */
     .logo-img {
-        width: clamp(38px, 3.6vw, 52px);
-        height: clamp(38px, 3.6vw, 52px);
+        width: clamp(32px, 2.6vw, 48px);
+        height: clamp(32px, 2.6vw, 48px);
     }
 
     /* Logo text: 22px max → 15px min */
     .logo-text {
-        font-size: clamp(15px, 1.5vw, 22px);
+        font-size: clamp(13px, 1.15vw, 20px);
         letter-spacing: clamp(0px, 0.02vw, 0.3px);
     }
 
     /* Nav list gap: 4px max → 1px min */
-    .nav-menu ul {
-        gap: clamp(1px, 0.28vw, 4px);
+        .nav-menu ul {
+        gap: clamp(0.5px, 0.15vw, 3px);
     }
 
     /* Nav link font: 13.5px max → 10.5px min */
     .nav-menu a {
-        font-size: clamp(10.5px, 0.95vw, 13.5px);
-        padding: clamp(6px, 0.65vw, 10px) clamp(6px, 0.85vw, 12px);
-        letter-spacing: clamp(0px, 0.014vw, 0.2px);
+        font-size: clamp(10px, 0.75vw, 13.5px);
+        padding: clamp(5px, 0.4vw, 10px) clamp(5px, 0.55vw, 12px);
+        letter-spacing: clamp(0px, 0.01vw, 0.2px);
     }
 
     /* Underline inset follows padding */
     .nav-menu a::after {
-        left: clamp(6px, 0.85vw, 12px);
-        right: clamp(6px, 0.85vw, 12px);
+        left: clamp(5px, 0.55vw, 12px);
+        right: clamp(5px, 0.55vw, 12px);
     }
 
     /* CBT item margin */
     .nav-cbt-item {
-        margin-left: clamp(3px, 0.5vw, 10px);
+        margin-left: clamp(2px, 0.35vw, 10px);
     }
 
     /* CBT button padding + font */
     .nav-cbt-btn {
-        padding: clamp(6px, 0.65vw, 10px) clamp(9px, 1.1vw, 20px) !important;
-        font-size: clamp(9.5px, 0.88vw, 12.5px) !important;
-        gap: clamp(4px, 0.5vw, 7px);
+        padding: clamp(5px, 0.45vw, 10px) clamp(6px, 0.7vw, 20px) !important;
+        font-size: clamp(9px, 0.72vw, 12.5px) !important;
+        gap: clamp(3px, 0.35vw, 7px);
     }
 
     .nav-cbt-btn i {
-        font-size: clamp(10px, 0.92vw, 13px);
+        font-size: clamp(9.5px, 0.75vw, 13px);
     }
 }
 
