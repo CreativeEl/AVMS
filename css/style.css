@@ -4230,3 +4230,207 @@ html, body {
     .map-actions { padding: 20px; }
     .btn-directions { width: 100%; justify-content: center; }
 }
+/* ============================================
+   NEWS TICKER — Injected by js/main.js
+   Appears at top of every public page.
+   ============================================ */
+
+.news-ticker {
+    display: flex;
+    align-items: stretch;
+    background: var(--red-deep);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    line-height: 1;
+    height: 44px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1100;
+    border-bottom: 2px solid var(--gold-deep);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.news-ticker-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gold);
+    color: var(--red-deep);
+    font-weight: 800;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 0 18px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    white-space: nowrap;
+}
+
+.news-ticker-badge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -10px;
+    width: 0;
+    height: 0;
+    border-top: 22px solid transparent;
+    border-bottom: 22px solid transparent;
+    border-left: 10px solid var(--gold);
+    z-index: 2;
+}
+
+.news-ticker-viewport {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+}
+
+.news-ticker-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 48px;
+    white-space: nowrap;
+    padding-left: 32px;
+    will-change: transform;
+    animation: news-ticker-scroll 40s linear infinite;
+}
+
+.news-ticker-viewport:hover .news-ticker-track {
+    animation-play-state: paused;
+}
+
+.news-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--white);
+    text-decoration: none;
+    transition: color var(--t-base);
+    flex-shrink: 0;
+}
+
+.news-ticker-item:hover {
+    color: var(--gold);
+}
+
+.news-ticker-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: var(--r-sm);
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.news-ticker-tag--news {
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--white);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.news-ticker-tag--event {
+    background: var(--gold);
+    color: var(--red-deep);
+    border: 1px solid var(--gold);
+}
+
+.news-ticker-text {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: inherit;
+    letter-spacing: 0.2px;
+    line-height: 1;
+}
+
+.news-ticker-loading {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    font-size: 13px;
+    padding-left: 4px;
+}
+
+/* --- Animation: seamless loop ---
+   Track contains items duplicated once.
+   Move from 0 to -50% for perfect wrap. */
+@keyframes news-ticker-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .news-ticker-track {
+        animation: none;
+        padding-left: 32px;
+    }
+    .news-ticker-viewport {
+        overflow-x: auto;
+    }
+    .news-ticker-viewport::-webkit-scrollbar {
+        height: 0;
+    }
+}
+
+/* --- Mobile: shorter bar, tighter badge --- */
+@media (max-width: 900px) {
+    .news-ticker {
+        height: 40px;
+        font-size: 12.5px;
+    }
+    .news-ticker-badge {
+        font-size: 10px;
+        padding: 0 12px;
+        letter-spacing: 1.2px;
+    }
+    .news-ticker-badge::after {
+        border-top-width: 20px;
+        border-bottom-width: 20px;
+        border-left-width: 8px;
+        right: -8px;
+    }
+    .news-ticker-track {
+        gap: 32px;
+        padding-left: 24px;
+    }
+    .news-ticker-text {
+        font-size: 12.5px;
+    }
+    .news-ticker-tag {
+        font-size: 9px;
+        padding: 3px 7px;
+    }
+}
+
+@media (max-width: 480px) {
+    .news-ticker {
+        height: 36px;
+    }
+    .news-ticker-badge {
+        font-size: 9px;
+        padding: 0 9px;
+        letter-spacing: 1px;
+    }
+    .news-ticker-badge::after {
+        border-top-width: 18px;
+        border-bottom-width: 18px;
+        border-left-width: 7px;
+        right: -7px;
+    }
+    .news-ticker-track {
+        gap: 24px;
+        padding-left: 18px;
+    }
+    .news-ticker-text {
+        font-size: 12px;
+    }
+}
