@@ -278,7 +278,11 @@ function applyHomepageContent(settings) {
 }
 
 // ============================================
-// APPLY ABOUT PAGE CONTENT
+// APPLY ABOUT PAGE CONTENT — FIXED
+// - When a background-image is applied to a
+//   non-IMG element, strip the placeholder class
+//   and remove child icon/text so the dashed
+//   gold border and centered icon disappear.
 // ============================================
 function applyAboutContent(settings) {
     if (settings.about_who_title) {
@@ -330,7 +334,19 @@ function applyAboutContent(settings) {
             if (el.tagName === 'IMG') {
                 el.src = settings.about_image;
             } else {
+                // FIX: Apply the background image AND strip the
+                // placeholder styling so the dashed gold border,
+                // padding, and centered icon all disappear.
                 el.style.backgroundImage = `url('${settings.about_image}')`;
+                el.style.backgroundSize = 'cover';
+                el.style.backgroundPosition = 'center';
+                el.style.backgroundRepeat = 'no-repeat';
+                el.style.border = 'none';
+                el.style.padding = '0';
+                el.style.minHeight = '0';
+                el.classList.remove('placeholder-image');
+                // Remove any child icon/text placeholder elements
+                el.querySelectorAll('i, p').forEach(child => child.remove());
             }
         });
     }
