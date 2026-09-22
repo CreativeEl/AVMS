@@ -4449,23 +4449,28 @@ html, body {
 }
 /* ============================================
    ABOUT PAGE — History section left-aligned
-   Override any inherited centering from shared classes
+   STRONG OVERRIDE — defeats any shared centering rules
    ============================================ */
-.history .section-header {
-    display: block;
-    text-align: left;
-    margin-bottom: 24px;
-}
-
-.history .section-title,
-.history .section-subtitle {
-    text-align: left;
-    margin-left: 0;
-    margin-right: 0;
-    max-width: 100%;
+.history .section-header,
+.history .section-header > div,
+.history .section-header .section-title,
+.history .section-header .section-subtitle {
+    display: block !important;
+    text-align: left !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    max-width: 100% !important;
 }
 
 .history .section-title::after {
-    left: 0;
-    transform: none;
+    left: 0 !important;
+    right: auto !important;
+    transform: none !important;
+    margin-left: 0 !important;
+}
+
+.history .section-subtitle {
+    margin-top: 8px !important;
 }
