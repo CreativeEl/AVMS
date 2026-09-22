@@ -163,28 +163,23 @@ function loadNewsTicker() {
             </a>`;
         }).join('');
 
-        // Put ONE set in the track — no duplication.
-        track.innerHTML = oneSetHtml;
+        // Put exactly TWO sets — current wave + next wave back-to-back.
+        // As set 1 scrolls off left, set 2 is already entering from right.
+        track.innerHTML = oneSetHtml + oneSetHtml;
 
         // Measure after layout
         requestAnimationFrame(function() {
-            const trackWidth = track.scrollWidth;
-            const viewportWidth = track.parentElement ? track.parentElement.clientWidth : window.innerWidth;
+            // Width of ONE set (each item, its gaps, and the inter-set gap)
+            const oneSetWidth = track.scrollWidth / 2;
 
-            // Total distance travelled per wave
-            const travelDistance = viewportWidth + trackWidth;
-
-            // Speed in px/sec. Lower = slower.
+            // Speed in px/sec. Lower = slower, higher = faster.
             const speedPxPerSec = 140;
 
-            // Scroll time = distance / speed
-            const scrollDuration = travelDistance / speedPxPerSec;
-
-            // Blank pause after the last headline leaves, before restart.
-            // 0.4s = brief beat. Bump up for a longer pause, down for none.
-            const gapDuration = 0.4;
-
-            const cycleDuration = scrollDuration + gapDuration;
+            // One full wave = one set width scrolled past.
+            // Because set 2 is directly behind set 1, when set 1 has moved
+            // exactly oneSetWidth to the left, the visual state is identical
+            // to start — so the loop is seamless and continuous.
+            const waveDuration = oneSetWidth / speedPxPerSec;
 
             // Inject dynamic keyframes sized to this track
             const styleId = 'newsTickerKeyframes';
@@ -195,23 +190,18 @@ function loadNewsTicker() {
                 document.head.appendChild(styleEl);
             }
 
-            const scrollPct = (scrollDuration / cycleDuration) * 100;
-            const startX = viewportWidth;
-            const endX = -trackWidth;
-
             styleEl.textContent = `
                 @keyframes news-ticker-scroll {
-                    0%   { transform: translateX(${startX}px); }
-                    ${scrollPct.toFixed(3)}% { transform: translateX(${endX}px); }
-                    ${scrollPct.toFixed(3)}%, 100% { transform: translateX(${endX}px); }
+                    0%   { transform: translateX(0); }
+                    100% { transform: translateX(-${oneSetWidth}px); }
                 }
             `;
 
             track.style.animation = 'none';
             void track.offsetWidth;
-            track.style.animation = 'news-ticker-scroll ' + cycleDuration.toFixed(2) + 's linear infinite';
+            track.style.animation = 'news-ticker-scroll ' + waveDuration.toFixed(2) + 's linear infinite';
 
-            console.log('[NewsTicker] track=' + trackWidth + 'px, viewport=' + viewportWidth + 'px, travel=' + travelDistance + 'px, scroll=' + scrollDuration.toFixed(2) + 's, gap=' + gapDuration + 's, cycle=' + cycleDuration.toFixed(2) + 's');
+            console.log('[NewsTicker] oneSet=' + oneSetWidth + 'px, wave=' + waveDuration.toFixed(2) + 's, speed=' + speedPxPerSec + 'px/s');
         });
     })
     .catch(function(err) {
