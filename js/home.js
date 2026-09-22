@@ -157,7 +157,11 @@ async function loadLeaders() {
         
         container.innerHTML = data.map(leader => `
             <div class="leader-card">
-                <div class="leader-photo">👤</div>
+                <div class="leader-photo">
+                    ${leader.photo_url
+                        ? `<img src="${leader.photo_url}" alt="${leader.name || 'Leader'}">`
+                        : '👤'}
+                </div>
                 <h4>${leader.name || 'Demo Leader'}</h4>
                 <p>${leader.position || 'Position'}</p>
             </div>
