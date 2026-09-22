@@ -163,24 +163,35 @@ function loadNewsTicker() {
             </a>`;
         }).join('');
 
-        // Put exactly TWO sets back-to-back.
-        // As set 1 scrolls off left, set 2 is right behind it — no gap needed.
-        track.innerHTML = oneSetHtml + oneSetHtml;
+        // Put ONE set in the track. No duplication.
+        // The animation will scroll this single set fully off the left edge,
+        // hold for a blink, then reset and replay the same set — which reads
+        // as a fresh wave entering from the right.
+        track.innerHTML = oneSetHtml;
 
         // Measure after layout
         requestAnimationFrame(function() {
-            // Width of ONE full set (all items + their gaps)
-            const oneSetWidth = track.scrollWidth / 2;
+            const trackWidth = track.scrollWidth;
+            const viewportWidth = track.parentElement ? track.parentElement.clientWidth : window.innerWidth;
 
-            // Speed in px/sec. Higher = faster.
+            // Full travel distance per wave:
+            //   start: track's left edge at viewport's right edge (+viewportWidth)
+            //   end:   track's right edge at viewport's left edge  (-trackWidth)
+            const travelDistance = viewportWidth + trackWidth;
+
+            // Speed in px/sec. Higher = faster scroll.
             const speedPxPerSec = 140;
 
-            // One wave = one set width scrolling past.
-            // When the track has moved exactly oneSetWidth to the left, the
-            // visual state is identical to the start — so the loop is seamless.
-            const waveDuration = oneSetWidth / speedPxPerSec;
+            // Time spent scrolling one wave across
+            const scrollDuration = travelDistance / speedPxPerSec;
 
-            // Inject dynamic keyframes matched to this track width
+            // "Very very very brief" pause — almost negligent.
+            // 0.05s = a single frame at 20fps. Barely perceptible.
+            const gapDuration = 0.05;
+
+            const cycleDuration = scrollDuration + gapDuration;
+
+            // Inject dynamic keyframes matched to this track's real width.
             const styleId = 'newsTickerKeyframes';
             let styleEl = document.getElementById(styleId);
             if (!styleEl) {
@@ -189,18 +200,27 @@ function loadNewsTicker() {
                 document.head.appendChild(styleEl);
             }
 
+            // scrollPct: the % of the cycle where the scroll ends and the hold begins.
+            // From that % up to 100%, the transform stays at the end position
+            // (off-screen left) — that's the brief pause before reset.
+            const scrollPct = (scrollDuration / cycleDuration) * 100;
+
+            const startX = viewportWidth;   // off-screen right
+            const endX = -trackWidth;       // off-screen left
+
             styleEl.textContent = `
                 @keyframes news-ticker-scroll {
-                    0%   { transform: translateX(0); }
-                    100% { transform: translateX(-${oneSetWidth}px); }
+                    0% { transform: translateX(${startX}px); }
+                    ${scrollPct.toFixed(4)}% { transform: translateX(${endX}px); }
+                    100% { transform: translateX(${endX}px); }
                 }
             `;
 
             track.style.animation = 'none';
             void track.offsetWidth;
-            track.style.animation = 'news-ticker-scroll ' + waveDuration.toFixed(2) + 's linear infinite';
+            track.style.animation = 'news-ticker-scroll ' + cycleDuration.toFixed(3) + 's linear infinite';
 
-            console.log('[NewsTicker] oneSet=' + oneSetWidth + 'px, wave=' + waveDuration.toFixed(2) + 's, speed=' + speedPxPerSec + 'px/s');
+            console.log('[NewsTicker] track=' + trackWidth + 'px, viewport=' + viewportWidth + 'px, travel=' + travelDistance + 'px, scroll=' + scrollDuration.toFixed(2) + 's, gap=' + gapDuration + 's, cycle=' + cycleDuration.toFixed(2) + 's');
         });
     })
     .catch(function(err) {
@@ -212,6 +232,6 @@ function loadNewsTicker() {
 
 function escapeTickerText(str) {
     const div = document.createElement('div');
-    div.textContent = String(str);
+    div.textContent = str == null ? '' : String(str);
     return div.innerHTML;
 }
