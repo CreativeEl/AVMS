@@ -470,7 +470,6 @@ button {
     align-items: center;
 }
 
-/* Hero quicklinks (right-side list) */
 .hero-quicklinks {
     display: flex;
     flex-direction: column;
