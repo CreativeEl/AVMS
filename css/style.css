@@ -3249,51 +3249,40 @@ html, body {
     width: 100%;
 }
 
-.nav-wrapper {
-    gap: 15px;
-}
-.nav-menu ul {
-    gap: 4px;
-}
-
 /* ============================================
    RESPONSIVE — NAV TIGHTENING (universal)
-   Strategy: fluid sizes via clamp() so the nav
-   ALWAYS fits from 900px up to any width.
-   Only below 900px does it collapse to hamburger.
-
-   - ≥1440px     → comfortable default
-   - 901–1439px  → smoothly tightens via clamp()
-   - ≤900px      → hamburger
+   Fluid sizing via clamp() so the nav ALWAYS fits
+   from 901px up to any width. Below 900px it
+   collapses to the hamburger menu.
    ============================================ */
 
-/* Fluid tier: applies from 0px up, but has no
-   visual effect until the viewport is small
-   enough that the clamp() lower bounds kick in. */
+/* Fluid nav tier — applies to all viewports ≥901px.
+   clamp() values: comfortable at large widths,
+   tighten automatically as the viewport shrinks. */
 @media (min-width: 901px) {
-    /* Nav wrapper: gap shrinks smoothly 20px → 8px */
+    /* Wrapper gap: 20px max → 8px min */
     .nav-wrapper {
         gap: clamp(8px, 1.2vw, 20px);
     }
 
-    /* Logo: image shrinks 52px → 38px */
+    /* Logo image: 52px max → 38px min */
     .logo-img {
         width: clamp(38px, 3.6vw, 52px);
         height: clamp(38px, 3.6vw, 52px);
     }
 
-    /* Logo text: 22px → 15px */
+    /* Logo text: 22px max → 15px min */
     .logo-text {
         font-size: clamp(15px, 1.5vw, 22px);
         letter-spacing: clamp(0px, 0.02vw, 0.3px);
     }
 
-    /* Nav link gap: 4px → 1px */
+    /* Nav list gap: 4px max → 1px min */
     .nav-menu ul {
         gap: clamp(1px, 0.28vw, 4px);
     }
 
-    /* Nav link font: 13.5px → 10.5px */
+    /* Nav link font: 13.5px max → 10.5px min */
     .nav-menu a {
         font-size: clamp(10.5px, 0.95vw, 13.5px);
         padding: clamp(6px, 0.65vw, 10px) clamp(6px, 0.85vw, 12px);
@@ -3321,42 +3310,11 @@ html, body {
     .nav-cbt-btn i {
         font-size: clamp(10px, 0.92vw, 13px);
     }
-}    .logo {
-        flex-shrink: 0;
-    }
-    .logo-img {
-        width: 42px;
-        height: 42px;
-    }
-    .logo-text {
-        font-size: 17px;
-    }
-    .nav-menu ul {
-        gap: 2px;
-    }
-    .nav-menu a {
-        font-size: 11.5px;
-        padding: 7px 7px;
-        letter-spacing: 0.1px;
-    }
-    .nav-menu a::after {
-        left: 7px;
-        right: 7px;
-    }
-    .nav-cbt-item {
-        margin-left: 4px;
-    }
-    .nav-cbt-btn {
-        padding: 7px 12px !important;
-        font-size: 10.5px !important;
-        gap: 5px;
-    }
-    .nav-cbt-btn i {
-        font-size: 11px;
-    }
 }
 
-/* --- Hamburger breakpoint: tablets & phones --- */
+/* ============================================
+   HAMBURGER — below 900px
+   ============================================ */
 @media (max-width: 900px) {
     .hero {
         padding: 90px 0 80px;
@@ -3780,7 +3738,7 @@ html, body {
     display: none;
 }
 
-/* --- Hero stacking breakpoint: 900px (side-by-side down to 900px) --- */
+/* --- Hero stacking breakpoint: 900px --- */
 @media (max-width: 900px) {
     .hero > .container {
         grid-template-columns: 1fr;
