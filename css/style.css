@@ -4434,3 +4434,16 @@ html, body {
         font-size: 12px;
     }
 }
+/* ============================================
+   ABOUT PAGE IMAGE — Rounded corners matching homepage
+   ============================================ */
+.about-image img,
+.about-image .about-img,
+.about-image [data-about="image"] {
+    border-radius: 20px;
+    overflow: hidden;
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
