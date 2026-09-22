@@ -4447,3 +4447,25 @@ html, body {
     height: auto;
     object-fit: cover;
 }
+/* ============================================
+   ABOUT PAGE — History section left-aligned
+   Override any inherited centering from shared classes
+   ============================================ */
+.history .section-header {
+    display: block;
+    text-align: left;
+    margin-bottom: 24px;
+}
+
+.history .section-title,
+.history .section-subtitle {
+    text-align: left;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+}
+
+.history .section-title::after {
+    left: 0;
+    transform: none;
+}
