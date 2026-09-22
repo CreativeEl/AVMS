@@ -4104,3 +4104,122 @@ html, body {
     z-index: 5;
     box-shadow: 0 2px 8px rgba(139, 26, 26, 0.3);
 }
+
+/* ============================================
+   MAP SECTION — Contact Page (reusable)
+   Shared map component for "Find Us" blocks.
+   Used on: contact.html (and can be reused on
+   any page that needs a location/directions card)
+   ============================================ */
+.map-section {
+    padding: 70px 0;
+    background: var(--cream-light);
+}
+
+.map-section .map-card {
+    background: var(--white);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--gold);
+    box-shadow: 0 4px 20px rgba(31, 78, 61, 0.08);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.map-header {
+    padding: 30px 30px 20px;
+    text-align: center;
+}
+
+.map-header .map-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+}
+
+.map-header h2 {
+    font-family: var(--font-display);
+    color: var(--green-deep);
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+}
+
+.map-header p {
+    color: var(--ink-soft);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.map-frame {
+    width: 100%;
+    line-height: 0;
+    background: var(--cream);
+}
+
+.map-frame iframe {
+    display: block;
+    width: 100%;
+    height: 450px;
+    border: 0;
+}
+
+.map-actions {
+    padding: 25px 30px 30px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-directions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--green-mid);
+    color: var(--white);
+    padding: 13px 28px;
+    border-radius: var(--r-pill);
+    font-weight: 700;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all var(--t-base);
+    letter-spacing: 0.3px;
+}
+
+.btn-directions:hover {
+    background: var(--green-deep);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(31, 78, 61, 0.3);
+}
+
+.btn-directions.secondary {
+    background: transparent;
+    color: var(--green-deep);
+    border: 2px solid var(--line);
+}
+
+.btn-directions.secondary:hover {
+    background: var(--cream);
+    border-color: var(--gold);
+    color: var(--green-deep);
+    box-shadow: none;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .map-section { padding: 50px 0; }
+    .map-header { padding: 25px 20px 15px; }
+    .map-header h2 { font-size: 22px; }
+    .map-frame iframe { height: 340px; }
+    .map-actions { padding: 20px; }
+    .btn-directions { width: 100%; justify-content: center; }
+}
