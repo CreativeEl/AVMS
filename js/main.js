@@ -163,33 +163,76 @@ function loadNewsTicker() {
             </a>`;
         }).join('');
 
-        // Seed the track with one set so we can measure its width
+        // Put ONE set in the track — no duplication.
+        // The animation scrolls it fully off-screen, then a gap, then restarts.
         track.innerHTML = oneSetHtml;
-        const oneSetWidth = track.scrollWidth;
 
-        // How wide is the visible ticker bar?
-        const viewport = track.parentElement;
-        const viewportWidth = viewport ? viewport.clientWidth : window.innerWidth;
+        // Measure after layout
+        requestAnimationFrame(function() {
+            const trackWidth = track.scrollWidth;
+            const viewportWidth = track.parentElement ? track.parentElement.clientWidth : window.innerWidth;
 
-        // We need enough copies that HALF the track is at least as wide
-        // as the viewport (so translateX(-50%) never reveals empty space).
-        // Always an even number of sets → -50% lands exactly on a set boundary.
-        const minSets = Math.max(2, Math.ceil(viewportWidth / Math.max(oneSetWidth, 1)) * 2);
-        const setsNeeded = minSets % 2 === 0 ? minSets : minSets + 1;
+            // Total distance the track travels:
+            //   from right edge (start position: translateX(viewportWidth))
+            //   to fully off the left (end: translateX(-trackWidth))
+            // So distance = viewportWidth + trackWidth.
+            // Blank gap after last item = one viewport width of empty space
+            // (achieved by including the viewportWidth in the travel distance).
+            const travelDistance = viewportWidth + trackWidth;
 
-        // Build the full track
-        track.innerHTML = oneSetHtml.repeat(setsNeeded);
+            // Speed in px/sec. Lower = slower. This is the pace knob.
+            const speedPxPerSec = 120;
 
-        // Speed: seconds per full loop. Lower = faster.
-        // 10s is the pace you approved previously; tweak this one number only.
-        const durationSeconds = 10;
+            // How long a full scroll-through takes
+            const scrollDuration = travelDistance / speedPxPerSec;
 
-        // Reset then apply the animation so the duration always takes effect
-        track.style.animation = 'none';
-        void track.offsetWidth;
-        track.style.animation = 'news-ticker-scroll ' + durationSeconds + 's linear infinite';
+            // Blank pause after the last headline finishes before restart
+            // (in seconds). Bump this to leave the bar empty longer.
+            const gapDuration = 1.5;
 
-        console.log('[NewsTicker] oneSet=' + oneSetWidth + 'px, viewport=' + viewportWidth + 'px, sets=' + setsNeeded + ', duration=' + durationSeconds + 's');
+            // Total cycle = scroll time + pause time
+            const cycleDuration = scrollDuration + gapDuration;
+
+            // The CSS animation must use percentages of the total cycle.
+            // Start: off-screen right (translateX(viewportWidth))
+            // End:   off-screen left  (translateX(-trackWidth))
+            // We express both relative to the track's own width so the
+            // keyframes are size-agnostic.
+            //
+            // We inject a <style> block so the keyframes are dynamic per
+            // track width (since viewportWidth / trackWidth vary per page).
+            const styleId = 'newsTickerKeyframes';
+            let styleEl = document.getElementById(styleId);
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = styleId;
+                document.head.appendChild(styleEl);
+            }
+
+            // Percentages of the FULL cycle:
+            const scrollPct = (scrollDuration / cycleDuration) * 100;
+
+            // Convert pixel start/end positions to translateX values.
+            // Start: pushed off to the right by viewportWidth.
+            // End:   pushed off to the left by trackWidth.
+            const startX = viewportWidth;      // px, positive → off right
+            const endX = -trackWidth;          // px, negative → off left
+
+            styleEl.textContent = `
+                @keyframes news-ticker-scroll {
+                    0%   { transform: translateX(${startX}px); }
+                    ${scrollPct.toFixed(3)}% { transform: translateX(${endX}px); }
+                    ${scrollPct.toFixed(3)}%, 100% { transform: translateX(${endX}px); }
+                }
+            `;
+
+            // Kill any prior animation, force reflow, then apply the new one
+            track.style.animation = 'none';
+            void track.offsetWidth;
+            track.style.animation = 'news-ticker-scroll ' + cycleDuration.toFixed(2) + 's linear infinite';
+
+            console.log('[NewsTicker] track=' + trackWidth + 'px, viewport=' + viewportWidth + 'px, travel=' + travelDistance + 'px, scroll=' + scrollDuration.toFixed(2) + 's, gap=' + gapDuration + 's, cycle=' + cycleDuration.toFixed(2) + 's');
+        });
     })
     .catch(function(err) {
         console.warn('[NewsTicker] Failed to load ticker data:', err);
