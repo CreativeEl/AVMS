@@ -3257,9 +3257,15 @@ html, body {
 }
 
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE — NAV TIGHTENING (laptops keep full row)
+   Strategy:
+     ≥1101px  → default comfortable spacing
+     1001–1100px → tighten nav spacing (fit 13 items on 1366px)
+     901–1000px  → tighten further (fit 13 items on ~980px)
+     ≤900px      → hamburger menu
    ============================================ */
 
+/* --- Laptop tier 1: slight tightening --- */
 @media (max-width: 1100px) {
     .hero-title {
         font-size: 52px;
@@ -3277,16 +3283,79 @@ html, body {
         grid-template-columns: 1.2fr 1fr 1fr 1fr;
         gap: 32px;
     }
+
+    /* Nav tightening so all 13 items fit on ~1366px laptops */
+    .nav-wrapper {
+        gap: 12px;
+    }
+    .logo-img {
+        width: 46px;
+        height: 46px;
+    }
+    .logo-text {
+        font-size: 19px;
+    }
+    .nav-menu ul {
+        gap: 3px;
+    }
     .nav-menu a {
         font-size: 12.5px;
         padding: 8px 9px;
     }
+    .nav-cbt-item {
+        margin-left: 6px;
+    }
     .nav-cbt-btn {
         padding: 8px 14px !important;
         font-size: 11.5px !important;
+        gap: 6px;
+    }
+    .nav-cbt-btn i {
+        font-size: 12px;
     }
 }
 
+/* --- Laptop tier 2: extra tightening for phone-desktop-mode widths --- */
+@media (max-width: 1000px) {
+    .nav-wrapper {
+        gap: 10px;
+    }
+    .logo {
+        flex-shrink: 0;
+    }
+    .logo-img {
+        width: 42px;
+        height: 42px;
+    }
+    .logo-text {
+        font-size: 17px;
+    }
+    .nav-menu ul {
+        gap: 2px;
+    }
+    .nav-menu a {
+        font-size: 11.5px;
+        padding: 7px 7px;
+        letter-spacing: 0.1px;
+    }
+    .nav-menu a::after {
+        left: 7px;
+        right: 7px;
+    }
+    .nav-cbt-item {
+        margin-left: 4px;
+    }
+    .nav-cbt-btn {
+        padding: 7px 12px !important;
+        font-size: 10.5px !important;
+        gap: 5px;
+    }
+    .nav-cbt-btn i {
+        font-size: 11px;
+    }
+}
+
+/* --- Hamburger breakpoint: tablets & phones --- */
 @media (max-width: 900px) {
     .hero {
         padding: 90px 0 80px;
@@ -3321,15 +3390,8 @@ html, body {
         grid-template-columns: 1fr 1fr;
         gap: 40px;
     }
-}
 
-/* ============================================
-   NAV COLLAPSE — laptops and below
-   Fixes nav cutoff at 1024–1440px widths.
-   Nav becomes a hamburger menu instead of a
-   cramped single row of 13 items.
-   ============================================ */
-@media (max-width: 1024px) {
+    /* ---- HAMBURGER NAVIGATION ---- */
     .utility-bar {
         display: none;
     }
@@ -3717,10 +3779,7 @@ html, body {
     display: none;
 }
 
-/* --- Hero stacking breakpoint: now 900px instead of 1100px ---
-   This keeps the side-by-side layout down to 900px,
-   which covers small laptops and phone-desktop-mode (~980px).
-   Below 900px, the hero stacks. */
+/* --- Hero stacking breakpoint: 900px (side-by-side down to 900px) --- */
 @media (max-width: 900px) {
     .hero > .container {
         grid-template-columns: 1fr;
