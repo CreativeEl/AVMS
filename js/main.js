@@ -163,25 +163,24 @@ function loadNewsTicker() {
             </a>`;
         }).join('');
 
-        // Put exactly TWO sets — current wave + next wave back-to-back.
-        // As set 1 scrolls off left, set 2 is already entering from right.
+        // Put exactly TWO sets back-to-back.
+        // As set 1 scrolls off left, set 2 is right behind it — no gap needed.
         track.innerHTML = oneSetHtml + oneSetHtml;
 
         // Measure after layout
         requestAnimationFrame(function() {
-            // Width of ONE set (each item, its gaps, and the inter-set gap)
+            // Width of ONE full set (all items + their gaps)
             const oneSetWidth = track.scrollWidth / 2;
 
-            // Speed in px/sec. Lower = slower, higher = faster.
+            // Speed in px/sec. Higher = faster.
             const speedPxPerSec = 140;
 
-            // One full wave = one set width scrolled past.
-            // Because set 2 is directly behind set 1, when set 1 has moved
-            // exactly oneSetWidth to the left, the visual state is identical
-            // to start — so the loop is seamless and continuous.
+            // One wave = one set width scrolling past.
+            // When the track has moved exactly oneSetWidth to the left, the
+            // visual state is identical to the start — so the loop is seamless.
             const waveDuration = oneSetWidth / speedPxPerSec;
 
-            // Inject dynamic keyframes sized to this track
+            // Inject dynamic keyframes matched to this track width
             const styleId = 'newsTickerKeyframes';
             let styleEl = document.getElementById(styleId);
             if (!styleEl) {
