@@ -4231,3 +4231,11 @@ html, body {
     .map-actions { padding: 20px; }
     .btn-directions { width: 100%; justify-content: center; }
 }
+@media (max-width: 768px) {
+    .map-section { padding: 50px 0; }
+    .map-header { padding: 25px 20px 15px; }
+    .map-header h2 { font-size: 22px; }
+    .map-frame iframe { height: 340px; }
+    .map-actions { padding: 20px; }
+    .btn-directions { width: 100%; justify-content: center; }
+}
