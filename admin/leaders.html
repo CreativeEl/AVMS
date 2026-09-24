@@ -15,7 +15,7 @@
         .btn-add:hover { background: #1F4E3D; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(31,78,61,0.2); }
 
         .table-container { background: white; border-radius: 12px; overflow-x: auto; border: 1px solid #f0ede0; box-shadow: 0 1px 3px rgba(31,78,61,0.04); }
-        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
         th { background: #FBF8EE; padding: 14px 15px; text-align: left; font-weight: 700; color: #1F4E3D; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #C9A961; }
         td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; }
         tr:hover { background: #FBF8EE; }
@@ -24,6 +24,8 @@
         .badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-active { background: #d4edda; color: #155724; }
         .badge-inactive { background: #f8d7da; color: #721c24; }
+        .badge-executive { background: #E8EFEA; color: #1F4E3D; }
+        .badge-senate { background: #F5F0DC; color: #A88943; }
 
         .btn-edit { background: #2D6B54; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; }
         .btn-edit:hover { background: #1F4E3D; }
@@ -51,68 +53,23 @@
 
         .photo-thumb { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #F5F0DC; display: flex; align-items: center; justify-content: center; font-size: 20px; overflow: hidden; border: 2px solid #C9A961; }
 
-        /* Image upload area */
-        .image-upload-area {
-            border: 2px dashed #C9A961;
-            border-radius: 10px;
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-            background: #FBF8EE;
-        }
+        .image-upload-area { border: 2px dashed #C9A961; border-radius: 10px; padding: 25px; text-align: center; transition: all 0.3s; cursor: pointer; background: #FBF8EE; }
         .image-upload-area:hover { border-color: #A88943; background: #F5F0DC; }
         .image-upload-area i { font-size: 40px; color: #2D6B54; margin-bottom: 10px; display: block; }
         .image-upload-area p { color: #555; margin-bottom: 5px; font-size: 14px; font-weight: 600; }
         .image-upload-area small { color: #888; font-size: 12px; }
         .image-upload-area input[type="file"] { display: none; }
 
-        .image-preview-box {
-            margin-top: 12px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid #C9A961;
-            background: #FBF8EE;
-            text-align: center;
-            padding: 15px;
-        }
-        .image-preview-box img {
-            max-width: 160px;
-            max-height: 160px;
-            border-radius: 50%;
-            object-fit: cover;
-            display: block;
-            margin: 0 auto 10px;
-            border: 3px solid #C9A961;
-        }
-        .image-preview-box .remove-btn {
-            background: #dc3545;
-            color: white;
-            padding: 6px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
+        .image-preview-box { margin-top: 12px; border-radius: 12px; overflow: hidden; border: 2px solid #C9A961; background: #FBF8EE; text-align: center; padding: 15px; }
+        .image-preview-box img { max-width: 160px; max-height: 160px; border-radius: 50%; object-fit: cover; display: block; margin: 0 auto 10px; border: 3px solid #C9A961; }
+        .image-preview-box .remove-btn { background: #dc3545; color: white; padding: 6px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
         .image-preview-box .remove-btn:hover { background: #c82333; }
 
-        /* Sidebar section labels */
-        .sidebar-section-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: #C9A961;
-            padding: 18px 20px 6px 20px;
-            user-select: none;
-            opacity: 0.85;
-        }
+        .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C9A961; padding: 18px 20px 6px 20px; user-select: none; opacity: 0.85; }
         .sidebar-section-label:first-child { padding-top: 4px; }
-        @media (max-width: 768px) {
-            .admin-sidebar .sidebar-section-label { display: none; }
-        }
+        @media (max-width: 768px) { .admin-sidebar .sidebar-section-label { display: none; } }
+
+        #classLevelGroup { display: none; }
     </style>
 </head>
 <body>
@@ -120,11 +77,9 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <!-- OVERVIEW -->
                 <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
-                <!-- CONTENT -->
                 <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html" class="active"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
@@ -135,25 +90,21 @@
                 <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
                 <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
 
-                <!-- PAGES -->
                 <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
 
-                <!-- CBT PORTAL -->
                 <div class="sidebar-section-label">CBT Portal</div>
                 <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
                 <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
                 <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
 
-                <!-- ENGAGEMENT -->
                 <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
 
-                <!-- SYSTEM -->
                 <div class="sidebar-section-label">System</div>
                 <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -172,7 +123,7 @@
             </header>
 
             <div class="page-header">
-                <p>Add, edit, or remove executive members</p>
+                <p>Add, edit, or remove executives and senators</p>
                 <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Leader</button>
             </div>
 
@@ -183,20 +134,21 @@
                             <th>Photo</th>
                             <th>Name</th>
                             <th>Position</th>
+                            <th>Tier</th>
+                            <th>Class</th>
                             <th>Order</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="leadersTableBody">
-                        <tr><td colspan="6" class="empty-state">Loading leaders...</td></tr>
+                        <tr><td colspan="8" class="empty-state">Loading leaders...</td></tr>
                     </tbody>
                 </table>
             </div>
         </main>
     </div>
 
-    <!-- Add/Edit Modal -->
     <div class="modal" id="leaderModal">
         <div class="modal-content">
             <h2 id="modalTitle">Add Leader</h2>
@@ -204,7 +156,6 @@
                 <input type="hidden" id="editId" value="">
                 <input type="hidden" id="existingPhotoUrl" value="">
 
-                <!-- Photo Upload -->
                 <div class="form-group">
                     <label>Photo</label>
                     <div class="image-upload-area" onclick="document.getElementById('leaderPhotoInput').click()">
@@ -222,21 +173,47 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="leaderTier">Tier *</label>
+                    <select id="leaderTier" required onchange="handleTierChange()">
+                        <option value="executive">Executive</option>
+                        <option value="senate">Senate</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="leaderName">Name *</label>
                     <input type="text" id="leaderName" required placeholder="Enter full name">
                 </div>
+
                 <div class="form-group">
                     <label for="leaderPosition">Position *</label>
-                    <input type="text" id="leaderPosition" required placeholder="Enter position (e.g., President)">
+                    <input type="text" id="leaderPosition" required placeholder="e.g., President or Senator">
                 </div>
+
+                <div class="form-group" id="classLevelGroup">
+                    <label for="leaderClassLevel">Class Level</label>
+                    <select id="leaderClassLevel">
+                        <option value="">— Senate President (no class) —</option>
+                        <option value="100">100 Level</option>
+                        <option value="200">200 Level</option>
+                        <option value="300">300 Level</option>
+                        <option value="400">400 Level</option>
+                        <option value="500">500 Level</option>
+                        <option value="600">600 Level</option>
+                    </select>
+                    <small style="color:#888; font-size:12px; display:block; margin-top:6px;">Leave blank for Senate President</small>
+                </div>
+
                 <div class="form-group">
                     <label for="leaderBio">Biography</label>
                     <textarea id="leaderBio" placeholder="Enter biography..."></textarea>
                 </div>
+
                 <div class="form-group">
                     <label for="leaderOrder">Display Order</label>
                     <input type="number" id="leaderOrder" value="0" placeholder="0 = first">
                 </div>
+
                 <div class="form-group">
                     <label for="leaderStatus">Status</label>
                     <select id="leaderStatus">
@@ -244,6 +221,7 @@
                         <option value="false">Inactive</option>
                     </select>
                 </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
                     <button type="submit" class="btn-save" id="saveLeaderBtn">Save Leader</button>
@@ -254,9 +232,6 @@
 
     <script src="../js/config.js"></script>
     <script>
-        // ============================================
-        // AUTH
-        // ============================================
         const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
         const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
         if (!adminLoggedIn) { window.location.href = 'index.html'; }
@@ -274,14 +249,8 @@
             window.location.href = 'index.html';
         });
 
-        // ============================================
-        // PHOTO STATE
-        // ============================================
         let pendingPhotoFile = null;
 
-        // ============================================
-        // LOAD LEADERS
-        // ============================================
         async function loadLeaders() {
             const tbody = document.getElementById('leadersTableBody');
             if (!tbody) return;
@@ -289,12 +258,14 @@
                 const { data, error } = await supabase
                     .from('leaders')
                     .select('*')
+                    .order('tier', { ascending: true })
+                    .order('class_level', { ascending: true, nullsFirst: true })
                     .order('display_order', { ascending: true });
 
                 if (error) throw error;
 
                 if (!data || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No leaders found. Click "Add Leader" to create one.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No leaders found. Click "Add Leader" to create one.</td></tr>`;
                     return;
                 }
 
@@ -309,6 +280,8 @@
                         </td>
                         <td><strong>${leader.name}</strong></td>
                         <td>${leader.position}</td>
+                        <td><span class="badge ${leader.tier === 'senate' ? 'badge-senate' : 'badge-executive'}">${leader.tier === 'senate' ? 'Senate' : 'Executive'}</span></td>
+                        <td>${leader.class_level ? leader.class_level + ' Level' : '—'}</td>
                         <td>${leader.display_order || 0}</td>
                         <td><span class="badge ${leader.is_active ? 'badge-active' : 'badge-inactive'}">${leader.is_active ? 'Active' : 'Inactive'}</span></td>
                         <td>
@@ -319,19 +292,29 @@
                 `).join('');
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Error: ${error.message}</td></tr>`;
             }
         }
 
-        // ============================================
-        // MODAL
-        // ============================================
+        function handleTierChange() {
+            const tier = document.getElementById('leaderTier').value;
+            const classGroup = document.getElementById('classLevelGroup');
+            if (tier === 'senate') {
+                classGroup.style.display = 'block';
+            } else {
+                classGroup.style.display = 'none';
+                document.getElementById('leaderClassLevel').value = '';
+            }
+        }
+
         function openAddModal() {
             document.getElementById('modalTitle').textContent = 'Add Leader';
             document.getElementById('editId').value = '';
             document.getElementById('existingPhotoUrl').value = '';
             document.getElementById('leaderForm').reset();
             document.getElementById('leaderStatus').value = 'true';
+            document.getElementById('leaderTier').value = 'executive';
+            document.getElementById('classLevelGroup').style.display = 'none';
             pendingPhotoFile = null;
             document.getElementById('photoPreviewBox').style.display = 'none';
             document.getElementById('uploadAreaText').textContent = 'Click to upload a photo';
@@ -349,8 +332,12 @@
                 document.getElementById('leaderBio').value = data.biography || '';
                 document.getElementById('leaderOrder').value = data.display_order || 0;
                 document.getElementById('leaderStatus').value = data.is_active ? 'true' : 'false';
+                document.getElementById('leaderTier').value = data.tier || 'executive';
+                document.getElementById('leaderClassLevel').value = data.class_level || '';
                 document.getElementById('existingPhotoUrl').value = data.photo_url || '';
                 pendingPhotoFile = null;
+
+                handleTierChange();
 
                 if (data.photo_url) {
                     document.getElementById('photoPreviewImg').src = data.photo_url;
@@ -370,9 +357,6 @@
             pendingPhotoFile = null;
         }
 
-        // ============================================
-        // PHOTO HANDLERS
-        // ============================================
         function handlePhotoSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -430,9 +414,6 @@
             return urlData.publicUrl;
         }
 
-        // ============================================
-        // SAVE LEADER
-        // ============================================
         document.getElementById('leaderForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
@@ -443,11 +424,14 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             try {
-                // Upload new photo if selected
                 let photoUrl = document.getElementById('existingPhotoUrl').value || null;
                 if (pendingPhotoFile) {
                     photoUrl = await uploadPhoto(pendingPhotoFile);
                 }
+
+                const tier = document.getElementById('leaderTier').value;
+                const classLevelRaw = document.getElementById('leaderClassLevel').value;
+                const classLevel = classLevelRaw ? parseInt(classLevelRaw) : null;
 
                 const data = {
                     name: document.getElementById('leaderName').value,
@@ -455,7 +439,9 @@
                     biography: document.getElementById('leaderBio').value,
                     display_order: parseInt(document.getElementById('leaderOrder').value) || 0,
                     is_active: document.getElementById('leaderStatus').value === 'true',
-                    photo_url: photoUrl
+                    photo_url: photoUrl,
+                    tier: tier,
+                    class_level: tier === 'senate' ? classLevel : null
                 };
 
                 let result;
@@ -477,9 +463,6 @@
             }
         });
 
-        // ============================================
-        // DELETE
-        // ============================================
         async function deleteLeader(id) {
             if (!confirm('Are you sure you want to delete this leader?')) return;
             try {
@@ -492,9 +475,6 @@
             }
         }
 
-        // ============================================
-        // INIT
-        // ============================================
         loadLeaders();
 
         document.getElementById('leaderModal').addEventListener('click', function(e) {
