@@ -4490,3 +4490,176 @@ html, body {
     padding-bottom: 8px;
     border-bottom: 2px solid var(--gold);
 }
+/* ============================================
+   SENATE / PARLIAMENT SECTION
+   ============================================ */
+.senate-section {
+    padding: 100px 0;
+    background: var(--cream-light);
+}
+
+.senate-president-block {
+    margin-bottom: 56px;
+}
+
+.senate-president-block:last-child {
+    margin-bottom: 0;
+}
+
+.senate-tier-heading {
+    font-family: var(--font-display);
+    font-size: 22px;
+    color: var(--green-deep);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--gold);
+}
+
+.senate-tier-heading i {
+    color: var(--gold);
+    font-size: 20px;
+}
+
+.senate-class-group {
+    margin-bottom: 40px;
+}
+
+.senate-class-group:last-child {
+    margin-bottom: 0;
+}
+
+.senate-class-heading {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--green-mid);
+    margin-bottom: 16px;
+    padding-left: 14px;
+    position: relative;
+    letter-spacing: 0.3px;
+}
+
+.senate-class-heading::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 20px;
+    background: var(--gold);
+}
+
+.senate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.senate-grid--president {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    max-width: 320px;
+}
+
+.senator-card {
+    background: var(--white);
+    padding: 24px 18px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--line-soft);
+    border-bottom: 3px solid var(--green-mid);
+    text-align: center;
+    transition: all var(--t-base);
+}
+
+.senator-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--line);
+}
+
+.senator-card--president {
+    border-bottom: 3px solid var(--gold);
+    background: linear-gradient(180deg, #FBF8EE 0%, var(--white) 100%);
+    box-shadow: 0 4px 20px rgba(201, 169, 97, 0.15);
+}
+
+.senator-card--president:hover {
+    box-shadow: 0 8px 28px rgba(201, 169, 97, 0.28);
+}
+
+.senator-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: var(--cream);
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--green-mid);
+    font-size: 32px;
+    overflow: hidden;
+    border: 3px solid var(--gold);
+}
+
+.senator-card--president .senator-photo {
+    width: 110px;
+    height: 110px;
+    border-color: var(--gold-deep);
+    box-shadow: 0 4px 12px rgba(201, 169, 97, 0.3);
+}
+
+.senator-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.senator-card h4 {
+    font-family: var(--font-display);
+    color: var(--green-deep);
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.senator-card--president h4 {
+    font-size: 18px;
+}
+
+.senator-class {
+    color: var(--red-deep);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.senator-card--president .senator-class {
+    color: var(--gold-deep);
+    font-size: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .senate-section { padding: 64px 0; }
+    .senate-tier-heading { font-size: 18px; }
+    .senate-class-heading { font-size: 16px; }
+    .senate-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 14px;
+    }
+    .senator-photo { width: 72px; height: 72px; font-size: 26px; }
+    .senator-card--president .senator-photo { width: 90px; height: 90px; }
+    .senator-card h4 { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+    .senate-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
