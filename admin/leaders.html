@@ -70,6 +70,53 @@
         @media (max-width: 768px) { .admin-sidebar .sidebar-section-label { display: none; } }
 
         #classLevelGroup { display: none; }
+
+        /* --- Section wrappers --- */
+        .leaders-section { margin-bottom: 40px; }
+        .leaders-section:last-child { margin-bottom: 0; }
+
+        .leaders-section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: Georgia, serif;
+            font-size: 22px;
+            color: #1F4E3D;
+            font-weight: 700;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #C9A961;
+        }
+
+        .leaders-section-heading i {
+            color: #C9A961;
+            font-size: 20px;
+        }
+
+        .leaders-section-heading--senate {
+            border-bottom-color: #A88943;
+        }
+
+        .leaders-section-heading--senate i {
+            color: #A88943;
+        }
+
+        .leaders-count-badge {
+            margin-left: auto;
+            background: #F5F0DC;
+            color: #A88943;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 999px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .leaders-section-heading--senate .leaders-count-badge {
+            background: #FBF8EE;
+            color: #1F4E3D;
+        }
     </style>
 </head>
 <body>
@@ -127,24 +174,57 @@
                 <button class="btn-add" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Leader</button>
             </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Photo</th>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Tier</th>
-                            <th>Class</th>
-                            <th>Order</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leadersTableBody">
-                        <tr><td colspan="8" class="empty-state">Loading leaders...</td></tr>
-                    </tbody>
-                </table>
+            <!-- EXECUTIVE COUNCIL SECTION -->
+            <div class="leaders-section">
+                <h2 class="leaders-section-heading">
+                    <i class="fas fa-users"></i>
+                    Executive Council
+                    <span class="leaders-count-badge" id="execCountBadge">0</span>
+                </h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Order</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="executivesTableBody">
+                            <tr><td colspan="6" class="empty-state">Loading executives...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SENATE / PARLIAMENT SECTION -->
+            <div class="leaders-section">
+                <h2 class="leaders-section-heading leaders-section-heading--senate">
+                    <i class="fas fa-landmark"></i>
+                    Senate / Parliament
+                    <span class="leaders-count-badge" id="senateCountBadge">0</span>
+                </h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Photo</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Class</th>
+                                <th>Order</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="senatorsTableBody">
+                            <tr><td colspan="7" class="empty-state">Loading senators...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
@@ -252,48 +332,89 @@
         let pendingPhotoFile = null;
 
         async function loadLeaders() {
-            const tbody = document.getElementById('leadersTableBody');
-            if (!tbody) return;
+            const execBody = document.getElementById('executivesTableBody');
+            const senateBody = document.getElementById('senatorsTableBody');
+            if (!execBody || !senateBody) return;
+
             try {
                 const { data, error } = await supabase
                     .from('leaders')
                     .select('*')
-                    .order('tier', { ascending: true })
                     .order('class_level', { ascending: true, nullsFirst: true })
                     .order('display_order', { ascending: true });
 
                 if (error) throw error;
 
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No leaders found. Click "Add Leader" to create one.</td></tr>`;
-                    return;
-                }
+                const all = data || [];
+                const executives = all.filter(l => l.tier !== 'senate');
+                const senators = all.filter(l => l.tier === 'senate');
 
-                tbody.innerHTML = data.map(leader => `
-                    <tr>
-                        <td>
-                            <div class="photo-thumb">
-                                ${leader.photo_url
-                                    ? `<img src="${leader.photo_url}" style="width:100%;height:100%;object-fit:cover;">`
-                                    : '👤'}
-                            </div>
-                        </td>
-                        <td><strong>${leader.name}</strong></td>
-                        <td>${leader.position}</td>
-                        <td><span class="badge ${leader.tier === 'senate' ? 'badge-senate' : 'badge-executive'}">${leader.tier === 'senate' ? 'Senate' : 'Executive'}</span></td>
-                        <td>${leader.class_level ? leader.class_level + ' Level' : '—'}</td>
-                        <td>${leader.display_order || 0}</td>
-                        <td><span class="badge ${leader.is_active ? 'badge-active' : 'badge-inactive'}">${leader.is_active ? 'Active' : 'Inactive'}</span></td>
-                        <td>
-                            <button class="btn-edit" onclick="editLeader(${leader.id})"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn-delete" onclick="deleteLeader(${leader.id})"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
+                document.getElementById('execCountBadge').textContent = executives.length;
+                document.getElementById('senateCountBadge').textContent = senators.length;
+
+                renderExecutives(executives, execBody);
+                renderSenators(senators, senateBody);
+
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Error: ${error.message}</td></tr>`;
+                execBody.innerHTML = `<tr><td colspan="6" class="empty-state">Error: ${error.message}</td></tr>`;
+                senateBody.innerHTML = `<tr><td colspan="7" class="empty-state">Error: ${error.message}</td></tr>`;
             }
+        }
+
+        function renderExecutives(list, tbody) {
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No executives yet. Click "Add Leader" and set Tier = Executive.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(leader => `
+                <tr>
+                    <td>
+                        <div class="photo-thumb">
+                            ${leader.photo_url
+                                ? `<img src="${leader.photo_url}" style="width:100%;height:100%;object-fit:cover;">`
+                                : '👤'}
+                        </div>
+                    </td>
+                    <td><strong>${leader.name || '—'}</strong></td>
+                    <td>${leader.position || '—'}</td>
+                    <td>${leader.display_order || 0}</td>
+                    <td><span class="badge ${leader.is_active ? 'badge-active' : 'badge-inactive'}">${leader.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <button class="btn-edit" onclick="editLeader(${leader.id})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" onclick="deleteLeader(${leader.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderSenators(list, tbody) {
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No senators yet. Click "Add Leader" and set Tier = Senate.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(leader => `
+                <tr>
+                    <td>
+                        <div class="photo-thumb">
+                            ${leader.photo_url
+                                ? `<img src="${leader.photo_url}" style="width:100%;height:100%;object-fit:cover;">`
+                                : '👤'}
+                        </div>
+                    </td>
+                    <td><strong>${leader.name || '—'}</strong></td>
+                    <td>${leader.position || '—'}</td>
+                    <td>${leader.class_level ? leader.class_level + ' Level' : '—'}</td>
+                    <td>${leader.display_order || 0}</td>
+                    <td><span class="badge ${leader.is_active ? 'badge-active' : 'badge-inactive'}">${leader.is_active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <button class="btn-edit" onclick="editLeader(${leader.id})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn-delete" onclick="deleteLeader(${leader.id})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         function handleTierChange() {
