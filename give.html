@@ -123,38 +123,12 @@
         </div>
     </section>
 
-    <!-- CURRENT PROJECTS -->
+    <!-- CURRENT PROJECTS (now populated by js/give.js) -->
     <section class="current-projects">
         <div class="container">
             <h2 class="section-title section-title-center">Current Projects &amp; Campaigns</h2>
-            <div class="projects-grid">
-                <div class="project-card">
-                    <div class="project-icon"><i class="fas fa-book"></i></div>
-                    <h3>Veterinary Library Fund</h3>
-                    <p>Help us expand our veterinary reference library with modern resources.</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 65%;"></div>
-                    </div>
-                    <p class="progress-text">65% funded • Target: ₦2,000,000</p>
-                </div>
-                <div class="project-card">
-                    <div class="project-icon"><i class="fas fa-stethoscope"></i></div>
-                    <h3>Community Outreach Program</h3>
-                    <p>Fund free veterinary services for local communities.</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 40%;"></div>
-                    </div>
-                    <p class="progress-text">40% funded • Target: ₦1,500,000</p>
-                </div>
-                <div class="project-card">
-                    <div class="project-icon"><i class="fas fa-laptop"></i></div>
-                    <h3>Student Tech Fund</h3>
-                    <p>Provide laptops and digital resources for students.</p>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 25%;"></div>
-                    </div>
-                    <p class="progress-text">25% funded • Target: ₦3,000,000</p>
-                </div>
+            <div class="projects-grid" id="projectsContainer">
+                <div class="loading">⏳ Loading projects...</div>
             </div>
         </div>
     </section>
