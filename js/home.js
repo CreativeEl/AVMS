@@ -127,6 +127,9 @@ async function loadEvents() {
 
 // ============================================
 // 3. LOAD LEADERS
+// Shows only executives on the homepage.
+// Senators (tier = 'senate') are excluded —
+// they appear on leadership.html instead.
 // ============================================
 async function loadLeaders() {
     const container = document.getElementById('leadersContainer');
@@ -139,6 +142,7 @@ async function loadLeaders() {
             .from('leaders')
             .select('*')
             .eq('is_active', true)
+            .eq('tier', 'executive')
             .order('display_order', { ascending: true })
             .limit(4);
             
