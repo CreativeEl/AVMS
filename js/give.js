@@ -5,8 +5,12 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔍 Give page loaded');
     initDonationForm();
+    loadProjects();
 });
 
+// ============================================
+// 1. DONATION FORM (unchanged)
+// ============================================
 function initDonationForm() {
     const form = document.getElementById('donationForm');
     if (!form) {
@@ -97,4 +101,77 @@ function initDonationForm() {
             submitBtn.disabled = false;
         }
     });
+}
+
+// ============================================
+// 2. LOAD PROJECTS (new)
+// Reads give_proj{1,2,3}_* values from site_settings
+// ============================================
+async function loadProjects() {
+    const container = document.getElementById('projectsContainer');
+    if (!container) return;
+
+    try {
+        const { data, error } = await supabase
+            .from('site_settings')
+            .select('*')
+            .in('setting_key', [
+                'give_proj1_icon', 'give_proj1_title', 'give_proj1_desc', 'give_proj1_progress', 'give_proj1_target',
+                'give_proj2_icon', 'give_proj2_title', 'give_proj2_desc', 'give_proj2_progress', 'give_proj2_target',
+                'give_proj3_icon', 'give_proj3_title', 'give_proj3_desc', 'give_proj3_progress', 'give_proj3_target'
+            ]);
+
+        if (error) throw error;
+
+        const settings = {};
+        (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
+
+        // Build project list — only include those with a title
+        const projects = [1, 2, 3]
+            .map(i => ({
+                icon:     settings[`give_proj${i}_icon`]     || 'fa-book',
+                title:    settings[`give_proj${i}_title`]    || '',
+                desc:     settings[`give_proj${i}_desc`]     || '',
+                progress: parseInt(settings[`give_proj${i}_progress`]) || 0,
+                target:   settings[`give_proj${i}_target`]   || ''
+            }))
+            .filter(p => p.title);
+
+        if (projects.length === 0) {
+            container.innerHTML = `
+                <div class="project-card" style="grid-column: 1 / -1; text-align: center;">
+                    <p style="color: #888;">No active campaigns at the moment. Check back soon.</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = projects.map(p => {
+            // Cap the visual bar at 100% but keep the real % in the text
+            const barWidth = Math.min(Math.max(p.progress, 0), 100);
+            const iconClass = p.icon.startsWith('fa-') ? p.icon : 'fa-book';
+
+            return `
+                <div class="project-card">
+                    <div class="project-icon"><i class="fas ${iconClass}"></i></div>
+                    <h3>${p.title}</h3>
+                    <p>${p.desc}</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${barWidth}%;"></div>
+                    </div>
+                    <p class="progress-text">${p.progress}% funded${p.target ? ' • Target: ' + p.target : ''}</p>
+                </div>
+            `;
+        }).join('');
+
+        console.log('✅ Projects loaded:', projects.length);
+
+    } catch (error) {
+        console.error('❌ Error loading projects:', error);
+        container.innerHTML = `
+            <div class="project-card" style="grid-column: 1 / -1; text-align: center;">
+                <p style="color: #e8491d;">⚠️ Could not load projects. Please try again later.</p>
+            </div>
+        `;
+    }
 }
