@@ -8,16 +8,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* ============================================
+           FIX: Sidebar footer (Logout) always visible
+           Works in desktop-mode-on-phone too
+           ============================================ */
+        .admin-sidebar {
+            max-height: 100vh;
+            display: flex !important;
+            flex-direction: column;
+        }
+        .sidebar-nav {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+        }
+        .sidebar-footer {
+            flex: 0 0 auto;
+            background: #1F4E3D;
+            z-index: 10;
+            border-top: 1px solid rgba(201, 169, 97, 0.3);
+        }
+
+        /* ============================================
+           FIX: Settings tabs — single line, horizontal scroll
+           Prevents wrapping in desktop mode which was
+           pushing the sidebar footer off-screen
+           ============================================ */
         .settings-tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 25px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             background: white;
             padding: 10px;
             border-radius: 12px;
             border: 1px solid #f0ede0;
             box-shadow: 0 1px 3px rgba(31,78,61,0.04);
+        }
+        .settings-tabs::-webkit-scrollbar {
+            height: 6px;
+        }
+        .settings-tabs::-webkit-scrollbar-thumb {
+            background: #C9A961;
+            border-radius: 3px;
         }
         .tab-btn {
             padding: 12px 24px;
@@ -32,6 +67,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            flex-shrink: 0;
         }
         .tab-btn:hover {
             background: #FBF8EE;
@@ -214,7 +250,6 @@
             margin-right: 8px;
         }
 
-        /* Image Upload Styles */
         .image-upload-area {
             border: 2px dashed #C9A961;
             border-radius: 10px;
@@ -297,7 +332,6 @@
             background: #c82333;
         }
 
-        /* Logo Preview */
         .logo-preview-box {
             display: flex;
             align-items: center;
@@ -338,7 +372,6 @@
             font-size: 13px;
         }
 
-        /* Loading spinner */
         .spinner {
             display: inline-block;
             width: 16px;
@@ -353,7 +386,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* ===== SIDEBAR SECTION LABELS ===== */
         .sidebar-section-label {
             font-size: 10px;
             font-weight: 700;
@@ -366,7 +398,6 @@
         }
         .sidebar-section-label:first-child { padding-top: 4px; }
 
-        /* ===== HERO SLIDESHOW SLOTS ===== */
         .slideshow-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -498,10 +529,6 @@
             .settings-card {
                 padding: 20px;
             }
-            .settings-tabs {
-                overflow-x: auto;
-                flex-wrap: nowrap;
-            }
             .tab-btn {
                 padding: 10px 16px;
                 font-size: 13px;
@@ -519,6 +546,12 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             .admin-sidebar .sidebar-section-label { display: none; }
+            .sidebar-footer a {
+                justify-content: center;
+            }
+            .sidebar-footer a i {
+                font-size: 18px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -602,9 +635,6 @@
                 </button>
             </div>
 
-            <!-- ============================================
-                 TAB 1: GENERAL
-                 ============================================ -->
             <div class="tab-content active" id="tab-general">
                 <div class="info-note">
                     <i class="fas fa-info-circle"></i>
@@ -642,9 +672,6 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 TAB 2: BRANDING
-                 ============================================ -->
             <div class="tab-content" id="tab-branding">
                 <div class="info-note">
                     <i class="fas fa-info-circle"></i>
@@ -758,9 +785,6 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 TAB 3: CONTACT
-                 ============================================ -->
             <div class="tab-content" id="tab-contact">
                 <div class="info-note">
                     <i class="fas fa-info-circle"></i>
@@ -814,9 +838,6 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 TAB 4: SOCIAL MEDIA
-                 ============================================ -->
             <div class="tab-content" id="tab-social">
                 <div class="info-note">
                     <i class="fas fa-info-circle"></i>
@@ -866,9 +887,6 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 TAB 5: HOMEPAGE
-                 ============================================ -->
             <div class="tab-content" id="tab-homepage">
                 <div class="info-note">
                     <i class="fas fa-info-circle"></i>
@@ -936,9 +954,6 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 TAB 6: FOOTER
-                 ============================================ -->
             <div class="tab-content" id="tab-footer">
                 <div class="info-note">
                     <i class="fas fa-info-circle"></i>
@@ -976,9 +991,6 @@
                 </div>
             </div>
 
-            <!-- ============================================
-                 TAB 7: ADMIN
-                 ============================================ -->
             <div class="tab-content" id="tab-admin">
                 <div class="info-note">
                     <i class="fas fa-shield-alt"></i>
@@ -1050,27 +1062,20 @@
 
     <script src="../js/config.js"></script>
     <script>
-        // ============================================
-        // AUTH CHECK (uses real Supabase Auth)
-        // ============================================
         let currentAdminEmail = '';
 
         async function initAuth() {
             const { data: { session } } = await supabase.auth.getSession();
 
             if (!session) {
-                // Fallback: legacy bridge flags
                 const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
                 if (!legacy) {
                     window.location.href = 'index.html';
                     return;
                 }
-                // Bridge user
                 currentAdminEmail = localStorage.getItem('adminEmail') || 'Admin';
             } else {
                 currentAdminEmail = session.user.email || 'Admin';
-
-                // Fill last sign in
                 const lastSignIn = session.user.last_sign_in_at
                     ? new Date(session.user.last_sign_in_at).toLocaleString()
                     : 'Unknown';
@@ -1086,9 +1091,6 @@
             }
         }
 
-        // ============================================
-        // LOGOUT (uses real signOut)
-        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', async function(e) {
             e.preventDefault();
             try {
@@ -1104,20 +1106,12 @@
             window.location.href = 'index.html';
         });
 
-        // ============================================
-        // TAB SWITCHING
-        // ============================================
         function switchTab(tabName, btn) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-
             document.getElementById('tab-' + tabName).classList.add('active');
             btn.classList.add('active');
         }
-
-        // ============================================
-        // HELPER FUNCTIONS
-        // ============================================
 
         async function saveSetting(key, value) {
             const { error } = await supabase
@@ -1151,9 +1145,6 @@
             btn.innerHTML = original;
         }
 
-        // ============================================
-        // FILE UPLOAD TO SUPABASE STORAGE
-        // ============================================
         async function uploadImage(file, folder) {
             const timestamp = Date.now();
             const fileExt = file.name.split('.').pop();
@@ -1185,9 +1176,6 @@
             return urlData.publicUrl;
         }
 
-        // ============================================
-        // CHANGE PASSWORD
-        // ============================================
         document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
@@ -1196,7 +1184,6 @@
             const confirmPassword = document.getElementById('confirmPassword').value;
             const btn = document.getElementById('savePasswordBtn');
 
-            // Validate new password matches
             if (newPassword !== confirmPassword) {
                 showMessage('passwordMessage', 'error', '❌ New passwords do not match.');
                 return;
@@ -1210,7 +1197,6 @@
             const original = showLoading(btn, 'Updating...');
 
             try {
-                // Step 1: Verify current password by re-authenticating
                 const { data: { session } } = await supabase.auth.getSession();
                 const email = session?.user?.email || currentAdminEmail;
 
@@ -1227,7 +1213,6 @@
                     throw new Error('Current password is incorrect.');
                 }
 
-                // Step 2: Update to new password
                 const { error: updateError } = await supabase.auth.updateUser({
                     password: newPassword
                 });
@@ -1237,8 +1222,6 @@
                 }
 
                 showMessage('passwordMessage', 'success', '✅ Password updated successfully!');
-
-                // Clear the form
                 document.getElementById('changePasswordForm').reset();
 
             } catch (error) {
@@ -1248,14 +1231,10 @@
             }
         });
 
-        // ============================================
-        // GENERAL INFORMATION
-        // ============================================
         document.getElementById('generalForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveGeneralBtn');
             const original = showLoading(btn);
-
             try {
                 await saveSetting('site_name', document.getElementById('siteName').value);
                 await saveSetting('site_short_name', document.getElementById('siteShortName').value);
@@ -1269,9 +1248,6 @@
             }
         });
 
-        // ============================================
-        // LOGO UPLOAD
-        // ============================================
         let pendingLogoFile = null;
 
         function handleLogoUpload(event) {
@@ -1331,9 +1307,6 @@
             }
         }
 
-        // ============================================
-        // FAVICON UPLOAD
-        // ============================================
         let pendingFaviconFile = null;
 
         function handleFaviconUpload(event) {
@@ -1393,9 +1366,6 @@
             }
         }
 
-        // ============================================
-        // HERO SLIDESHOW
-        // ============================================
         const SLIDESHOW_SLOTS = 6;
         let slideshowUrls = new Array(SLIDESHOW_SLOTS).fill('');
         let pendingSlideFiles = new Array(SLIDESHOW_SLOTS).fill(null);
@@ -1507,7 +1477,6 @@
                             }
                         }
                     } catch (e) {
-                        // ignore parse errors
                     }
                 }
 
@@ -1518,9 +1487,6 @@
             }
         }
 
-        // ============================================
-        // HERO IMAGE UPLOAD (Legacy)
-        // ============================================
         let pendingHeroImageFile = null;
 
         function handleHeroImageUpload(event) {
@@ -1559,9 +1525,6 @@
             }
         }
 
-        // ============================================
-        // ABOUT IMAGE UPLOAD
-        // ============================================
         let pendingAboutImageFile = null;
 
         function handleAboutImageUpload(event) {
@@ -1600,9 +1563,6 @@
             }
         }
 
-        // ============================================
-        // CONTACT FORM
-        // ============================================
         document.getElementById('contactForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveContactBtn');
@@ -1623,9 +1583,6 @@
             }
         });
 
-        // ============================================
-        // SOCIAL MEDIA
-        // ============================================
         document.getElementById('socialForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveSocialBtn');
@@ -1645,9 +1602,6 @@
             }
         });
 
-        // ============================================
-        // HOMEPAGE
-        // ============================================
         document.getElementById('homepageForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveHomepageBtn');
@@ -1672,9 +1626,6 @@
             }
         });
 
-        // ============================================
-        // FOOTER
-        // ============================================
         document.getElementById('footerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveFooterBtn');
@@ -1692,9 +1643,6 @@
             }
         });
 
-        // ============================================
-        // LOAD EXISTING SETTINGS
-        // ============================================
         async function loadSettings() {
             try {
                 const { data, error } = await supabase.from('site_settings').select('*');
@@ -1758,9 +1706,6 @@
             }
         }
 
-        // ============================================
-        // INIT
-        // ============================================
         initAuth();
         loadSettings();
         loadSlideshow();
