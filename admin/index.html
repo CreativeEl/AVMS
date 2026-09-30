@@ -253,10 +253,18 @@
             const errorDiv = document.getElementById('loginError');
             const submitBtn = document.getElementById('loginBtn');
 
-            // If already logged in via Supabase, skip to dashboard
+            // If already logged in via Supabase, restore flags then go to dashboard
             supabase.auth.getSession().then(({ data }) => {
                 if (data && data.session) {
-                    console.log('✅ Existing session found');
+                    console.log('✅ Existing Supabase session found — restoring bridge flags');
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    sessionStorage.setItem('adminSession', JSON.stringify({
+                        email: data.session.user.email,
+                        loggedIn: true,
+                        timestamp: Date.now()
+                    }));
+                    localStorage.setItem('adminEmail', data.session.user.email);
                     window.location.href = 'dashboard.html';
                     return;
                 }
