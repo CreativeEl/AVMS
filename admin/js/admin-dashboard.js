@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
 });
 
+// ============================================
+// AUTH CHECK
+// ============================================
 async function checkAuth() {
     try {
         // 1. Try real Supabase session first
@@ -28,6 +31,9 @@ async function checkAuth() {
             sessionStorage.setItem('adminLoggedIn', 'true');
             localStorage.setItem('adminEmail', email);
 
+            // Reveal the page
+            document.body.classList.add('authed');
+
             loadStats();
             loadRecentActivity();
             return;
@@ -42,6 +48,10 @@ async function checkAuth() {
                     console.log('⚠️ Using legacy session bridge');
                     const nameEl = document.getElementById('adminName');
                     if (nameEl) nameEl.textContent = (parsed.email || '').split('@')[0];
+
+                    // Reveal the page
+                    document.body.classList.add('authed');
+
                     loadStats();
                     loadRecentActivity();
                     return;
@@ -61,21 +71,20 @@ async function checkAuth() {
     }
 }
 
+// ============================================
+// LOAD STATS
+// ============================================
 async function loadStats() {
     try {
-        // Count leaders
         const { count: leaders } = await supabase.from('leaders').select('*', { count: 'exact', head: true });
         document.getElementById('statLeaders').textContent = leaders || 0;
 
-        // Count announcements
         const { count: announcements } = await supabase.from('announcements').select('*', { count: 'exact', head: true });
         document.getElementById('statAnnouncements').textContent = announcements || 0;
 
-        // Count events
         const { count: events } = await supabase.from('events').select('*', { count: 'exact', head: true });
         document.getElementById('statEvents').textContent = events || 0;
 
-        // Count pending applications
         const { count: applications } = await supabase
             .from('membership_applications')
             .select('*', { count: 'exact', head: true })
@@ -87,11 +96,14 @@ async function loadStats() {
     }
 }
 
+// ============================================
+// LOAD RECENT ACTIVITY
+// ============================================
 async function loadRecentActivity() {
     const container = document.getElementById('recentActivity');
+    if (!container) return;
 
     try {
-        // Get recent applications
         const { data: applications } = await supabase
             .from('membership_applications')
             .select('*')
@@ -122,7 +134,9 @@ async function loadRecentActivity() {
     }
 }
 
-// Logout
+// ============================================
+// LOGOUT
+// ============================================
 document.getElementById('logoutBtn').addEventListener('click', async function(e) {
     e.preventDefault();
     try {
