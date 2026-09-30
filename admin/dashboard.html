@@ -111,6 +111,22 @@
         .activity-status.rejected { background: #f8d7da; color: #721c24; }
         .activity-time { color: #888; font-size: 12px; }
 
+        /* ===== AUTH GUARD — hide content until verified ===== */
+        body:not(.authed) .admin-wrapper { display: none; }
+        body.authed .auth-checking {
+            display: none;
+        }
+        .auth-checking {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1F4E3D;
+            font-size: 16px;
+            font-weight: 600;
+            background: #FBF8EE;
+        }
+
         @media (max-width: 768px) {
             .admin-sidebar { width: 60px; }
             .admin-sidebar .sidebar-header h2 { display: none; }
@@ -127,7 +143,9 @@
         }
     </style>
 </head>
-<body>
+<body class="">
+    <div class="auth-checking">🔐 Verifying session...</div>
+
     <div class="admin-wrapper">
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
@@ -238,90 +256,6 @@
     </div>
 
     <script src="../js/config.js"></script>
-    <script>
-        // ============================================
-        // AUTH CHECK - CHECK BOTH STORAGES
-        // ============================================
-        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
-        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-        
-        console.log('🔐 Auth check - Logged in:', adminLoggedIn);
-        
-        if (!adminLoggedIn) {
-            console.log('❌ Not logged in, redirecting to login...');
-            window.location.href = 'index.html';
-        } else {
-            console.log('✅ Logged in as:', adminEmail);
-            const adminNameEl = document.getElementById('adminName');
-            if (adminNameEl) adminNameEl.textContent = adminEmail?.split('@')[0] || 'Admin';
-        }
-
-        // ============================================
-        // LOGOUT
-        // ============================================
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            localStorage.removeItem('adminLoggedIn');
-            localStorage.removeItem('adminEmail');
-            sessionStorage.removeItem('adminLoggedIn');
-            sessionStorage.removeItem('adminEmail');
-            window.location.href = 'index.html';
-        });
-
-        // ============================================
-        // LOAD STATS
-        // ============================================
-        async function loadStats() {
-            try {
-                const { count: leaders } = await supabase.from('leaders').select('*', { count: 'exact', head: true });
-                document.getElementById('statLeaders').textContent = leaders || 0;
-
-                const { count: announcements } = await supabase.from('announcements').select('*', { count: 'exact', head: true });
-                document.getElementById('statAnnouncements').textContent = announcements || 0;
-
-                const { count: events } = await supabase.from('events').select('*', { count: 'exact', head: true });
-                document.getElementById('statEvents').textContent = events || 0;
-
-                const { count: applications } = await supabase
-                    .from('membership_applications')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'pending');
-                document.getElementById('statApplications').textContent = applications || 0;
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-
-        // ============================================
-        // LOAD RECENT ACTIVITY
-        // ============================================
-        async function loadActivity() {
-            const container = document.getElementById('recentActivity');
-            try {
-                const { data } = await supabase
-                    .from('membership_applications')
-                    .select('*')
-                    .order('applied_at', { ascending: false })
-                    .limit(5);
-
-                if (data && data.length > 0) {
-                    container.innerHTML = data.map(app => `
-                        <div class="activity-item">
-                            <span><strong>${app.first_name} ${app.surname}</strong> applied for membership</span>
-                            <span class="activity-status ${app.status}">${app.status}</span>
-                            <span class="activity-time">${new Date(app.applied_at).toLocaleDateString()}</span>
-                        </div>
-                    `).join('');
-                } else {
-                    container.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">No recent activity</p>';
-                }
-            } catch (error) {
-                container.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">Could not load activity</p>';
-            }
-        }
-
-        loadStats();
-        loadActivity();
-    </script>
+    <script src="js/admin-dashboard.js"></script>
 </body>
 </html>
