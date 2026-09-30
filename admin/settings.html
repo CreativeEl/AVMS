@@ -533,11 +533,9 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <!-- ===== OVERVIEW ===== -->
                 <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
-                <!-- ===== CONTENT ===== -->
                 <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
@@ -548,25 +546,21 @@
                 <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
                 <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
 
-                <!-- ===== PAGES ===== -->
                 <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
 
-                <!-- ===== CBT PORTAL ===== -->
                 <div class="sidebar-section-label">CBT Portal</div>
                 <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
                 <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
                 <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
 
-                <!-- ===== ENGAGEMENT ===== -->
                 <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
 
-                <!-- ===== SYSTEM ===== -->
                 <div class="sidebar-section-label">System</div>
                 <a href="settings.html" class="active"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -584,7 +578,6 @@
                 </div>
             </header>
 
-            <!-- Tabs -->
             <div class="settings-tabs">
                 <button class="tab-btn active" onclick="switchTab('general', this)">
                     <i class="fas fa-building"></i> General
@@ -708,9 +701,6 @@
                     <div class="save-message" id="faviconMessage"></div>
                 </div>
 
-                <!-- ============================================
-                     HERO SLIDESHOW
-                     ============================================ -->
                 <div class="settings-card">
                     <h2><i class="fas fa-images"></i> Hero Slideshow (Homepage)</h2>
                     <div class="info-note" style="margin-bottom: 20px;">
@@ -719,7 +709,6 @@
                     </div>
 
                     <div class="slideshow-grid" id="slideshowGrid">
-                        <!-- 6 slots injected by JS -->
                     </div>
 
                     <div class="settings-actions">
@@ -991,9 +980,9 @@
                  TAB 7: ADMIN
                  ============================================ -->
             <div class="tab-content" id="tab-admin">
-                <div class="warning-note">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Important:</strong> Admin credentials are stored in the code. To change them, edit <code>admin/index.html</code> on GitHub.
+                <div class="info-note">
+                    <i class="fas fa-shield-alt"></i>
+                    Your admin panel uses <strong>Supabase Authentication</strong>. Credentials are stored securely in Supabase — not in the code.
                 </div>
 
                 <div class="settings-card">
@@ -1004,25 +993,45 @@
                         <small>This is the email you logged in with</small>
                     </div>
                     <div class="form-group">
-                        <label>Admin Login Time</label>
+                        <label>Last Sign In</label>
                         <input type="text" id="adminLoginTime" readonly style="background: #FBF8EE;">
                     </div>
                 </div>
 
                 <div class="settings-card">
-                    <h2><i class="fas fa-key"></i> How to Change Admin Credentials</h2>
-                    <div style="line-height: 1.8; color: #555;">
-                        <p>1. Go to your GitHub repository</p>
-                        <p>2. Open <code>admin/index.html</code></p>
-                        <p>3. Find the <code>admins</code> array in the JavaScript section</p>
-                        <p>4. Update or add new admin credentials:</p>
-                        <pre style="background: #1F4E3D; color: #fff; padding: 15px; border-radius: 8px; overflow-x: auto; margin-top: 10px; font-size: 13px;">
-const admins = [
-    { email: 'admin@avmsabu.com', password: 'newpassword123' },
-    { email: 'youremail@example.com', password: 'yourpassword' }
-];</pre>
-                        <p style="margin-top: 15px;">5. Commit the changes</p>
-                        <p>6. Wait 1-2 minutes for Vercel to deploy</p>
+                    <h2><i class="fas fa-key"></i> Change Password</h2>
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <input type="password" id="currentPassword" placeholder="Enter your current password" required autocomplete="current-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <input type="password" id="newPassword" placeholder="Enter new password (min 6 characters)" required autocomplete="new-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Re-enter new password" required autocomplete="new-password">
+                        </div>
+                        <div class="settings-actions">
+                            <button type="submit" class="btn-save" id="savePasswordBtn">
+                                <i class="fas fa-key"></i> Update Password
+                            </button>
+                        </div>
+                        <div class="save-message" id="passwordMessage"></div>
+                    </form>
+                </div>
+
+                <div class="settings-card">
+                    <h2><i class="fas fa-users-cog"></i> Managing Admin Users</h2>
+                    <div style="line-height: 1.8; color: #555; font-size: 14px;">
+                        <p>To add or remove admin users, go to your Supabase Auth dashboard:</p>
+                        <p style="margin-top: 12px;">
+                            <a href="https://supabase.com/dashboard/project/tlkqzhudnpdnbxaltwbs/auth/users" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 8px; background: #1F4E3D; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                                <i class="fas fa-external-link-alt"></i> Open Supabase Auth Dashboard
+                            </a>
+                        </p>
+                        <p style="margin-top: 12px; color: #888; font-size: 13px;">From there, you can invite new admins, reset their passwords, or remove access.</p>
                     </div>
                 </div>
 
@@ -1030,8 +1039,8 @@ const admins = [
                     <h2><i class="fas fa-database"></i> System Information</h2>
                     <div style="line-height: 2; color: #555; font-size: 14px;">
                         <p><strong>Supabase URL:</strong> <span id="supabaseUrlDisplay" style="color: #2D6B54;"></span></p>
-                        <p><strong>Website URL:</strong> <a href="https://avms-abu.vercel.app" target="_blank" style="color: #2D6B54;">https://avms-abu.vercel.app</a></p>
-                        <p><strong>Admin Panel URL:</strong> <a href="https://avms-abu.vercel.app/admin/index.html" target="_blank" style="color: #2D6B54;">/admin/index.html</a></p>
+                        <p><strong>Website URL:</strong> <a href="https://avms-three.vercel.app" target="_blank" style="color: #2D6B54;">https://avms-three.vercel.app</a></p>
+                        <p><strong>Admin Panel URL:</strong> <a href="https://avms-three.vercel.app/admin/index.html" target="_blank" style="color: #2D6B54;">/admin/index.html</a></p>
                     </div>
                 </div>
             </div>
@@ -1042,29 +1051,56 @@ const admins = [
     <script src="../js/config.js"></script>
     <script>
         // ============================================
-        // AUTH CHECK
+        // AUTH CHECK (uses real Supabase Auth)
         // ============================================
-        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
-        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        let currentAdminEmail = '';
 
-        if (!adminLoggedIn) {
-            window.location.href = 'index.html';
-        } else {
-            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
-            document.getElementById('currentAdminEmail').value = adminEmail || 'Unknown';
-            document.getElementById('adminLoginTime').value = new Date().toLocaleString();
+        async function initAuth() {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session) {
+                // Fallback: legacy bridge flags
+                const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+                if (!legacy) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                // Bridge user
+                currentAdminEmail = localStorage.getItem('adminEmail') || 'Admin';
+            } else {
+                currentAdminEmail = session.user.email || 'Admin';
+
+                // Fill last sign in
+                const lastSignIn = session.user.last_sign_in_at
+                    ? new Date(session.user.last_sign_in_at).toLocaleString()
+                    : 'Unknown';
+                document.getElementById('adminLoginTime').value = lastSignIn;
+            }
+
+            document.getElementById('adminName').textContent = currentAdminEmail.split('@')[0] || 'Admin';
+            document.getElementById('currentAdminEmail').value = currentAdminEmail;
             document.getElementById('supabaseUrlDisplay').textContent = SUPABASE_URL;
+
+            if (!document.getElementById('adminLoginTime').value) {
+                document.getElementById('adminLoginTime').value = new Date().toLocaleString();
+            }
         }
 
         // ============================================
-        // LOGOUT
+        // LOGOUT (uses real signOut)
         // ============================================
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
             e.preventDefault();
+            try {
+                await supabase.auth.signOut();
+            } catch (err) {
+                console.warn('signOut failed:', err);
+            }
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('adminEmail');
             sessionStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminSession');
             window.location.href = 'index.html';
         });
 
@@ -1148,6 +1184,69 @@ const admins = [
 
             return urlData.publicUrl;
         }
+
+        // ============================================
+        // CHANGE PASSWORD
+        // ============================================
+        document.getElementById('changePasswordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const btn = document.getElementById('savePasswordBtn');
+
+            // Validate new password matches
+            if (newPassword !== confirmPassword) {
+                showMessage('passwordMessage', 'error', '❌ New passwords do not match.');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showMessage('passwordMessage', 'error', '❌ New password must be at least 6 characters.');
+                return;
+            }
+
+            const original = showLoading(btn, 'Updating...');
+
+            try {
+                // Step 1: Verify current password by re-authenticating
+                const { data: { session } } = await supabase.auth.getSession();
+                const email = session?.user?.email || currentAdminEmail;
+
+                if (!email) {
+                    throw new Error('Could not determine your email. Please log out and back in.');
+                }
+
+                const { error: signInError } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: currentPassword
+                });
+
+                if (signInError) {
+                    throw new Error('Current password is incorrect.');
+                }
+
+                // Step 2: Update to new password
+                const { error: updateError } = await supabase.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (updateError) {
+                    throw updateError;
+                }
+
+                showMessage('passwordMessage', 'success', '✅ Password updated successfully!');
+
+                // Clear the form
+                document.getElementById('changePasswordForm').reset();
+
+            } catch (error) {
+                showMessage('passwordMessage', 'error', '❌ ' + error.message);
+            } finally {
+                hideLoading(btn, original);
+            }
+        });
 
         // ============================================
         // GENERAL INFORMATION
@@ -1659,6 +1758,10 @@ const admins = [
             }
         }
 
+        // ============================================
+        // INIT
+        // ============================================
+        initAuth();
         loadSettings();
         loadSlideshow();
     </script>
