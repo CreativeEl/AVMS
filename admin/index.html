@@ -299,13 +299,17 @@
 
                     console.log('✅ Login successful for:', data.user.email);
 
-                    // Store email for pre-fill on next visit (not the session — Supabase handles that)
+                    // Store email for pre-fill on next visit
                     localStorage.setItem('adminEmail', email);
 
-                    // Clean up old fake-auth flags so nothing else relies on them
-                    localStorage.removeItem('adminLoggedIn');
-                    sessionStorage.removeItem('adminLoggedIn');
-                    sessionStorage.removeItem('adminSession');
+                    // Bridge: set old flags so unupdated pages still work
+                    localStorage.setItem('adminLoggedIn', 'true');
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    sessionStorage.setItem('adminSession', JSON.stringify({
+                        email: data.user.email,
+                        loggedIn: true,
+                        timestamp: Date.now()
+                    }));
 
                     // Redirect to dashboard
                     window.location.href = 'dashboard.html';
