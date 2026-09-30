@@ -11,15 +11,25 @@ function initLogin() {
     const form = document.getElementById('loginForm');
     const errorDiv = document.getElementById('loginError');
 
+    // If no login form, this page isn't the login page — do nothing.
+    // (Guards against this script accidentally being loaded on other admin pages.)
     if (!form) {
-        console.error('❌ Login form not found');
+        console.log('ℹ️ No login form on this page — skipping login logic');
         return;
     }
 
-    // Check if already logged in via Supabase
+    // If already logged in via Supabase, restore flags then go to dashboard
     supabase.auth.getSession().then(({ data }) => {
-        if (data && data.session) {
-            console.log('✅ Existing Supabase session — redirecting');
+        if (data && data.session && data.session.user) {
+            console.log('✅ Existing Supabase session — restoring bridge flags');
+            localStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminSession', JSON.stringify({
+                email: data.session.user.email,
+                loggedIn: true,
+                timestamp: Date.now()
+            }));
+            localStorage.setItem('adminEmail', data.session.user.email);
             window.location.href = 'dashboard.html';
         }
     });
@@ -59,6 +69,11 @@ function initLogin() {
             // Bridge: keep old flags so pages not yet updated still work
             localStorage.setItem('adminLoggedIn', 'true');
             sessionStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminSession', JSON.stringify({
+                email: data.user.email,
+                loggedIn: true,
+                timestamp: Date.now()
+            }));
 
             window.location.href = 'dashboard.html';
 
