@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -153,6 +155,12 @@
             transform: translateY(0);
         }
 
+        .login-box .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .login-box .error-msg {
             background: #f8d7da;
             color: #721c24;
@@ -228,7 +236,7 @@
                     <label for="adminPassword">Password</label>
                     <input type="password" id="adminPassword" name="adminPassword" placeholder="Enter your password" required autocomplete="current-password">
                 </div>
-                <button type="submit" class="btn">Sign In</button>
+                <button type="submit" class="btn" id="loginBtn">Sign In</button>
             </form>
 
             <div class="login-footer">
@@ -243,42 +251,72 @@
 
             const form = document.getElementById('loginForm');
             const errorDiv = document.getElementById('loginError');
+            const submitBtn = document.getElementById('loginBtn');
 
-            // Pre-fill from session if "remember" flag exists
-            const rememberedEmail = localStorage.getItem('adminEmail');
-            if (rememberedEmail) {
-                document.getElementById('adminEmail').value = rememberedEmail;
-                document.getElementById('adminPassword').focus();
-            } else {
-                document.getElementById('adminEmail').focus();
-            }
+            // If already logged in via Supabase, skip to dashboard
+            supabase.auth.getSession().then(({ data }) => {
+                if (data && data.session) {
+                    console.log('✅ Existing session found');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                // Pre-fill from previous session if "remember" flag exists
+                const rememberedEmail = localStorage.getItem('adminEmail');
+                if (rememberedEmail) {
+                    document.getElementById('adminEmail').value = rememberedEmail;
+                    document.getElementById('adminPassword').focus();
+                } else {
+                    document.getElementById('adminEmail').focus();
+                }
+            });
 
-            form.addEventListener('submit', function(e) {
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 errorDiv.classList.remove('show');
 
-                const email = document.getElementById('adminEmail').value;
+                const email = document.getElementById('adminEmail').value.trim();
                 const password = document.getElementById('adminPassword').value;
 
-                const admins = [
-                    { email: 'admin@avmsabu.com', password: 'admin123' },
-                    { email: 'avms@abu.edu.ng', password: 'avms2024' }
-                ];
+                // Show loading state
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = 'Signing in...';
 
-                const admin = admins.find(a => a.email === email && a.password === password);
+                try {
+                    const { data, error } = await supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
 
-                if (admin) {
-                    console.log('✅ Login successful!');
-                    localStorage.setItem('adminLoggedIn', 'true');
+                    if (error) {
+                        console.error('❌ Login error:', error.message);
+                        errorDiv.textContent = '❌ ' + (error.message || 'Invalid email or password.');
+                        errorDiv.classList.add('show');
+                        document.getElementById('adminPassword').value = '';
+                        document.getElementById('adminPassword').focus();
+                        return;
+                    }
+
+                    console.log('✅ Login successful for:', data.user.email);
+
+                    // Store email for pre-fill on next visit (not the session — Supabase handles that)
                     localStorage.setItem('adminEmail', email);
-                    sessionStorage.setItem('adminLoggedIn', 'true');
-                    sessionStorage.setItem('adminEmail', email);
+
+                    // Clean up old fake-auth flags so nothing else relies on them
+                    localStorage.removeItem('adminLoggedIn');
+                    sessionStorage.removeItem('adminLoggedIn');
+                    sessionStorage.removeItem('adminSession');
+
+                    // Redirect to dashboard
                     window.location.href = 'dashboard.html';
-                } else {
-                    errorDiv.textContent = '❌ Invalid email or password.';
+
+                } catch (err) {
+                    console.error('❌ Unexpected error:', err);
+                    errorDiv.textContent = '❌ Something went wrong. Please try again.';
                     errorDiv.classList.add('show');
-                    document.getElementById('adminPassword').value = '';
-                    document.getElementById('adminPassword').focus();
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
                 }
             });
         });
