@@ -5,23 +5,58 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔍 Admin dashboard loaded');
     checkAuth();
-    loadStats();
-    loadRecentActivity();
 });
 
-function checkAuth() {
-    const session = sessionStorage.getItem('adminSession');
-    if (!session) {
-        window.location.href = 'index.html';
-        return;
-    }
+async function checkAuth() {
     try {
-        const data = JSON.parse(session);
-        if (!data.loggedIn) {
-            window.location.href = 'index.html';
+        // 1. Try real Supabase session first
+        const { data, error } = await supabase.auth.getSession();
+
+        if (data && data.session && data.session.user) {
+            console.log('✅ Supabase session found:', data.session.user.email);
+            const email = data.session.user.email || '';
+            const nameEl = document.getElementById('adminName');
+            if (nameEl) nameEl.textContent = email.split('@')[0];
+
+            // Bridge: keep old flags fresh so un-updated pages still work
+            sessionStorage.setItem('adminSession', JSON.stringify({
+                email: email,
+                loggedIn: true,
+                timestamp: Date.now()
+            }));
+            localStorage.setItem('adminLoggedIn', 'true');
+            sessionStorage.setItem('adminLoggedIn', 'true');
+            localStorage.setItem('adminEmail', email);
+
+            loadStats();
+            loadRecentActivity();
+            return;
         }
-        document.getElementById('adminName').textContent = data.email.split('@')[0];
-    } catch (e) {
+
+        // 2. Fallback: accept old bridge flag (only for pages mid-migration)
+        const legacy = sessionStorage.getItem('adminSession');
+        if (legacy) {
+            try {
+                const parsed = JSON.parse(legacy);
+                if (parsed && parsed.loggedIn) {
+                    console.log('⚠️ Using legacy session bridge');
+                    const nameEl = document.getElementById('adminName');
+                    if (nameEl) nameEl.textContent = (parsed.email || '').split('@')[0];
+                    loadStats();
+                    loadRecentActivity();
+                    return;
+                }
+            } catch (e) {
+                console.warn('Bad legacy session payload:', e);
+            }
+        }
+
+        // 3. Neither worked — send to login
+        console.log('🚫 Not authenticated — redirecting to login');
+        window.location.href = 'index.html';
+
+    } catch (err) {
+        console.error('❌ Auth check failed:', err);
         window.location.href = 'index.html';
     }
 }
@@ -54,7 +89,7 @@ async function loadStats() {
 
 async function loadRecentActivity() {
     const container = document.getElementById('recentActivity');
-    
+
     try {
         // Get recent applications
         const { data: applications } = await supabase
@@ -88,8 +123,16 @@ async function loadRecentActivity() {
 }
 
 // Logout
-document.getElementById('logoutBtn').addEventListener('click', function(e) {
+document.getElementById('logoutBtn').addEventListener('click', async function(e) {
     e.preventDefault();
+    try {
+        await supabase.auth.signOut();
+    } catch (err) {
+        console.warn('signOut failed (continuing with local clear):', err);
+    }
     sessionStorage.removeItem('adminSession');
+    sessionStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminEmail');
     window.location.href = 'index.html';
 });
