@@ -92,10 +92,14 @@
             }
         });
 
-        // Close when a nav link is tapped (so it doesn't stay open across page load)
+        // Close when a nav link is tapped.
+        // Also closes on the Logout button (href="#") so the drawer
+        // doesn't stay visibly open while the redirect fires.
         sidebar.addEventListener('click', function (e) {
             var link = e.target.closest('a');
-            if (link && link.getAttribute('href') && link.getAttribute('href') !== '#') {
+            if (!link) return;
+            var href = link.getAttribute('href');
+            if (href && (href !== '#' || link.id === 'logoutBtn')) {
                 closeDrawer();
             }
         });
