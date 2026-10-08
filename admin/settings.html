@@ -10,7 +10,6 @@
     <style>
         /* ============================================
            FIX: Sidebar footer (Logout) always visible
-           Works in desktop-mode-on-phone too
            ============================================ */
         .admin-sidebar {
             max-height: 100vh;
@@ -30,9 +29,7 @@
         }
 
         /* ============================================
-           FIX: Settings tabs — single line, horizontal scroll
-           Prevents wrapping in desktop mode which was
-           pushing the sidebar footer off-screen
+           Settings tabs — single line, horizontal scroll
            ============================================ */
         .settings-tabs {
             display: flex;
@@ -47,13 +44,8 @@
             border: 1px solid #f0ede0;
             box-shadow: 0 1px 3px rgba(31,78,61,0.04);
         }
-        .settings-tabs::-webkit-scrollbar {
-            height: 6px;
-        }
-        .settings-tabs::-webkit-scrollbar-thumb {
-            background: #C9A961;
-            border-radius: 3px;
-        }
+        .settings-tabs::-webkit-scrollbar { height: 6px; }
+        .settings-tabs::-webkit-scrollbar-thumb { background: #C9A961; border-radius: 3px; }
         .tab-btn {
             padding: 12px 24px;
             border: none;
@@ -69,33 +61,16 @@
             gap: 8px;
             flex-shrink: 0;
         }
-        .tab-btn:hover {
-            background: #FBF8EE;
-            color: #1F4E3D;
-        }
-        .tab-btn.active {
-            background: #1F4E3D;
-            color: white;
-        }
-        .tab-btn i {
-            font-size: 16px;
-        }
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.4s ease;
-        }
-        .tab-content.active {
-            display: block;
-        }
+        .tab-btn:hover { background: #FBF8EE; color: #1F4E3D; }
+        .tab-btn.active { background: #1F4E3D; color: white; }
+        .tab-btn i { font-size: 16px; }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 25px;
-        }
+        .settings-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
         .settings-card {
             background: white;
             border-radius: 12px;
@@ -115,22 +90,10 @@
             gap: 10px;
             font-weight: 700;
         }
-        .settings-card h2 i {
-            color: #C9A961;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .form-row-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-        .form-group {
-            margin-bottom: 18px;
-        }
+        .settings-card h2 i { color: #C9A961; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 18px; }
         .form-group label {
             display: block;
             font-weight: 600;
@@ -158,16 +121,8 @@
             border-color: #C9A961;
             box-shadow: 0 0 0 3px rgba(201,169,97,0.15);
         }
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        .form-group small {
-            display: block;
-            color: #888;
-            font-size: 12px;
-            margin-top: 5px;
-        }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .form-group small { display: block; color: #888; font-size: 12px; margin-top: 5px; }
         .btn-save {
             background: #2D6B54;
             color: white;
@@ -187,11 +142,7 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(31,78,61,0.2);
         }
-        .btn-save:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .save-message {
             margin-top: 15px;
             padding: 12px 20px;
@@ -199,31 +150,11 @@
             display: none;
             font-weight: 500;
         }
-        .save-message.show {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-        .save-message.success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-        .save-message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-        .save-message.info {
-            background: #FBF8EE;
-            color: #1F4E3D;
-            border-left: 4px solid #C9A961;
-        }
-        .settings-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
-            gap: 10px;
-        }
+        .save-message.show { display: block; animation: fadeIn 0.3s ease; }
+        .save-message.success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .save-message.error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .save-message.info { background: #FBF8EE; color: #1F4E3D; border-left: 4px solid #C9A961; }
+        .settings-actions { display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px; }
         .info-note {
             background: #FBF8EE;
             color: #1F4E3D;
@@ -233,10 +164,7 @@
             border-left: 4px solid #C9A961;
             font-size: 14px;
         }
-        .info-note i {
-            margin-right: 8px;
-            color: #C9A961;
-        }
+        .info-note i { margin-right: 8px; color: #C9A961; }
         .warning-note {
             background: #fff3cd;
             color: #856404;
@@ -246,9 +174,7 @@
             border-left: 4px solid #C9A961;
             font-size: 14px;
         }
-        .warning-note i {
-            margin-right: 8px;
-        }
+        .warning-note i { margin-right: 8px; }
 
         .image-upload-area {
             border: 2px dashed #C9A961;
@@ -260,33 +186,12 @@
             background: #FBF8EE;
             margin-bottom: 15px;
         }
-        .image-upload-area:hover {
-            border-color: #A88943;
-            background: #F5F0DC;
-        }
-        .image-upload-area.dragover {
-            border-color: #8B1A1A;
-            background: #fff5f2;
-        }
-        .image-upload-area i {
-            font-size: 48px;
-            color: #2D6B54;
-            margin-bottom: 15px;
-            display: block;
-        }
-        .image-upload-area p {
-            color: #555;
-            margin-bottom: 10px;
-            font-size: 15px;
-            font-weight: 600;
-        }
-        .image-upload-area small {
-            color: #888;
-            font-size: 12px;
-        }
-        .image-upload-area input[type="file"] {
-            display: none;
-        }
+        .image-upload-area:hover { border-color: #A88943; background: #F5F0DC; }
+        .image-upload-area.dragover { border-color: #8B1A1A; background: #fff5f2; }
+        .image-upload-area i { font-size: 48px; color: #2D6B54; margin-bottom: 15px; display: block; }
+        .image-upload-area p { color: #555; margin-bottom: 10px; font-size: 15px; font-weight: 600; }
+        .image-upload-area small { color: #888; font-size: 12px; }
+        .image-upload-area input[type="file"] { display: none; }
         .image-preview {
             display: flex;
             align-items: center;
@@ -305,18 +210,9 @@
             object-fit: contain;
             background: white;
         }
-        .image-preview .preview-info {
-            flex: 1;
-        }
-        .image-preview .preview-info p {
-            color: #555;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        .image-preview .preview-info small {
-            color: #888;
-            font-size: 12px;
-        }
+        .image-preview .preview-info { flex: 1; }
+        .image-preview .preview-info p { color: #555; font-size: 14px; margin-bottom: 5px; }
+        .image-preview .preview-info small { color: #888; font-size: 12px; }
         .image-preview .remove-btn {
             background: #dc3545;
             color: white;
@@ -328,9 +224,7 @@
             font-weight: 600;
             transition: background 0.2s;
         }
-        .image-preview .remove-btn:hover {
-            background: #c82333;
-        }
+        .image-preview .remove-btn:hover { background: #c82333; }
 
         .logo-preview-box {
             display: flex;
@@ -356,21 +250,14 @@
             flex-shrink: 0;
             border: 2px solid #C9A961;
         }
-        .logo-preview-box .logo-display img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .logo-preview-box .logo-display img { width: 100%; height: 100%; object-fit: cover; }
         .logo-preview-box .logo-info h4 {
             color: #1F4E3D;
             font-size: 16px;
             margin-bottom: 5px;
             font-family: Georgia, serif;
         }
-        .logo-preview-box .logo-info p {
-            color: #888;
-            font-size: 13px;
-        }
+        .logo-preview-box .logo-info p { color: #888; font-size: 13px; }
 
         .spinner {
             display: inline-block;
@@ -382,21 +269,7 @@
             animation: spin 0.8s ease-in-out infinite;
             margin-right: 8px;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .sidebar-section-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: #C9A961;
-            padding: 18px 20px 6px 20px;
-            user-select: none;
-            opacity: 0.85;
-        }
-        .sidebar-section-label:first-child { padding-top: 4px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .slideshow-grid {
             display: grid;
@@ -404,7 +277,6 @@
             gap: 16px;
             margin-top: 20px;
         }
-
         .slide-slot {
             background: #FBF8EE;
             border: 2px solid #e3e0d2;
@@ -414,16 +286,11 @@
             position: relative;
             aspect-ratio: 16 / 10;
         }
-
-        .slide-slot.has-image {
-            border-color: #2D6B54;
-        }
-
+        .slide-slot.has-image { border-color: #2D6B54; }
         .slide-slot:hover {
             border-color: #C9A961;
             box-shadow: 0 4px 15px rgba(201,169,97,0.15);
         }
-
         .slide-slot-number {
             position: absolute;
             top: 8px;
@@ -436,7 +303,6 @@
             font-weight: 700;
             z-index: 2;
         }
-
         .slide-slot-inner {
             width: 100%;
             height: 100%;
@@ -449,7 +315,6 @@
             text-align: center;
             position: relative;
         }
-
         .slide-slot-inner img {
             width: 100%;
             height: 100%;
@@ -457,19 +322,13 @@
             position: absolute;
             inset: 0;
         }
-
-        .slide-slot-placeholder {
-            color: #888;
-            font-size: 13px;
-        }
-
+        .slide-slot-placeholder { color: #888; font-size: 13px; }
         .slide-slot-placeholder i {
             font-size: 28px;
             color: #C9A961;
             margin-bottom: 8px;
             display: block;
         }
-
         .slide-slot-actions {
             position: absolute;
             bottom: 8px;
@@ -478,7 +337,6 @@
             gap: 6px;
             z-index: 2;
         }
-
         .slide-slot-remove {
             background: rgba(220, 53, 69, 0.95);
             color: white;
@@ -493,11 +351,7 @@
             justify-content: center;
             transition: background 0.2s;
         }
-
-        .slide-slot-remove:hover {
-            background: #c82333;
-        }
-
+        .slide-slot-remove:hover { background: #c82333; }
         .slide-slot-replace {
             position: absolute;
             inset: 0;
@@ -513,55 +367,85 @@
             font-weight: 600;
             z-index: 1;
         }
+        .slide-slot:hover .slide-slot-replace { display: flex; }
+        .slide-slot-replace i { font-size: 20px; }
 
-        .slide-slot:hover .slide-slot-replace {
+        /* ===== AUTH GUARD — hide content until verified ===== */
+        body:not(.authed) .admin-wrapper { display: none; }
+        body.authed .auth-checking { display: none; }
+        .auth-checking {
+            min-height: 100vh;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1F4E3D;
+            font-size: 16px;
+            font-weight: 600;
+            background: #FBF8EE;
         }
 
-        .slide-slot-replace i {
-            font-size: 20px;
-        }
+        /* ===== MOBILE SIDEBAR (HAMBURGER DRAWER) ===== */
+        .admin-hamburger,
+        .admin-overlay { display: none; }
 
         @media (max-width: 768px) {
-            .form-row, .form-row-3 {
-                grid-template-columns: 1fr;
+            .admin-hamburger {
+                display: flex; align-items: center; justify-content: center;
+                position: fixed; top: 14px; left: 14px;
+                width: 44px; height: 44px; border-radius: 50%;
+                background: #1F4E3D; color: white;
+                border: 2px solid #C9A961; cursor: pointer;
+                z-index: 1100; font-size: 18px;
+                box-shadow: 0 4px 12px rgba(31,78,61,0.25);
+                transition: transform 0.18s, background 0.18s;
+                padding: 0; -webkit-tap-highlight-color: transparent;
             }
-            .settings-card {
-                padding: 20px;
+            .admin-hamburger:active { transform: scale(0.94); background: #2D6B54; }
+
+            .admin-overlay {
+                display: block; position: fixed; inset: 0;
+                background: rgba(20, 47, 37, 0.6);
+                backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+                opacity: 0; pointer-events: none;
+                transition: opacity 0.28s; z-index: 1050;
             }
-            .tab-btn {
-                padding: 10px 16px;
-                font-size: 13px;
-                white-space: nowrap;
+            .admin-overlay.open { opacity: 1; pointer-events: auto; }
+
+            .admin-sidebar {
+                width: 280px; max-width: 85vw;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1060;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.2);
             }
-            .logo-preview-box {
-                flex-direction: column;
-                text-align: center;
-            }
-            .image-preview {
-                flex-direction: column;
-                text-align: center;
-            }
-            .slideshow-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            .admin-sidebar .sidebar-section-label { display: none; }
-            .sidebar-footer a {
-                justify-content: center;
-            }
-            .sidebar-footer a i {
-                font-size: 18px;
-            }
+            .admin-sidebar.open { transform: translateX(0); }
+
+            .admin-sidebar .sidebar-header h2 { display: block; font-size: 20px; }
+            .admin-sidebar .sidebar-nav a span,
+            .admin-sidebar .sidebar-footer a span { display: inline; }
+            .admin-sidebar .sidebar-section-label { display: block; }
+
+            .admin-main { margin-left: 0; padding: 70px 18px 18px 18px; }
+
+            body.admin-sidebar-locked { overflow: hidden; }
+
+            /* Settings page responsive rules */
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
+            .settings-card { padding: 20px; }
+            .tab-btn { padding: 10px 16px; font-size: 13px; white-space: nowrap; }
+            .logo-preview-box { flex-direction: column; text-align: center; }
+            .image-preview { flex-direction: column; text-align: center; }
+            .slideshow-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 480px) {
-            .slideshow-grid {
-                grid-template-columns: 1fr;
-            }
+            .slideshow-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body>
+<body class="">
+    <div class="auth-checking">🔐 Verifying session...</div>
+
     <div class="admin-wrapper">
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
@@ -1035,19 +919,6 @@
                 </div>
 
                 <div class="settings-card">
-                    <h2><i class="fas fa-users-cog"></i> Managing Admin Users</h2>
-                    <div style="line-height: 1.8; color: #555; font-size: 14px;">
-                        <p>To add or remove admin users, go to your Supabase Auth dashboard:</p>
-                        <p style="margin-top: 12px;">
-                            <a href="https://supabase.com/dashboard/project/tlkqzhudnpdnbxaltwbs/auth/users" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 8px; background: #1F4E3D; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600;">
-                                <i class="fas fa-external-link-alt"></i> Open Supabase Auth Dashboard
-                            </a>
-                        </p>
-                        <p style="margin-top: 12px; color: #888; font-size: 13px;">From there, you can invite new admins, reset their passwords, or remove access.</p>
-                    </div>
-                </div>
-
-                <div class="settings-card">
                     <h2><i class="fas fa-database"></i> System Information</h2>
                     <div style="line-height: 2; color: #555; font-size: 14px;">
                         <p><strong>Supabase URL:</strong> <span id="supabaseUrlDisplay" style="color: #2D6B54;"></span></p>
@@ -1065,6 +936,7 @@
         let currentAdminEmail = '';
 
         async function initAuth() {
+            const nameEl = document.getElementById('adminName');
             const { data: { session } } = await supabase.auth.getSession();
 
             if (!session) {
@@ -1082,7 +954,8 @@
                 document.getElementById('adminLoginTime').value = lastSignIn;
             }
 
-            document.getElementById('adminName').textContent = currentAdminEmail.split('@')[0] || 'Admin';
+            document.body.classList.add('authed');
+            if (nameEl) nameEl.textContent = currentAdminEmail.split('@')[0] || 'Admin';
             document.getElementById('currentAdminEmail').value = currentAdminEmail;
             document.getElementById('supabaseUrlDisplay').textContent = SUPABASE_URL;
 
@@ -1710,5 +1583,6 @@
         loadSettings();
         loadSlideshow();
     </script>
+    <script src="js/admin-sidebar.js"></script>
 </body>
 </html>
