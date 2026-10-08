@@ -5,6 +5,24 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔍 Admin dashboard loaded');
     checkAuth();
+
+    // Logout — attach once DOM is ready so the button definitely exists
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            try {
+                await supabase.auth.signOut();
+            } catch (err) {
+                console.warn('signOut failed (continuing with local clear):', err);
+            }
+            sessionStorage.removeItem('adminSession');
+            sessionStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            window.location.href = 'index.html';
+        });
+    }
 });
 
 // ============================================
@@ -133,20 +151,3 @@ async function loadRecentActivity() {
         container.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">Could not load activity</p>';
     }
 }
-
-// ============================================
-// LOGOUT
-// ============================================
-document.getElementById('logoutBtn').addEventListener('click', async function(e) {
-    e.preventDefault();
-    try {
-        await supabase.auth.signOut();
-    } catch (err) {
-        console.warn('signOut failed (continuing with local clear):', err);
-    }
-    sessionStorage.removeItem('adminSession');
-    sessionStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminLoggedIn');
-    localStorage.removeItem('adminEmail');
-    window.location.href = 'index.html';
-});
