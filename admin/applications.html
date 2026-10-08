@@ -57,24 +57,70 @@
         .search-box { padding: 10px 15px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; width: 250px; transition: all 0.2s; }
         .search-box:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
 
-        /* ===== SIDEBAR SECTION LABELS ===== */
-        .sidebar-section-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: #C9A961;
-            padding: 18px 20px 6px 20px;
-            user-select: none;
-            opacity: 0.85;
+        /* ===== AUTH GUARD — hide content until verified ===== */
+        body:not(.authed) .admin-wrapper { display: none; }
+        body.authed .auth-checking { display: none; }
+        .auth-checking {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1F4E3D;
+            font-size: 16px;
+            font-weight: 600;
+            background: #FBF8EE;
         }
-        .sidebar-section-label:first-child { padding-top: 4px; }
+
+        /* ===== MOBILE SIDEBAR (HAMBURGER DRAWER) ===== */
+        .admin-hamburger,
+        .admin-overlay { display: none; }
+
         @media (max-width: 768px) {
-            .admin-sidebar .sidebar-section-label { display: none; }
+            .admin-hamburger {
+                display: flex; align-items: center; justify-content: center;
+                position: fixed; top: 14px; left: 14px;
+                width: 44px; height: 44px; border-radius: 50%;
+                background: #1F4E3D; color: white;
+                border: 2px solid #C9A961; cursor: pointer;
+                z-index: 1100; font-size: 18px;
+                box-shadow: 0 4px 12px rgba(31,78,61,0.25);
+                transition: transform 0.18s, background 0.18s;
+                padding: 0; -webkit-tap-highlight-color: transparent;
+            }
+            .admin-hamburger:active { transform: scale(0.94); background: #2D6B54; }
+
+            .admin-overlay {
+                display: block; position: fixed; inset: 0;
+                background: rgba(20, 47, 37, 0.6);
+                backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+                opacity: 0; pointer-events: none;
+                transition: opacity 0.28s; z-index: 1050;
+            }
+            .admin-overlay.open { opacity: 1; pointer-events: auto; }
+
+            .admin-sidebar {
+                width: 280px; max-width: 85vw;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1060;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+            }
+            .admin-sidebar.open { transform: translateX(0); }
+
+            .admin-sidebar .sidebar-header h2 { display: block; font-size: 20px; }
+            .admin-sidebar .sidebar-nav a span,
+            .admin-sidebar .sidebar-footer a span { display: inline; }
+            .admin-sidebar .sidebar-section-label { display: block; }
+
+            .admin-main { margin-left: 0; padding: 70px 18px 18px 18px; }
+
+            body.admin-sidebar-locked { overflow: hidden; }
         }
     </style>
 </head>
-<body>
+<body class="">
+    <div class="auth-checking">🔐 Verifying session...</div>
+
     <div class="admin-wrapper">
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
@@ -175,16 +221,29 @@
     <script src="../js/config.js"></script>
     <script>
         // ============================================
-        // AUTH CHECK
+        // AUTH GUARD (real Supabase session, with legacy flag bridge)
         // ============================================
-        const adminLoggedIn = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
-        const adminEmail = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+        (async function initAuth() {
+            const nameEl = document.getElementById('adminName');
+            try {
+                const { data } = await supabase.auth.getSession();
+                if (data && data.session) {
+                    document.body.classList.add('authed');
+                    if (nameEl) nameEl.textContent = (data.session.user?.email || 'Admin').split('@')[0];
+                    return;
+                }
+            } catch (e) { /* fall through to legacy bridge */ }
 
-        if (!adminLoggedIn) {
+            const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+            if (legacy) {
+                document.body.classList.add('authed');
+                const email = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+                if (nameEl) nameEl.textContent = email ? email.split('@')[0] : 'Admin';
+                return;
+            }
+
             window.location.href = 'index.html';
-        } else {
-            document.getElementById('adminName').textContent = adminEmail?.split('@')[0] || 'Admin';
-        }
+        })();
 
         // ============================================
         // STATE
@@ -196,12 +255,14 @@
         // ============================================
         // LOGOUT
         // ============================================
-        document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
             e.preventDefault();
+            try { await supabase.auth.signOut(); } catch (err) { /* ignore */ }
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('adminEmail');
             sessionStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminSession');
             window.location.href = 'index.html';
         });
 
@@ -352,5 +413,6 @@
             if (e.target === this) closeModal();
         });
     </script>
+    <script src="js/admin-sidebar.js"></script>
 </body>
 </html>
