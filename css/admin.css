@@ -501,6 +501,11 @@ body {
         background: var(--green-mid);
     }
 
+    .admin-hamburger:focus-visible {
+        outline: 2px solid var(--gold);
+        outline-offset: 2px;
+    }
+
     /* --- Overlay behind drawer --- */
     .admin-overlay {
         display: block;
