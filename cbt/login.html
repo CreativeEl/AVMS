@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
     <title>CBT Practice Login - AVMS ABU Zaria</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -370,7 +371,6 @@
         // ============================================
         // LOGIN PAGE LOGIC
         // ============================================
-        console.log('🎓 CBT Login page loaded');
 
         const form = document.getElementById('loginForm');
         const errorMsg = document.getElementById('errorMsg');
@@ -403,10 +403,10 @@
         });
 
         // ============================================
-        // TRIM REG NO AND REMOVE EXTRA SPACES
+        // TRIM REG NO, REMOVE SPACES, AUTO-UPPERCASE
         // ============================================
         regNoInput.addEventListener('input', function() {
-            this.value = this.value.trim().replace(/\s+/g, '');
+            this.value = this.value.replace(/\s+/g, '').toUpperCase();
         });
 
         // ============================================
@@ -451,7 +451,7 @@
             e.preventDefault();
             hideMessages();
 
-            const regNo = regNoInput.value.trim();
+            const regNo = regNoInput.value.trim().toUpperCase();
             const stateOfOrigin = stateInput.value.trim().toLowerCase();
 
             // Basic validation
@@ -470,8 +470,6 @@
             setLoading(true);
 
             try {
-                console.log('🔍 Checking credentials for:', regNo);
-
                 // Query the cbt_students table
                 const { data, error } = await supabase
                     .from('cbt_students')
@@ -482,22 +480,19 @@
                     .maybeSingle();
 
                 if (error) {
-                    console.error('Database error:', error);
+                    console.warn('CBT login DB error:', error);
                     showError('Connection error. Please try again.');
                     setLoading(false);
                     return;
                 }
 
                 if (!data) {
-                    console.log('❌ No matching student found');
                     showError('Invalid Registration Number or State of Origin. Please check and try again.');
                     setLoading(false);
                     return;
                 }
 
                 // SUCCESS — store session
-                console.log('✅ Login successful for:', data.full_name);
-
                 sessionStorage.setItem('cbt_student', JSON.stringify({
                     id: data.id,
                     reg_no: data.reg_no,
@@ -511,7 +506,8 @@
                 // Also set in localStorage for "remember" across tabs (optional)
                 localStorage.setItem('cbt_last_reg_no', data.reg_no);
 
-                showSuccess(`Welcome, ${data.full_name.split(' ')[0]}! Redirecting...`);
+                const firstName = data.full_name ? String(data.full_name).split(' ')[0] : 'Student';
+                showSuccess(`Welcome, ${firstName}! Redirecting...`);
 
                 // Redirect after short delay
                 setTimeout(() => {
@@ -519,7 +515,7 @@
                 }, 1200);
 
             } catch (err) {
-                console.error('Unexpected error:', err);
+                console.warn('CBT login unexpected error:', err);
                 showError('Something went wrong. Please try again.');
                 setLoading(false);
             }
@@ -541,7 +537,6 @@
         // ============================================
         // (So the student is forced to log in again)
         sessionStorage.removeItem('cbt_student');
-        console.log('🧹 Cleared any old session');
     </script>
 </body>
 </html>
