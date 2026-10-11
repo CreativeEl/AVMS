@@ -15,6 +15,26 @@ let currentAlbumPhotos = [];
 let currentPhotoIndex = 0;
 
 // ============================================
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function safeUrl(url) {
+    if (!url) return '';
+    const str = String(url).trim();
+    if (/^https?:\/\//i.test(str)) return str;
+    return '';
+}
+
+// ============================================
 // LOAD GALLERY ALBUMS
 // ============================================
 async function loadGalleryAlbums() {
@@ -45,19 +65,20 @@ async function loadGalleryAlbums() {
         
         debugLog(`Found ${data.length} albums`);
 
-        // Get photo counts for each album
-        for (const album of data) {
-            const { count } = await supabase
+        // Get photo counts for all albums in parallel
+        const counts = await Promise.all(data.map(album =>
+            supabase
                 .from('gallery_images')
                 .select('*', { count: 'exact', head: true })
-                .eq('album_id', album.id);
-            album.photo_count = count || 0;
-        }
+                .eq('album_id', album.id)
+                .then(({ count }) => count || 0)
+        ));
+        data.forEach((album, i) => { album.photo_count = counts[i]; });
 
         renderAlbums(data, container);
         
     } catch (error) {
-        console.error('Error loading gallery:', error);
+        console.warn('Error loading gallery:', error);
         container.innerHTML = `
             <div class="gallery-placeholder">
                 <i class="fas fa-exclamation-circle" style="font-size: 60px; color: #e8491d;"></i>
@@ -72,11 +93,13 @@ async function loadGalleryAlbums() {
 // RENDER ALBUMS
 // ============================================
 function renderAlbums(albums, container) {
-    container.innerHTML = albums.map(album => `
+    container.innerHTML = albums.map(album => {
+        const coverUrl = safeUrl(album.cover_image);
+        return `
         <div class="gallery-album" onclick="openAlbumModal(${album.id})" data-album-id="${album.id}">
             <div class="album-cover">
-                ${album.cover_image ? 
-                    `<img src="${album.cover_image}" alt="${escapeHtml(album.title)}" onerror="handleBrokenCover(this)">` : 
+                ${coverUrl ? 
+                    `<img src="${coverUrl}" alt="${escapeHtml(album.title)}" onerror="handleBrokenCover(this)">` : 
                     `<i class="fas fa-images"></i>`
                 }
                 <span class="album-photo-count-badge">
@@ -93,7 +116,8 @@ function renderAlbums(albums, container) {
                 ${album.category ? `<p class="album-category">📂 ${escapeHtml(album.category)}</p>` : ''}
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 // ============================================
@@ -177,25 +201,28 @@ async function openAlbumModal(albumId) {
 
         bodyEl.innerHTML = `
             <div class="album-photos-public">
-                ${currentAlbumPhotos.map((photo, idx) => `
+                ${currentAlbumPhotos.map((photo, idx) => {
+                    const photoUrl = safeUrl(photo.image_url);
+                    return `
                     <div class="album-photo-public" onclick="openPhotoViewer(${idx})">
-                        <img src="${photo.image_url}" 
+                        <img src="${photoUrl}" 
                              alt="${escapeHtml(photo.caption || 'Photo')}" 
                              loading="lazy"
                              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23e0e7ef%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2240%22 text-anchor=%22middle%22 dy=%22.3em%22%3E🖼️%3C/text%3E%3C/svg%3E'">
                         ${photo.caption ? `<div class="photo-caption-overlay">${escapeHtml(photo.caption)}</div>` : ''}
                     </div>
-                `).join('')}
+                `;
+                }).join('')}
             </div>
         `;
 
     } catch (error) {
-        console.error('Error opening album:', error);
+        console.warn('Error opening album:', error);
         bodyEl.innerHTML = `
             <div class="album-no-photos">
                 <i class="fas fa-exclamation-circle" style="color: #e8491d;"></i>
                 <h3 style="color: #e8491d;">Could not load album</h3>
-                <p style="color: #888;">${error.message}</p>
+                <p style="color: #888;">Please try again later.</p>
             </div>
         `;
         overlay.classList.add('show');
@@ -223,7 +250,7 @@ function openPhotoViewer(index) {
 function updatePhotoViewer() {
     const photo = currentAlbumPhotos[currentPhotoIndex];
     if (!photo) return;
-    document.getElementById('photoViewerImg').src = photo.image_url;
+    document.getElementById('photoViewerImg').src = safeUrl(photo.image_url);
     document.getElementById('photoViewerCaption').textContent = photo.caption || '';
 }
 
@@ -235,19 +262,6 @@ function photoViewerNav(direction) {
 
 function closePhotoViewer() {
     document.getElementById('photoViewerOverlay').classList.remove('show');
-}
-
-// ============================================
-// HELPERS
-// ============================================
-function escapeHtml(text) {
-    if (!text) return '';
-    return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
 }
 
 // ============================================
