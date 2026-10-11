@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
     <title>Results - AVMS CBT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -452,7 +453,6 @@
             flex-shrink: 0;
             color: #555;
         }
-        /* The correct answer — always green */
         .review-option.is-correct {
             background: #d4edda;
             border-color: #28a745;
@@ -461,7 +461,6 @@
             background: #28a745;
             color: white;
         }
-        /* What the user chose — if wrong, red */
         .review-option.user-chose-wrong {
             background: #f8d7da;
             border-color: #dc3545;
@@ -470,7 +469,6 @@
             background: #dc3545;
             color: white;
         }
-        /* What the user chose — if correct, add a small check */
         .review-option.user-chose-correct {
             background: #d4edda;
             border-color: #28a745;
@@ -499,7 +497,6 @@
             color: white;
         }
 
-        /* Solution box */
         .solution-box {
             background: #FBF8EE;
             border-left: 4px solid #C9A961;
@@ -525,7 +522,6 @@
             line-height: 1.6;
         }
 
-        /* Answered note */
         .user-answer-note {
             font-size: 13px;
             color: #666;
@@ -535,7 +531,6 @@
             color: #1F4E3D;
         }
 
-        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -553,9 +548,6 @@
             display: block;
         }
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
         @media (max-width: 640px) {
             .score-card { padding: 30px 20px; }
             .result-title { font-size: 22px; }
@@ -569,7 +561,6 @@
             .btn-action { width: 100%; justify-content: center; }
         }
 
-        /* Print styles */
         @media print {
             body { background: white; }
             .topbar, .actions-row, .review-filters { display: none !important; }
@@ -696,7 +687,6 @@
         const main = document.getElementById('mainContent');
 
         main.innerHTML = `
-            <!-- SCORE CARD -->
             <div class="score-card">
                 <div class="score-card-inner">
                     <span class="result-emoji">${emoji}</span>
@@ -717,7 +707,7 @@
                     <div class="score-meta">
                         <div class="score-meta-item">
                             <i class="fas fa-book"></i>
-                            <span>${result.course_code} — ${result.course_name}</span>
+                            <span>${escapeHtml(result.course_code)} — ${escapeHtml(result.course_name)}</span>
                         </div>
                         <div class="score-meta-item">
                             <i class="fas fa-clock"></i>
@@ -737,7 +727,6 @@
                 </div>
             </div>
 
-            <!-- STATS ROW -->
             <div class="stats-row">
                 <div class="stat-card correct">
                     <i class="fas fa-check-circle"></i>
@@ -756,7 +745,6 @@
                 </div>
             </div>
 
-            <!-- ACTION BUTTONS -->
             <div class="actions-row">
                 <button class="btn-action btn-primary" onclick="retake()">
                     <i class="fas fa-redo"></i> Retake ${result.mode === 'exam' ? 'Exam' : 'Test'}
@@ -769,7 +757,6 @@
                 </button>
             </div>
 
-            <!-- REVIEW SECTION -->
             <div class="review-header">
                 <h2><i class="fas fa-search"></i> Review Answers</h2>
                 <div class="review-filters">
@@ -804,7 +791,7 @@
                 return;
             }
 
-            list.innerHTML = filtered.map((a, i) => {
+            list.innerHTML = filtered.map((a) => {
                 const originalIndex = result.answers.indexOf(a) + 1;
                 let statusClass, statusIcon, statusText;
                 if (!a.user_answer) {
@@ -821,7 +808,6 @@
                     statusText = 'Wrong';
                 }
 
-                // Build options with visual cues
                 const optionsHtml = a.options.map(opt => {
                     const isCorrect = opt.letter === a.correct_answer;
                     const isUserChoice = opt.letter === a.user_answer;
@@ -849,8 +835,8 @@
                 }).join('');
 
                 const userAnswerNote = a.user_answer
-                    ? `<div class="user-answer-note">You chose <strong>${a.user_answer}</strong>. Correct answer is <strong>${a.correct_answer}</strong>.</div>`
-                    : `<div class="user-answer-note">You did not answer this question. Correct answer is <strong>${a.correct_answer}</strong>.</div>`;
+                    ? `<div class="user-answer-note">You chose <strong>${escapeHtml(a.user_answer)}</strong>. Correct answer is <strong>${escapeHtml(a.correct_answer)}</strong>.</div>`
+                    : `<div class="user-answer-note">You did not answer this question. Correct answer is <strong>${escapeHtml(a.correct_answer)}</strong>.</div>`;
 
                 const solutionHtml = a.solution
                     ? `
@@ -894,12 +880,10 @@
         // RETAKE
         // ============================================
         function retake() {
-            // Keep the same mode config, just clear the test progress
             const storageKey = `cbt_test_${result.course_id}_${result.mode}`;
             localStorage.removeItem(storageKey);
             sessionStorage.removeItem('cbt_last_result');
 
-            // Redirect to the test/exam page directly
             const goTo = result.mode === 'exam' ? 'exam.html' : 'test.html';
             window.location.href = goTo;
         }
@@ -908,8 +892,6 @@
         // INIT
         // ============================================
         renderReview();
-
-        console.log('✅ Results page loaded');
     </script>
 </body>
 </html>
