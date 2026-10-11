@@ -1,0 +1,48 @@
+{
+  "name": "AVMS ABU Zaria",
+  "short_name": "AVMS",
+  "description": "Association of Veterinary Medical Students — Ahmadu Bello University, Zaria. Official student portal.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1F4E3D",
+  "theme_color": "#1F4E3D",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "CBT Practice",
+      "short_name": "CBT",
+      "description": "Open the CBT Practice Portal",
+      "url": "/cbt/login.html"
+    },
+    {
+      "name": "Announcements",
+      "short_name": "News",
+      "description": "Latest AVMS announcements",
+      "url": "/announcements.html"
+    }
+  ]
+}
