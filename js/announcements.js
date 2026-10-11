@@ -8,6 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// ESCAPE HELPER (prevents HTML/script injection from DB content)
+// ============================================
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============================================
 // LOAD ALL ANNOUNCEMENTS
 // ============================================
 async function loadAllAnnouncements() {
@@ -38,7 +51,7 @@ async function loadAllAnnouncements() {
         renderAnnouncements(data, container);
         
     } catch (error) {
-        console.error('Error loading announcements:', error);
+        console.warn('Error loading announcements:', error);
         container.innerHTML = `
             <div class="announcement-item">
                 <p style="color: #e8491d;">⚠️ Could not load announcements. Please try again later.</p>
@@ -54,10 +67,10 @@ function renderAnnouncements(announcements, container) {
     container.innerHTML = announcements.map(ann => `
         <div class="announcement-item ${ann.featured ? 'featured' : ''}">
             ${ann.featured ? '<span class="featured-badge">⭐ Featured</span>' : ''}
-            <h3>${ann.title || 'Untitled'}</h3>
+            <h3>${escapeHtml(ann.title) || 'Untitled'}</h3>
             <p class="announcement-date">📅 ${formatDate(ann.published_at)}</p>
-            ${ann.category ? `<p class="announcement-category">📂 ${ann.category}</p>` : ''}
-            <p class="announcement-content">${ann.content || 'No content available.'}</p>
+            ${ann.category ? `<p class="announcement-category">📂 ${escapeHtml(ann.category)}</p>` : ''}
+            <p class="announcement-content">${escapeHtml(ann.content) || 'No content available.'}</p>
         </div>
     `).join('');
 }
