@@ -8,6 +8,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function safeUrl(url) {
+    if (!url) return '';
+    const str = String(url).trim();
+    if (/^https?:\/\//i.test(str)) return str;
+    return '';
+}
+
+// ============================================
 // LOAD DOCUMENTS
 // ============================================
 async function loadDocuments() {
@@ -38,7 +58,7 @@ async function loadDocuments() {
         renderDocuments(data, container);
         
     } catch (error) {
-        console.error('Error loading documents:', error);
+        console.warn('Error loading documents:', error);
         container.innerHTML = `
             <div class="download-item">
                 <p style="color: #e8491d;">⚠️ Could not load documents. Please try again later.</p>
@@ -62,20 +82,23 @@ function renderDocuments(documents, container) {
     let html = '';
     for (const [category, docs] of Object.entries(categories)) {
         html += `
-            <h2 class="category-title">📂 ${category}</h2>
+            <h2 class="category-title">📂 ${escapeHtml(category)}</h2>
             <div class="category-documents">
-                ${docs.map(doc => `
+                ${docs.map(doc => {
+                    const fileUrl = safeUrl(doc.file_url);
+                    return `
                     <div class="download-item">
                         <div class="download-icon">
                             <i class="fas fa-file-${getFileIcon(doc.file_url)}"></i>
                         </div>
                         <div class="download-info">
-                            <h4>${doc.title || 'Untitled'}</h4>
-                            ${doc.description ? `<p>${doc.description}</p>` : ''}
+                            <h4>${escapeHtml(doc.title) || 'Untitled'}</h4>
+                            ${doc.description ? `<p>${escapeHtml(doc.description)}</p>` : ''}
                         </div>
-                        ${doc.file_url ? `<a href="${doc.file_url}" target="_blank" class="download-btn"><i class="fas fa-download"></i> Download</a>` : ''}
+                        ${fileUrl ? `<a href="${fileUrl}" target="_blank" rel="noopener" class="download-btn"><i class="fas fa-download"></i> Download</a>` : ''}
                     </div>
-                `).join('')}
+                `;
+                }).join('')}
             </div>
         `;
     }
