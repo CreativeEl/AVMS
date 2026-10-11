@@ -3,24 +3,35 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔍 Give page loaded');
     initDonationForm();
     loadProjects();
 });
 
 // ============================================
-// 1. DONATION FORM (unchanged)
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// ============================================
+// 1. DONATION FORM
 // ============================================
 function initDonationForm() {
     const form = document.getElementById('donationForm');
     if (!form) {
-        console.error('❌ Donation form not found!');
+        console.warn('Donation form not found.');
         return;
     }
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log('✅ Donation form submitted');
 
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
@@ -41,11 +52,8 @@ function initDonationForm() {
             status: 'pending'
         };
 
-        console.log('📋 Donation data:', formData);
-
         // Check if Supabase is available
-        if (typeof supabase === 'undefined') {
-            console.error('❌ Supabase not initialized!');
+        if (typeof supabase === 'undefined' || !supabase) {
             msgDiv.innerHTML = `
                 <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
                     <p>⚠️ Database connection error. Please try again later.</p>
@@ -56,55 +64,40 @@ function initDonationForm() {
             return;
         }
 
-        try {
-            // Save to Supabase
-            supabase.from('donations').insert([formData]).then(({ data, error }) => {
-                if (error) {
-                    console.error('❌ Supabase error:', error);
-                    throw error;
-                }
+        // Save to Supabase
+        supabase.from('donations').insert([formData]).then(({ data, error }) => {
+            if (error) {
+                throw error;
+            }
 
-                msgDiv.innerHTML = `
-                    <div style="background: #d4edda; color: #155724; padding: 20px; border-radius: 10px; text-align: center;">
-                        <i class="fas fa-check-circle" style="font-size: 40px; color: #28a745;"></i>
-                        <h3 style="color: #155724; margin-top: 10px;">✅ Thank You for Your Support!</h3>
-                        <p>Your donation of ₦${formData.amount} has been recorded.</p>
-                        <p style="margin-top: 10px; font-size: 14px;">We will contact you shortly with payment details.</p>
-                    </div>
-                `;
+            msgDiv.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 20px; border-radius: 10px; text-align: center;">
+                    <i class="fas fa-check-circle" style="font-size: 40px; color: #28a745;"></i>
+                    <h3 style="color: #155724; margin-top: 10px;">✅ Thank You for Your Support!</h3>
+                    <p>Your donation of ₦${escapeHtml(formData.amount)} has been recorded.</p>
+                    <p style="margin-top: 10px; font-size: 14px;">We will contact you shortly with payment details.</p>
+                </div>
+            `;
 
-                form.reset();
-                console.log('✅ Donation recorded successfully');
+            form.reset();
 
-            }).catch((error) => {
-                console.error('❌ Error:', error);
-                msgDiv.innerHTML = `
-                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                        <i class="fas fa-exclamation-circle" style="font-size: 30px;"></i>
-                        <p>⚠️ Could not process donation. Please try again later.</p>
-                    </div>
-                `;
-            }).finally(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            });
-
-        } catch (error) {
-            console.error('❌ Error:', error);
+        }).catch((error) => {
+            console.warn('Donation insert failed:', error);
             msgDiv.innerHTML = `
                 <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
                     <i class="fas fa-exclamation-circle" style="font-size: 30px;"></i>
                     <p>⚠️ Could not process donation. Please try again later.</p>
                 </div>
             `;
+        }).finally(() => {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-        }
+        });
     });
 }
 
 // ============================================
-// 2. LOAD PROJECTS (new)
+// 2. LOAD PROJECTS
 // Reads give_proj{1,2,3}_* values from site_settings
 // ============================================
 async function loadProjects() {
@@ -149,25 +142,28 @@ async function loadProjects() {
         container.innerHTML = projects.map(p => {
             // Cap the visual bar at 100% but keep the real % in the text
             const barWidth = Math.min(Math.max(p.progress, 0), 100);
-            const iconClass = p.icon.startsWith('fa-') ? p.icon : 'fa-book';
+
+            // Sanitize icon class: only letters, numbers, and hyphens
+            let iconClass = String(p.icon || '').trim();
+            if (!/^fa-[a-z0-9-]+$/i.test(iconClass)) {
+                iconClass = 'fa-book';
+            }
 
             return `
                 <div class="project-card">
                     <div class="project-icon"><i class="fas ${iconClass}"></i></div>
-                    <h3>${p.title}</h3>
-                    <p>${p.desc}</p>
+                    <h3>${escapeHtml(p.title)}</h3>
+                    <p>${escapeHtml(p.desc)}</p>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: ${barWidth}%;"></div>
                     </div>
-                    <p class="progress-text">${p.progress}% funded${p.target ? ' • Target: ' + p.target : ''}</p>
+                    <p class="progress-text">${escapeHtml(String(p.progress))}% funded${p.target ? ' • Target: ' + escapeHtml(p.target) : ''}</p>
                 </div>
             `;
         }).join('');
 
-        console.log('✅ Projects loaded:', projects.length);
-
     } catch (error) {
-        console.error('❌ Error loading projects:', error);
+        console.warn('Error loading projects:', error);
         container.innerHTML = `
             <div class="project-card" style="grid-column: 1 / -1; text-align: center;">
                 <p style="color: #e8491d;">⚠️ Could not load projects. Please try again later.</p>
