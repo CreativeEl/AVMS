@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
     <title>CBT Dashboard - AVMS ABU Zaria</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -586,12 +587,24 @@
 
     <script>
         // ============================================
+        // HELPERS
+        // ============================================
+        function escapeHtml(text) {
+            if (text == null) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        // ============================================
         // SESSION CHECK
         // ============================================
         const studentJson = sessionStorage.getItem('cbt_student');
 
         if (!studentJson) {
-            console.log('❌ No session — redirecting to login');
             window.location.href = 'login.html';
             throw new Error('Not logged in');
         }
@@ -600,23 +613,24 @@
         try {
             student = JSON.parse(studentJson);
         } catch (err) {
-            console.error('Bad session data:', err);
             sessionStorage.removeItem('cbt_student');
             window.location.href = 'login.html';
             throw err;
         }
 
-        console.log('✅ Logged in as:', student.full_name);
-
         // ============================================
         // POPULATE STUDENT INFO
         // ============================================
-        document.getElementById('topbarName').textContent = student.full_name.split(' ')[0];
-        document.getElementById('welcomeTitle').textContent = `Welcome, ${student.full_name.split(' ')[0]}! 👋`;
-        document.getElementById('metaRegNo').textContent = student.reg_no;
-        document.getElementById('metaLevel').textContent = `Level ${student.level}`;
-        document.getElementById('metaState').textContent =
-            student.state_of_origin.charAt(0).toUpperCase() + student.state_of_origin.slice(1);
+        const firstName = student.full_name ? String(student.full_name).split(' ')[0] : 'Student';
+        const stateName = student.state_of_origin
+            ? (student.state_of_origin.charAt(0).toUpperCase() + student.state_of_origin.slice(1))
+            : '—';
+
+        document.getElementById('topbarName').textContent = firstName;
+        document.getElementById('welcomeTitle').textContent = `Welcome, ${firstName}! 👋`;
+        document.getElementById('metaRegNo').textContent = student.reg_no || '—';
+        document.getElementById('metaLevel').textContent = `Level ${student.level || '—'}`;
+        document.getElementById('metaState').textContent = stateName;
 
         // ============================================
         // STATE
@@ -659,14 +673,13 @@
                 if (error) throw error;
 
                 allCourses = data || [];
-                console.log(`✅ Loaded ${allCourses.length} courses`);
 
                 // Load question counts for all courses
                 await loadQuestionCounts();
 
                 displayCourses();
             } catch (err) {
-                console.error('Error loading courses:', err);
+                console.warn('Error loading courses:', err);
                 document.getElementById('coursesGrid').innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -694,10 +707,8 @@
                 (data || []).forEach(q => {
                     questionCounts[q.course_id] = (questionCounts[q.course_id] || 0) + 1;
                 });
-
-                console.log('📊 Question counts loaded:', questionCounts);
             } catch (err) {
-                console.error('Error loading question counts:', err);
+                console.warn('Error loading question counts:', err);
                 questionCounts = {};
             }
         }
@@ -725,19 +736,21 @@
 
             grid.innerHTML = filtered.map(course => {
                 const qCount = questionCounts[course.id] || 0;
-                const canTakeTest = qCount >= 10;   // require at least 10 questions
-                const canTakeExam = qCount >= 20;   // require at least 20 for exam
+                // Align with the actual startMode requirements below
+                const canTakeTest = qCount >= 40;
+                const canTakeExam = qCount >= 60;
+                const safeCode = JSON.stringify(String(course.code || ''));
 
                 return `
                     <div class="course-card">
                         <div class="course-header">
-                            <span class="course-code">${course.code}</span>
+                            <span class="course-code">${escapeHtml(course.code)}</span>
                             <span class="course-semester-badge ${course.semester === 1 ? 'sem1' : 'sem2'}">
                                 ${course.semester === 1 ? '1st Sem' : '2nd Sem'}
                             </span>
                         </div>
-                        <div class="course-name">${course.name}</div>
-                        <div class="course-description">${course.description || 'No description available.'}</div>
+                        <div class="course-name">${escapeHtml(course.name)}</div>
+                        <div class="course-description">${escapeHtml(course.description) || 'No description available.'}</div>
                         <div class="course-stats">
                             <div class="course-stat">
                                 <i class="fas fa-question-circle"></i>
@@ -749,12 +762,12 @@
                             </div>
                         </div>
                         <div class="course-actions">
-                            <button class="btn-mode btn-test" onclick="startMode('test', ${course.id}, '${course.code}')" ${!canTakeTest ? 'disabled title="Need at least 10 questions"' : ''}>
+                            <button class="btn-mode btn-test" onclick="startMode('test', ${course.id}, ${safeCode})" ${!canTakeTest ? 'disabled title="Need at least 40 questions"' : ''}>
                                 <i class="fas fa-pen"></i>
                                 Take Test
                                 <span class="mode-label">40 Qs · 40 min</span>
                             </button>
-                            <button class="btn-mode btn-exam" onclick="startMode('exam', ${course.id}, '${course.code}')" ${!canTakeExam ? 'disabled title="Need at least 20 questions"' : ''}>
+                            <button class="btn-mode btn-exam" onclick="startMode('exam', ${course.id}, ${safeCode})" ${!canTakeExam ? 'disabled title="Need at least 60 questions"' : ''}>
                                 <i class="fas fa-clipboard-list"></i>
                                 Take Exam
                                 <span class="mode-label">60 Qs · 60 min</span>
@@ -795,7 +808,6 @@
             };
             sessionStorage.setItem('cbt_current_mode', JSON.stringify(modeConfig));
 
-            console.log('🎬 Starting:', modeConfig);
             window.location.href = mode === 'test' ? 'test.html' : 'exam.html';
         }
 
