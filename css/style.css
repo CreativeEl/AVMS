@@ -4647,4 +4647,97 @@ html, body {
     color: #555;
     font-size: 14.5px;
     line-height: 1.65;
-    margin-bottom: 26
+    margin-bottom: 26px;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pwa-modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.pwa-btn {
+    padding: 14px 26px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 2px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.25s ease;
+    flex: 1;
+    min-width: 130px;
+}
+
+.pwa-btn-primary {
+    background: #1F4E3D;
+    color: #ffffff;
+    border-color: #1F4E3D;
+    box-shadow: 0 4px 14px rgba(31, 78, 61, 0.3);
+}
+
+.pwa-btn-primary:hover {
+    background: #2D6B54;
+    border-color: #2D6B54;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(31, 78, 61, 0.45);
+}
+
+.pwa-btn-ghost {
+    background: transparent;
+    color: #666;
+    border-color: #e3e0d2;
+}
+
+.pwa-btn-ghost:hover {
+    background: #F5F0DC;
+    border-color: #C9A961;
+    color: #1F4E3D;
+}
+
+.pwa-modal-hint {
+    color: #888;
+    font-size: 12px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.pwa-modal-hint i {
+    color: #C9A961;
+}
+
+@media (max-width: 480px) {
+    .pwa-modal {
+        padding: 32px 22px 26px;
+        border-radius: 16px;
+    }
+    .pwa-modal-icon {
+        width: 76px;
+        height: 76px;
+        border-radius: 18px;
+    }
+    .pwa-modal-title {
+        font-size: 20px;
+    }
+    .pwa-modal-text {
+        font-size: 13.5px;
+    }
+    .pwa-btn {
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+}
