@@ -9,6 +9,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// ESCAPE HELPER (prevents HTML/script injection from DB content)
+// ============================================
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============================================
 // LOAD ALL LEADERS
 // ============================================
 async function loadAllLeaders() {
@@ -37,7 +50,7 @@ async function loadAllLeaders() {
         renderSenate(senators);
 
     } catch (error) {
-        console.error('Error loading leaders:', error);
+        console.warn('Error loading leaders:', error);
         renderErrorStates();
     }
 }
@@ -61,12 +74,12 @@ function renderExecutiveCouncil(executives) {
     container.innerHTML = executives.map(leader => `
         <div class="leader-card-full">
             <div class="leader-photo-full">
-                ${leader.photo_url ? `<img src="${leader.photo_url}" alt="${leader.name || 'Leader'}">` : '👤'}
+                ${leader.photo_url ? `<img src="${leader.photo_url}" alt="${escapeHtml(leader.name) || 'Leader'}">` : '👤'}
             </div>
             <div class="leader-info-full">
-                <h3>${leader.name || 'Unnamed Leader'}</h3>
-                <p class="leader-position">${leader.position || 'Position'}</p>
-                <p class="leader-bio">${leader.biography || 'No biography available yet.'}</p>
+                <h3>${escapeHtml(leader.name) || 'Unnamed Leader'}</h3>
+                <p class="leader-position">${escapeHtml(leader.position) || 'Position'}</p>
+                <p class="leader-bio">${escapeHtml(leader.biography) || 'No biography available yet.'}</p>
             </div>
         </div>
     `).join('');
@@ -114,10 +127,10 @@ function renderSenate(senators) {
                     <div class="senator-card senator-card--president">
                         <div class="senator-photo">
                             ${president.photo_url
-                                ? `<img src="${president.photo_url}" alt="${president.name || 'Senator'}">`
+                                ? `<img src="${president.photo_url}" alt="${escapeHtml(president.name) || 'Senator'}">`
                                 : '<i class="fas fa-user-tie"></i>'}
                         </div>
-                        <h4>${president.name || 'Unnamed'}</h4>
+                        <h4>${escapeHtml(president.name) || 'Unnamed'}</h4>
                         <p class="senator-class">Senate President</p>
                     </div>
                 </div>
@@ -138,10 +151,10 @@ function renderSenate(senators) {
                             <div class="senator-card">
                                 <div class="senator-photo">
                                     ${s.photo_url
-                                        ? `<img src="${s.photo_url}" alt="${s.name || 'Senator'}">`
+                                        ? `<img src="${s.photo_url}" alt="${escapeHtml(s.name) || 'Senator'}">`
                                         : '<i class="fas fa-user"></i>'}
                                 </div>
-                                <h4>${s.name || 'Unnamed'}</h4>
+                                <h4>${escapeHtml(s.name) || 'Unnamed'}</h4>
                                 <p class="senator-class">${level} Level</p>
                             </div>
                         `).join('')}
