@@ -8,6 +8,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function safeUrl(url) {
+    if (!url) return '';
+    const str = String(url).trim();
+    if (/^https?:\/\//i.test(str)) return str;
+    return '';
+}
+
+// ============================================
 // LOAD SCHOLARSHIPS
 // ============================================
 async function loadScholarships() {
@@ -38,7 +58,7 @@ async function loadScholarships() {
         renderScholarships(data, container);
         
     } catch (error) {
-        console.error('Error loading scholarships:', error);
+        console.warn('Error loading scholarships:', error);
         container.innerHTML = `
             <div class="scholarship-item">
                 <p style="color: #e8491d;">⚠️ Could not load scholarships. Please try again later.</p>
@@ -51,18 +71,21 @@ async function loadScholarships() {
 // RENDER SCHOLARSHIPS
 // ============================================
 function renderScholarships(scholarships, container) {
-    container.innerHTML = scholarships.map(scholar => `
+    container.innerHTML = scholarships.map(scholar => {
+        const applyUrl = safeUrl(scholar.application_link);
+        return `
         <div class="scholarship-item">
-            <h3>${scholar.title || 'Untitled Scholarship'}</h3>
-            <p class="scholarship-provider"><i class="fas fa-building"></i> ${scholar.provider || 'Provider TBD'}</p>
+            <h3>${escapeHtml(scholar.title) || 'Untitled Scholarship'}</h3>
+            <p class="scholarship-provider"><i class="fas fa-building"></i> ${escapeHtml(scholar.provider) || 'Provider TBD'}</p>
             <div class="scholarship-meta">
                 <span><i class="fas fa-calendar-alt"></i> Opens: ${formatDate(scholar.opening_date)}</span>
                 <span><i class="fas fa-calendar-times"></i> Deadline: ${formatDate(scholar.deadline)}</span>
             </div>
-            <p class="scholarship-description">${scholar.description || 'No description available.'}</p>
-            <p class="scholarship-eligibility"><strong>Eligibility:</strong> ${scholar.eligibility || 'Contact for details.'}</p>
-            ${scholar.requirements ? `<p class="scholarship-requirements"><strong>Requirements:</strong> ${scholar.requirements}</p>` : ''}
-            ${scholar.application_link ? `<a href="${scholar.application_link}" target="_blank" class="btn btn-primary">Apply Now</a>` : ''}
+            <p class="scholarship-description">${escapeHtml(scholar.description) || 'No description available.'}</p>
+            <p class="scholarship-eligibility"><strong>Eligibility:</strong> ${escapeHtml(scholar.eligibility) || 'Contact for details.'}</p>
+            ${scholar.requirements ? `<p class="scholarship-requirements"><strong>Requirements:</strong> ${escapeHtml(scholar.requirements)}</p>` : ''}
+            ${applyUrl ? `<a href="${applyUrl}" target="_blank" rel="noopener" class="btn btn-primary">Apply Now</a>` : ''}
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
