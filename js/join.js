@@ -3,20 +3,38 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔍 Join Us page loaded');
     initForm();
 });
 
 // Store uploaded file data
 const uploadedFiles = {};
 
+// ============================================
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function sanitizeFileName(name) {
+    if (!name) return 'file';
+    return String(name)
+        .replace(/[^a-zA-Z0-9._-]/g, '_')
+        .slice(-120);
+}
+
 function initForm() {
     const form = document.getElementById('membershipForm');
     if (!form) {
-        console.error('❌ Form not found!');
+        console.warn('Join form not found.');
         return;
     }
-    console.log('✅ Form found!');
 
     const pages = document.querySelectorAll('.form-page');
     const steps = document.querySelectorAll('.step-item');
@@ -57,7 +75,6 @@ function initForm() {
     // Next buttons
     document.querySelectorAll('.btn-next').forEach(btn => {
         btn.addEventListener('click', function() {
-            console.log('➡️ Next button clicked');
             if (validateStep(currentStep)) {
                 if (currentStep < totalSteps - 1) {
                     currentStep++;
@@ -73,7 +90,6 @@ function initForm() {
     // Previous buttons
     document.querySelectorAll('.btn-prev').forEach(btn => {
         btn.addEventListener('click', function() {
-            console.log('⬅️ Back button clicked');
             if (currentStep > 0) {
                 currentStep--;
                 showStep(currentStep);
@@ -98,7 +114,7 @@ function initForm() {
             let previewHtml = `
                 <div class="file-item" data-file="${input.id}">
                     <i class="fas fa-file" style="color: ${statusColor};"></i>
-                    <span><strong>${input.id.replace(/([A-Z])/g, ' $1').trim()}:</strong> ${fileName} (${fileSizeKB} KB)</span>
+                    <span><strong>${escapeHtml(input.id.replace(/([A-Z])/g, ' $1').trim())}:</strong> ${escapeHtml(fileName)} (${fileSizeKB} KB)</span>
                     <span style="margin-left: auto; color: ${statusColor}; font-weight: bold;">${isUploaded ? '✅ Uploaded' : '❌ Required'}</span>
             `;
             
@@ -285,7 +301,7 @@ function initForm() {
         if (!container) return;
 
         const fields = {
-            'Full Name': document.getElementById('firstName')?.value + ' ' + document.getElementById('surname')?.value || 'Not provided',
+            'Full Name': (document.getElementById('firstName')?.value || '') + ' ' + (document.getElementById('surname')?.value || ''),
             'Registration Number': document.getElementById('regNumber')?.value || 'Not provided',
             'Level': document.getElementById('level')?.value || 'Not provided',
             'Phone': document.getElementById('phone')?.value || 'Not provided',
@@ -300,9 +316,10 @@ function initForm() {
 
         let html = '<div class="summary-grid">';
         for (const [label, value] of Object.entries(fields)) {
+            const displayValue = value && value.trim() ? escapeHtml(value) : 'Not provided';
             html += `
                 <div class="summary-item">
-                    <strong>${label}:</strong> ${value}
+                    <strong>${escapeHtml(label)}:</strong> ${displayValue}
                 </div>
             `;
         }
@@ -314,7 +331,7 @@ function initForm() {
         let hasFiles = false;
         fileFields.forEach(field => {
             if (uploadedFiles[field]) {
-                filesHtml += `<li>${field.replace(/([A-Z])/g, ' $1').trim()}: ${uploadedFiles[field].name}</li>`;
+                filesHtml += `<li>${escapeHtml(field.replace(/([A-Z])/g, ' $1').trim())}: ${escapeHtml(uploadedFiles[field].name)}</li>`;
                 hasFiles = true;
             }
         });
@@ -330,29 +347,27 @@ function initForm() {
     // ============================================
     // FORM SUBMISSION WITH LOADING SPINNER
     // ============================================
-    const submitBtn = document.querySelector('.btn-submit');
-    console.log('🔍 Submit button found:', submitBtn);
-    
-    if (submitBtn) {
-        submitBtn.addEventListener('click', function(e) {
-            console.log('✅ Submit button CLICKED!');
-            form.dispatchEvent(new Event('submit'));
-        });
-    } else {
-        console.error('❌ Submit button NOT found!');
-    }
-
     form.addEventListener('submit', function(e) {
         e.preventDefault();
-        console.log('✅ Form SUBMIT event fired!');
         handleFormSubmit(e);
     });
 
     async function handleFormSubmit(e) {
         const submitBtn = document.querySelector('.btn-submit');
         const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
-        
-        console.log('📤 Processing form submission...');
+
+        // Supabase availability check FIRST
+        if (typeof supabase === 'undefined' || !supabase) {
+            const msgDiv = document.getElementById('formMessage');
+            if (msgDiv) {
+                msgDiv.innerHTML = `
+                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
+                        <p>⚠️ Database connection error. Please try again later.</p>
+                    </div>
+                `;
+            }
+            return;
+        }
         
         if (submitBtn) {
             submitBtn.innerHTML = `<span class="spinner"></span> Submitting...`;
@@ -363,7 +378,6 @@ function initForm() {
         if (msgDiv) msgDiv.innerHTML = '';
 
         if (!validateStep(4)) {
-            console.log('❌ Validation failed');
             if (submitBtn) {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -389,11 +403,9 @@ function initForm() {
             
             if (file) {
                 try {
-                    console.log(`📤 Uploading ${field}...`);
-                    
                     const timestamp = Date.now();
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `${timestamp}_${file.name}`;
+                    const safeName = sanitizeFileName(file.name);
+                    const fileName = `${timestamp}_${safeName}`;
                     
                     let folderPath = '';
                     switch(field) {
@@ -404,19 +416,15 @@ function initForm() {
                     }
                     
                     const filePath = `${folderPath}${fileName}`;
-                    console.log(`📁 Uploading to: ${filePath}`);
                     
                     const { data, error } = await supabase.storage
                         .from('membership-documents')
                         .upload(filePath, file);
 
                     if (error) {
-                        console.error(`❌ Error uploading ${field}:`, error);
                         uploadSuccess = false;
                         throw error;
                     }
-
-                    console.log(`✅ ${field} uploaded successfully!`, data);
 
                     const { data: urlData } = supabase.storage
                         .from('membership-documents')
@@ -424,15 +432,13 @@ function initForm() {
                     
                     const publicUrl = urlData?.publicUrl;
                     fileUrls[field] = publicUrl;
-                    console.log(`🔗 ${field} URL:`, publicUrl);
                     
                 } catch (error) {
-                    console.error(`❌ Failed to upload ${field}:`, error);
                     uploadSuccess = false;
                     if (msgDiv) {
                         msgDiv.innerHTML = `
                             <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                                <p>⚠️ Failed to upload ${field.replace(/([A-Z])/g, ' $1').trim()}. Please try again.</p>
+                                <p>⚠️ Failed to upload ${escapeHtml(field.replace(/([A-Z])/g, ' $1').trim())}. Please try again.</p>
                             </div>
                         `;
                     }
@@ -452,9 +458,6 @@ function initForm() {
             }
             return;
         }
-
-        console.log('✅ All files uploaded successfully!');
-        console.log('📁 File URLs:', fileUrls);
 
         // ============================================
         // STEP 2: SAVE APPLICATION TO DATABASE
@@ -488,48 +491,24 @@ function initForm() {
             status: 'pending'
         };
 
-        console.log('📋 Form data with file URLs:', formData);
-
-        if (typeof supabase === 'undefined') {
-            console.error('❌ Supabase not initialized!');
-            if (msgDiv) {
-                msgDiv.innerHTML = `
-                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                        <p>⚠️ Database connection error. Please try again later.</p>
-                    </div>
-                `;
-            }
-            if (submitBtn) {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
-            return;
-        }
-
         try {
-            console.log('📤 Sending to Supabase...');
-            
             const { data, error } = await supabase
                 .from('membership_applications')
                 .insert([formData]);
 
-            console.log('📥 Supabase response:', { data, error });
-
             if (error) {
-                console.error('❌ Supabase error:', error);
                 throw error;
             }
 
             showConfirmation(formData);
-            console.log('✅ Application submitted successfully');
 
         } catch (error) {
-            console.error('❌ Submission error:', error);
+            console.warn('Submission error:', error);
             if (msgDiv) {
                 msgDiv.innerHTML = `
                     <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
                         <i class="fas fa-exclamation-circle" style="font-size: 30px;"></i>
-                        <p>⚠️ Could not submit application. Error: ${error.message}</p>
+                        <p>⚠️ Could not submit application. Please try again, or contact AVMS if the problem persists.</p>
                     </div>
                 `;
             }
@@ -560,7 +539,7 @@ function initForm() {
         }
         
         const confirmName = document.getElementById('confirmName');
-        if (confirmName) confirmName.textContent = data.first_name + ' ' + data.surname;
+        if (confirmName) confirmName.textContent = (data.first_name || '') + ' ' + (data.surname || '');
         
         const confirmReg = document.getElementById('confirmReg');
         if (confirmReg) confirmReg.textContent = data.reg_number;
