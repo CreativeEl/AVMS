@@ -302,9 +302,8 @@
 
         async function loadHeroSlideshow() {
             const container = document.getElementById('heroSlideshow');
-            const dotsContainer = document.getElementById('heroSlideDots');
             const heroSection = document.getElementById('heroSection');
-            if (!container) return;
+            if (!container || !heroSection) return;
 
             try {
                 // Load from site_settings → hero_slideshow (JSON array of URLs)
@@ -446,7 +445,16 @@
                     return;
                 }
 
-                container.innerHTML = data.map(photo => `
+                // Filter out rows with no image_url to avoid broken <img>
+                const validPhotos = data.filter(p => p && p.image_url);
+
+                if (validPhotos.length === 0) {
+                    const section = document.querySelector('.photo-strip-section');
+                    if (section) section.style.display = 'none';
+                    return;
+                }
+
+                container.innerHTML = validPhotos.map(photo => `
                     <a href="gallery.html" class="photo-strip-item">
                         <img src="${photo.image_url}" alt="${photo.caption || 'AVMS Photo'}" loading="lazy">
                     </a>
