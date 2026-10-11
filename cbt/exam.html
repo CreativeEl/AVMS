@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
     <title>Examination in Progress - AVMS CBT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -805,7 +806,6 @@
 
         function handleTabSwitch() {
             tabSwitchCount++;
-            console.warn(`⚠️ Tab switch — count: ${tabSwitchCount}`);
 
             if (tabSwitchCount === 1) {
                 showWarning('⚠️ Warning: Leaving this page during an exam is not allowed. If you do it again, your exam will be submitted automatically.');
@@ -858,9 +858,7 @@
                 const shuffled = shuffleArray(data);
                 const selected = shuffled.slice(0, modeConfig.question_count);
 
-                // ============================================
-                // FIX: Shuffle options AND relabel A/B/C/D by position
-                // ============================================
+                // Shuffle options AND relabel A/B/C/D by position
                 questions = selected.map(q => {
                     const rawOptions = [
                         { text: q.option_a, wasCorrect: q.correct_answer === 'A' },
@@ -890,15 +888,13 @@
                     };
                 });
 
-                console.log('✅ Loaded', questions.length, 'questions with corrected labels');
-
                 restoreProgress();
                 renderNavigator();
                 renderQuestion();
                 startTimer();
                 updateProgressInfo();
             } catch (err) {
-                console.error('Error loading questions:', err);
+                console.warn('Error loading exam questions:', err);
                 alert('Failed to load questions. Redirecting.');
                 window.location.href = 'dashboard.html';
             }
@@ -916,26 +912,32 @@
         // ============================================
         // PROGRESS
         // ============================================
+        function hashQuestionIds() {
+            return JSON.stringify(questions.map(q => q.id).sort());
+        }
+
         function restoreProgress() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (!saved) return;
             try {
                 const data = JSON.parse(saved);
-                if (data.questionsHash === JSON.stringify(questions.map(q => q.id))) {
+                if (data.questionsHash === hashQuestionIds()) {
                     userAnswers = data.answers || {};
-                    currentIndex = data.currentIndex || 0;
+                    const restoredIndex = data.currentIndex || 0;
+                    currentIndex = Math.min(Math.max(restoredIndex, 0), questions.length - 1);
                     timeLeft = data.timeLeft || timeLeft;
-                    console.log('✅ Progress restored');
                 } else {
                     localStorage.removeItem(STORAGE_KEY);
                 }
-            } catch (err) { console.warn(err); }
+            } catch (err) {
+                console.warn('Could not restore exam progress:', err);
+            }
         }
 
         function saveProgress() {
             if (isSubmitted) return;
             const data = {
-                questionsHash: JSON.stringify(questions.map(q => q.id)),
+                questionsHash: hashQuestionIds(),
                 answers: userAnswers,
                 currentIndex,
                 timeLeft,
@@ -956,8 +958,10 @@
             document.getElementById('questionText').textContent = q.text;
 
             const badge = document.getElementById('difficultyBadge');
-            badge.textContent = q.difficulty;
-            badge.className = 'difficulty-badge ' + q.difficulty;
+            const allowedDifficulties = ['easy', 'medium', 'hard'];
+            const safeDifficulty = allowedDifficulties.includes(q.difficulty) ? q.difficulty : 'medium';
+            badge.textContent = safeDifficulty;
+            badge.className = 'difficulty-badge ' + safeDifficulty;
 
             document.getElementById('optionsList').innerHTML = q.options.map(opt => `
                 <div class="option-item ${userAnswers[currentIndex] === opt.letter ? 'selected' : ''}"
@@ -1118,7 +1122,7 @@
                 course_name: modeConfig.course_name,
                 score,
                 total: questions.length,
-                percentage: Math.round((score / questions.length) * 100),
+                percentage: questions.length ? Math.round((score / questions.length) * 100) : 0,
                 time_taken_seconds: timeTaken,
                 time_allowed_seconds: modeConfig.time_minutes * 60,
                 auto_submitted: auto,
@@ -1138,9 +1142,8 @@
                     time_taken_seconds: timeTaken,
                     answers_json: detailedAnswers
                 }]);
-                console.log('✅ Attempt saved');
             } catch (err) {
-                console.error('Could not save attempt:', err);
+                console.warn('Could not save exam attempt:', err);
             }
 
             localStorage.removeItem(STORAGE_KEY);
