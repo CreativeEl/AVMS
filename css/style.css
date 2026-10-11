@@ -4539,3 +4539,112 @@ html, body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+/* ============================================
+   PWA INSTALL MODAL — Centered popup
+   ============================================ */
+
+.pwa-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 47, 37, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.pwa-modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.pwa-modal {
+    background: #FBF8EE;
+    border-radius: 20px;
+    padding: 40px 32px 32px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(201, 169, 97, 0.35);
+    border-top: 4px solid #C9A961;
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2),
+                opacity 0.3s ease;
+}
+
+.pwa-modal-overlay.show .pwa-modal {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.pwa-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 16px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+}
+
+.pwa-modal-close:hover {
+    background: #F5F0DC;
+    color: #1F4E3D;
+    transform: rotate(90deg);
+}
+
+.pwa-modal-icon {
+    width: 92px;
+    height: 92px;
+    margin: 0 auto 20px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #1F4E3D;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 10px 24px rgba(31, 78, 61, 0.25),
+        0 0 0 4px rgba(201, 169, 97, 0.25);
+    padding: 8px;
+}
+
+.pwa-modal-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.pwa-modal-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    color: #1F4E3D;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+}
+
+.pwa-modal-text {
+    color: #555;
+    font-size: 14.5px;
+    line-height: 1.65;
+    margin-bottom: 26
