@@ -8,6 +8,29 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// ESCAPE HELPER (prevents HTML/script injection from DB content)
+// ============================================
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============================================
+// SAFE URL HELPER (only allows http/https)
+// ============================================
+function safeUrl(url) {
+    if (!url) return '';
+    const str = String(url).trim();
+    if (/^https?:\/\//i.test(str)) return str;
+    return '';
+}
+
+// ============================================
 // LOAD ALL EVENTS
 // ============================================
 async function loadAllEvents() {
@@ -75,7 +98,7 @@ async function loadAllEvents() {
         container.innerHTML = html;
         
     } catch (error) {
-        console.error('Error loading events:', error);
+        console.warn('Error loading events:', error);
         container.innerHTML = `
             <div class="event-card-full">
                 <p style="color: #e8491d;">⚠️ Could not load events. Please try again later.</p>
@@ -88,25 +111,29 @@ async function loadAllEvents() {
 // RENDER EVENTS
 // ============================================
 function renderEvents(events) {
-    return events.map(event => `
+    return events.map(event => {
+        const imgUrl = safeUrl(event.image_url);
+        const regUrl = safeUrl(event.registration_link);
+        return `
         <div class="event-card-full ${event.featured ? 'featured' : ''}">
             ${event.featured ? '<span class="featured-badge">⭐ Featured</span>' : ''}
-            ${event.image_url ? 
+            ${imgUrl ? 
                 `<div class="event-card-image">
-                    <img src="${event.image_url}" alt="${event.title || 'Event'}" 
+                    <img src="${imgUrl}" alt="${escapeHtml(event.title) || 'Event'}" 
                          onerror="this.parentElement.style.display='none'">
                 </div>` : ''
             }
             <div class="event-details-full">
-                <h3>${event.title || 'Untitled Event'}</h3>
+                <h3>${escapeHtml(event.title) || 'Untitled Event'}</h3>
                 <div class="event-meta">
                     <span><i class="fas fa-calendar"></i> ${formatDate(event.event_date)}</span>
-                    ${event.start_time ? `<span><i class="fas fa-clock"></i> ${event.start_time}</span>` : ''}
-                    ${event.venue ? `<span><i class="fas fa-map-marker-alt"></i> ${event.venue}</span>` : ''}
+                    ${event.start_time ? `<span><i class="fas fa-clock"></i> ${escapeHtml(event.start_time)}</span>` : ''}
+                    ${event.venue ? `<span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(event.venue)}</span>` : ''}
                 </div>
-                <p class="event-description">${event.description || 'No description available.'}</p>
-                ${event.registration_link ? `<a href="${event.registration_link}" class="btn btn-primary btn-sm">Register Now</a>` : ''}
+                <p class="event-description">${escapeHtml(event.description) || 'No description available.'}</p>
+                ${regUrl ? `<a href="${regUrl}" class="btn btn-primary btn-sm" target="_blank" rel="noopener">Register Now</a>` : ''}
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
