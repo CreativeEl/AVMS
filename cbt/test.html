@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
     <title>Test in Progress - AVMS CBT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -805,7 +806,6 @@
         // ============================================
         document.getElementById('testTitle').textContent =
             `${modeConfig.mode === 'exam' ? 'Examination' : 'Practice Test'} · ${modeConfig.course_code}`;
-        document.getElementById('totalNum').textContent = modeConfig.question_count;
 
         // ============================================
         // ANTI-CHEAT: refresh / close warning
@@ -829,7 +829,6 @@
 
         function handleTabSwitch() {
             tabSwitchCount++;
-            console.warn(`⚠️ Tab switch detected — count: ${tabSwitchCount}`);
 
             if (tabSwitchCount === 1) {
                 showWarning('⚠️ Warning: Leaving this page during a test is not allowed. If you do it again, your test will be submitted automatically.');
@@ -886,9 +885,7 @@
                 const shuffled = shuffleArray(data);
                 const selected = shuffled.slice(0, modeConfig.question_count);
 
-                // ============================================
-                // FIX: Shuffle options AND relabel A/B/C/D by position
-                // ============================================
+                // Shuffle options AND relabel A/B/C/D by position
                 questions = selected.map(q => {
                     // Build the raw option content (no letters attached yet)
                     const rawOptions = [
@@ -922,7 +919,8 @@
                     };
                 });
 
-                console.log('✅ Loaded', questions.length, 'questions with corrected labels');
+                // Update total display to reflect actual loaded count
+                document.getElementById('totalNum').textContent = questions.length;
 
                 // Try to restore progress
                 restoreProgress();
@@ -934,7 +932,7 @@
                 updateProgressInfo();
 
             } catch (err) {
-                console.error('Error loading questions:', err);
+                console.warn('Error loading questions:', err);
                 alert('Failed to load questions. Redirecting to dashboard.');
                 window.location.href = 'dashboard.html';
             }
@@ -953,16 +951,20 @@
         // ============================================
         // RESTORE / SAVE PROGRESS
         // ============================================
+        function hashQuestionIds() {
+            return JSON.stringify(questions.map(q => q.id).sort());
+        }
+
         function restoreProgress() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (!saved) return;
             try {
                 const data = JSON.parse(saved);
-                if (data.questionsHash === JSON.stringify(questions.map(q => q.id))) {
+                if (data.questionsHash === hashQuestionIds()) {
                     userAnswers = data.answers || {};
-                    currentIndex = data.currentIndex || 0;
+                    const restoredIndex = data.currentIndex || 0;
+                    currentIndex = Math.min(Math.max(restoredIndex, 0), questions.length - 1);
                     timeLeft = data.timeLeft || timeLeft;
-                    console.log('✅ Progress restored');
                 } else {
                     localStorage.removeItem(STORAGE_KEY);
                 }
@@ -974,7 +976,7 @@
         function saveProgress() {
             if (isSubmitted) return;
             const data = {
-                questionsHash: JSON.stringify(questions.map(q => q.id)),
+                questionsHash: hashQuestionIds(),
                 answers: userAnswers,
                 currentIndex: currentIndex,
                 timeLeft: timeLeft,
@@ -994,9 +996,12 @@
             document.getElementById('currentNum').textContent = currentIndex + 1;
             document.getElementById('questionText').textContent = q.text;
 
+            // Safe difficulty class — only allow known values
             const badge = document.getElementById('difficultyBadge');
-            badge.textContent = q.difficulty;
-            badge.className = 'difficulty-badge ' + q.difficulty;
+            const allowedDifficulties = ['easy', 'medium', 'hard'];
+            const safeDifficulty = allowedDifficulties.includes(q.difficulty) ? q.difficulty : 'medium';
+            badge.textContent = safeDifficulty;
+            badge.className = 'difficulty-badge ' + safeDifficulty;
 
             const optionsList = document.getElementById('optionsList');
             optionsList.innerHTML = q.options.map(opt => `
@@ -1178,7 +1183,7 @@
                 course_name: modeConfig.course_name,
                 score: score,
                 total: questions.length,
-                percentage: Math.round((score / questions.length) * 100),
+                percentage: questions.length ? Math.round((score / questions.length) * 100) : 0,
                 time_taken_seconds: timeTaken,
                 time_allowed_seconds: modeConfig.time_minutes * 60,
                 auto_submitted: auto,
@@ -1199,9 +1204,8 @@
                     time_taken_seconds: timeTaken,
                     answers_json: detailedAnswers
                 }]);
-                console.log('✅ Attempt saved to database');
             } catch (err) {
-                console.error('Could not save attempt:', err);
+                console.warn('Could not save attempt to database:', err);
             }
 
             // Clear localStorage
