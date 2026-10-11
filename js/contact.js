@@ -4,9 +4,21 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('🔍 Contact page loaded');
     initContactForm();
 });
+
+// ============================================
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
 // ============================================
 // MESSAGE HELPERS — on-brand success/error boxes
@@ -33,7 +45,7 @@ function errorHtml(text = 'Could not send message. Please try again later.') {
         <div class="contact-msg contact-msg-error">
             <i class="fas fa-exclamation-circle"></i>
             <div>
-                <p>${text}</p>
+                <p>${escapeHtml(text)}</p>
             </div>
         </div>
     `;
@@ -41,6 +53,7 @@ function errorHtml(text = 'Could not send message. Please try again later.') {
 
 // ============================================
 // INJECT ON-BRAND MESSAGE STYLES (once)
+// NOTE: Ideally these should live in css/style.css — flagged for later consolidation.
 // ============================================
 (function injectContactStyles() {
     if (document.getElementById('contact-js-styles')) return;
@@ -111,19 +124,18 @@ function errorHtml(text = 'Could not send message. Please try again later.') {
 function initContactForm() {
     const form = document.getElementById('contactForm');
     if (!form) {
-        console.error('❌ Contact form not found!');
+        console.warn('Contact form not found.');
         return;
     }
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        console.log('✅ Contact form submitted');
 
         const submitBtn = form.querySelector('button[type="submit"]');
         const msgDiv = document.getElementById('contactMessageDiv');
 
         if (!submitBtn) {
-            console.error('❌ Submit button not found inside form!');
+            console.warn('Submit button not found inside contact form.');
             return;
         }
 
@@ -156,16 +168,13 @@ function initContactForm() {
             return;
         }
 
-        console.log('📋 Contact form data:', formData);
-
         // ---- Show loading ----
         submitBtn.innerHTML = `<span class="spinner"></span> Sending...`;
         submitBtn.disabled = true;
         if (msgDiv) msgDiv.innerHTML = '';
 
         // ---- Check Supabase ----
-        if (typeof supabase === 'undefined') {
-            console.error('❌ Supabase not initialized!');
+        if (typeof supabase === 'undefined' || !supabase) {
             showContactMessage(msgDiv, 'error', errorHtml('Database connection error. Please try again later.'));
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
@@ -178,16 +187,14 @@ function initContactForm() {
             .insert([formData])
             .then(({ data, error }) => {
                 if (error) {
-                    console.error('❌ Supabase error:', error);
                     throw error;
                 }
 
                 showContactMessage(msgDiv, 'success', successHtml());
                 form.reset();
-                console.log('✅ Contact message saved successfully');
             })
             .catch((error) => {
-                console.error('❌ Error:', error);
+                console.warn('Contact message insert failed:', error);
                 showContactMessage(msgDiv, 'error', errorHtml());
             })
             .finally(() => {
