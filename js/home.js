@@ -12,6 +12,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
+// ESCAPE HELPER (prevents HTML/script injection from DB content)
+// ============================================
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// ============================================
 // 1. LOAD ANNOUNCEMENTS
 // ============================================
 async function loadAnnouncements() {
@@ -42,14 +55,14 @@ async function loadAnnouncements() {
         
         container.innerHTML = data.map(ann => `
             <div class="announcement-card">
-                <h3>${ann.title || 'Untitled'}</h3>
+                <h3>${escapeHtml(ann.title) || 'Untitled'}</h3>
                 <p class="date">📅 ${formatDate(ann.published_at)}</p>
-                <p>${truncateText(ann.content || 'No content available', 120)}</p>
+                <p>${escapeHtml(truncateText(ann.content || 'No content available', 120))}</p>
             </div>
         `).join('');
         
     } catch (error) {
-        console.error('Error loading announcements:', error);
+        console.warn('Error loading announcements:', error);
         container.innerHTML = `
             <div class="announcement-card">
                 <h3>⚠️ Connection Error</h3>
@@ -103,16 +116,16 @@ async function loadEvents() {
                     ${event.image_url ? '' : '🎉'}
                 </div>
                 <div class="event-details">
-                    <h3>${event.title || 'Untitled Event'}</h3>
+                    <h3>${escapeHtml(event.title) || 'Untitled Event'}</h3>
                     <p class="event-info"><i class="fas fa-calendar"></i> ${formatDate(event.event_date)}</p>
-                    <p class="event-info"><i class="fas fa-map-marker-alt"></i> ${event.venue || 'Venue TBD'}</p>
-                    <p>${truncateText(event.description || 'No description', 80)}</p>
+                    <p class="event-info"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(event.venue) || 'Venue TBD'}</p>
+                    <p>${escapeHtml(truncateText(event.description || 'No description', 80))}</p>
                 </div>
             </div>
         `).join('');
         
     } catch (error) {
-        console.error('Error loading events:', error);
+        console.warn('Error loading events:', error);
         container.innerHTML = `
             <div class="event-card">
                 <div class="event-image">⚠️</div>
@@ -163,16 +176,16 @@ async function loadLeaders() {
             <div class="leader-card">
                 <div class="leader-photo">
                     ${leader.photo_url
-                        ? `<img src="${leader.photo_url}" alt="${leader.name || 'Leader'}">`
+                        ? `<img src="${leader.photo_url}" alt="${escapeHtml(leader.name) || 'Leader'}">`
                         : '👤'}
                 </div>
-                <h4>${leader.name || 'Demo Leader'}</h4>
-                <p>${leader.position || 'Position'}</p>
+                <h4>${escapeHtml(leader.name) || 'Demo Leader'}</h4>
+                <p>${escapeHtml(leader.position) || 'Position'}</p>
             </div>
         `).join('');
         
     } catch (error) {
-        console.error('Error loading leaders:', error);
+        console.warn('Error loading leaders:', error);
         container.innerHTML = `
             <div class="leader-card">
                 <div class="leader-photo">⚠️</div>
