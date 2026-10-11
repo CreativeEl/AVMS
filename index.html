@@ -12,6 +12,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
+
+    <!-- ============ PWA ============ -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1F4E3D">
+    <link rel="apple-touch-icon" href="https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AVMS">
+    <!-- ================================ -->
 </head>
 <body>
 
@@ -107,9 +116,7 @@
                 </div>
             </div>
 
-            <!-- Slideshow pane -->
             <div class="hero-slideshow" id="heroSlideshow">
-                <!-- Slides injected by JS -->
                 <div class="hero-slide-dots" id="heroSlideDots"></div>
                 <div class="hero-slide-nav">
                     <button class="hero-slide-btn" onclick="heroPrevSlide()" aria-label="Previous slide">
@@ -287,15 +294,13 @@
     <script src="js/main.js"></script>
     <script src="js/home.js"></script>
     <script src="js/site-loader.js"></script>
+    <script src="js/pwa.js"></script>
 
     <!-- ==========================================
     HERO SLIDESHOW + PHOTO STRIP LOADERS
     ========================================== -->
     <script>
-        // ============================================
-        // HERO SLIDESHOW
-        // ============================================
-        let heroSlides = [];       // array of image URLs
+        let heroSlides = [];
         let heroCurrentIndex = 0;
         let heroAutoplayTimer = null;
         const HERO_AUTOPLAY_MS = 5000;
@@ -306,7 +311,6 @@
             if (!container || !heroSection) return;
 
             try {
-                // Load from site_settings → hero_slideshow (JSON array of URLs)
                 const { data, error } = await supabase
                     .from('site_settings')
                     .select('setting_value')
@@ -316,7 +320,6 @@
                 if (error) throw error;
 
                 if (!data || !data.setting_value) {
-                    // No slideshow images uploaded — hide pane, keep green gradient
                     heroSection.classList.add('no-slideshow');
                     container.innerHTML = `
                         <div class="hero-slide-dots" id="heroSlideDots"></div>
@@ -332,7 +335,6 @@
                     return;
                 }
 
-                // Parse JSON array of URLs
                 let urls = [];
                 try {
                     urls = JSON.parse(data.setting_value);
@@ -341,7 +343,6 @@
                     urls = [];
                 }
 
-                // Filter to non-empty strings
                 urls = urls.filter(u => u && typeof u === 'string' && u.trim() !== '');
 
                 if (urls.length === 0) {
@@ -351,52 +352,43 @@
 
                 heroSlides = urls;
 
-                // Build slides
                 const slidesHtml = heroSlides.map((url, i) => `
                     <div class="hero-slide ${i === 0 ? 'active' : ''}" 
                          style="background-image: url('${url}');"
                          data-slide-index="${i}"></div>
                 `).join('');
 
-                // Build dots
                 const dotsHtml = heroSlides.map((_, i) => `
                     <button class="hero-slide-dot ${i === 0 ? 'active' : ''}" 
                             onclick="heroGoToSlide(${i})"
                             aria-label="Slide ${i + 1}"></button>
                 `).join('');
 
-                // Keep the nav buttons, replace the rest
                 const navHtml = container.querySelector('.hero-slide-nav').outerHTML;
                 container.innerHTML = slidesHtml + `<div class="hero-slide-dots" id="heroSlideDots">${dotsHtml}</div>` + navHtml;
 
-                // Start autoplay
                 startHeroAutoplay();
 
-                // Pause autoplay on hover
                 container.addEventListener('mouseenter', stopHeroAutoplay);
                 container.addEventListener('mouseleave', startHeroAutoplay);
 
             } catch (err) {
                 console.warn('Hero slideshow could not load:', err);
-                // Fail silently — keep the green gradient
             }
         }
 
         function heroGoToSlide(index) {
             if (heroSlides.length === 0) return;
 
-            // Clamp
             if (index < 0) index = heroSlides.length - 1;
             if (index >= heroSlides.length) index = 0;
 
             heroCurrentIndex = index;
 
-            // Update slides
             document.querySelectorAll('.hero-slide').forEach((el, i) => {
                 el.classList.toggle('active', i === heroCurrentIndex);
             });
 
-            // Update dots
             document.querySelectorAll('.hero-slide-dot').forEach((el, i) => {
                 el.classList.toggle('active', i === heroCurrentIndex);
             });
@@ -423,9 +415,6 @@
             }
         }
 
-        // ============================================
-        // PHOTO STRIP
-        // ============================================
         (async function loadPhotoStrip() {
             const container = document.getElementById('photoStripContainer');
             if (!container) return;
@@ -445,7 +434,6 @@
                     return;
                 }
 
-                // Filter out rows with no image_url to avoid broken <img>
                 const validPhotos = data.filter(p => p && p.image_url);
 
                 if (validPhotos.length === 0) {
@@ -466,10 +454,18 @@
             }
         })();
 
-        // ============================================
-        // INIT SLIDESHOW
-        // ============================================
         loadHeroSlideshow();
+
+        // ============================================
+        // REGISTER SERVICE WORKER (PWA)
+        // ============================================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch((err) => {
+                    console.warn('SW registration failed:', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
