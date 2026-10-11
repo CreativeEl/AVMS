@@ -4,8 +4,6 @@
 // ============================================
 
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('🔄 Loading site settings...');
-
     try {
         // Fetch all settings from Supabase
         const { data, error } = await supabase
@@ -20,8 +18,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             settings[s.setting_key] = s.setting_value;
         });
 
-        console.log('✅ Settings loaded:', Object.keys(settings).length, 'items');
-
         // ============================================
         // APPLY SETTINGS
         // ============================================
@@ -35,27 +31,58 @@ document.addEventListener('DOMContentLoaded', async function() {
         applyAboutContent(settings);
         applyJoinContent(settings);
 
-        console.log('✅ Site settings applied');
-
     } catch (error) {
-        console.error('❌ Error loading settings:', error);
+        console.warn('Error loading site settings:', error);
     }
 });
 
 // ============================================
-// APPLY LOGO — FIXED
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+    if (text == null) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// Safe icon class: only "fa-xxx" or "fas"/"far" style tokens
+function sanitizeIcon(icon) {
+    if (!icon) return '';
+    const str = String(icon).trim();
+    return /^[a-z0-9-]+$/i.test(str) ? str : '';
+}
+
+// Escape text, then convert \n\n → <br><br>, \n → <br>
+function textToHtml(text) {
+    if (text == null) return '';
+    return escapeHtml(text)
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>');
+}
+
+// ============================================
+// APPLY LOGO
 // - Updates existing .logo-img only
-// - Never creates duplicate images
-// - Never hides .logo-text
+// - Also updates .logo-text from site_short_name
 // ============================================
 function applyLogo(settings) {
-    if (!settings.site_logo) return;
+    if (settings.site_logo) {
+        document.querySelectorAll('.logo-img').forEach(el => {
+            if (el.tagName === 'IMG') {
+                el.src = settings.site_logo;
+            }
+        });
+    }
 
-    document.querySelectorAll('.logo-img').forEach(el => {
-        if (el.tagName === 'IMG') {
-            el.src = settings.site_logo;
-        }
-    });
+    if (settings.site_short_name) {
+        document.querySelectorAll('[data-footer="site-short-name"], .logo-text').forEach(el => {
+            el.textContent = settings.site_short_name;
+        });
+    }
 }
 
 // ============================================
@@ -107,7 +134,7 @@ function applyContactInfo(settings) {
 
     if (settings.contact_address) {
         document.querySelectorAll('[data-contact="address"], .contact-address').forEach(el => {
-            el.innerHTML = settings.contact_address.replace(/\n/g, '<br>');
+            el.innerHTML = textToHtml(settings.contact_address);
         });
     }
 
@@ -125,8 +152,7 @@ function applyContactInfo(settings) {
 }
 
 // ============================================
-// APPLY SOCIAL LINKS - FIXED
-// Always shows icons, no underline, consistent size
+// APPLY SOCIAL LINKS
 // ============================================
 function applySocialLinks(settings) {
     const socialMap = {
@@ -142,18 +168,12 @@ function applySocialLinks(settings) {
         const icon = link.querySelector('i');
         if (!icon) return;
 
-        // FIX: Remove underline and force consistent display
-        link.style.textDecoration = 'none';
-        link.style.display = 'inline-block';
-        link.style.lineHeight = '1';
-
         const iconClass = icon.className;
         for (const [key, platform] of Object.entries(socialMap)) {
             if (iconClass.includes(platform)) {
                 if (settings[key]) {
                     link.href = settings[key];
                 }
-                // FIX: Always keep icon visible (never hide)
                 break;
             }
         }
@@ -164,12 +184,6 @@ function applySocialLinks(settings) {
 // APPLY FOOTER CONTENT
 // ============================================
 function applyFooterContent(settings) {
-    if (settings.footer_description) {
-        document.querySelectorAll('[data-footer="description"]').forEach(el => {
-            el.textContent = settings.footer_description;
-        });
-    }
-
     if (settings.copyright_text) {
         document.querySelectorAll('[data-footer="copyright"]').forEach(el => {
             el.textContent = settings.copyright_text;
@@ -179,12 +193,6 @@ function applyFooterContent(settings) {
     if (settings.copyright_year) {
         document.querySelectorAll('.current-year').forEach(el => {
             el.textContent = settings.copyright_year;
-        });
-    }
-
-    if (settings.footer_credit) {
-        document.querySelectorAll('[data-footer="credit"]').forEach(el => {
-            el.textContent = settings.footer_credit;
         });
     }
 
@@ -206,8 +214,11 @@ function applyFooterContent(settings) {
 // ============================================
 function applyHomepageContent(settings) {
     if (settings.hero_title) {
+        // Only replace if the h1 has no inner span structure (avoid wiping cursive styling)
         document.querySelectorAll('[data-home="hero-title"]').forEach(el => {
-            el.textContent = settings.hero_title;
+            if (!el.querySelector('span')) {
+                el.textContent = settings.hero_title;
+            }
         });
     }
 
@@ -261,7 +272,7 @@ function applyHomepageContent(settings) {
     }
     if (settings.welcome_message) {
         document.querySelectorAll('[data-home="welcome-message"]').forEach(el => {
-            el.innerHTML = settings.welcome_message.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+            el.innerHTML = textToHtml(settings.welcome_message);
         });
     }
 
@@ -278,11 +289,7 @@ function applyHomepageContent(settings) {
 }
 
 // ============================================
-// APPLY ABOUT PAGE CONTENT — FIXED
-// - When a background-image is applied to a
-//   non-IMG element, strip the placeholder class
-//   and remove child icon/text so the dashed
-//   gold border and centered icon disappear.
+// APPLY ABOUT PAGE CONTENT
 // ============================================
 function applyAboutContent(settings) {
     if (settings.about_who_title) {
@@ -292,7 +299,7 @@ function applyAboutContent(settings) {
     }
     if (settings.about_who_content) {
         document.querySelectorAll('[data-about="who-content"]').forEach(el => {
-            el.innerHTML = settings.about_who_content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+            el.innerHTML = textToHtml(settings.about_who_content);
         });
     }
 
@@ -325,7 +332,7 @@ function applyAboutContent(settings) {
     }
     if (settings.about_history_content) {
         document.querySelectorAll('[data-about="history-content"]').forEach(el => {
-            el.innerHTML = settings.about_history_content.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>');
+            el.innerHTML = textToHtml(settings.about_history_content);
         });
     }
 
@@ -334,9 +341,6 @@ function applyAboutContent(settings) {
             if (el.tagName === 'IMG') {
                 el.src = settings.about_image;
             } else {
-                // FIX: Apply the background image AND strip the
-                // placeholder styling so the dashed gold border,
-                // padding, and centered icon all disappear.
                 el.style.backgroundImage = `url('${settings.about_image}')`;
                 el.style.backgroundSize = 'cover';
                 el.style.backgroundPosition = 'center';
@@ -345,7 +349,6 @@ function applyAboutContent(settings) {
                 el.style.padding = '0';
                 el.style.minHeight = '0';
                 el.classList.remove('placeholder-image');
-                // Remove any child icon/text placeholder elements
                 el.querySelectorAll('i, p').forEach(child => child.remove());
             }
         });
@@ -353,9 +356,12 @@ function applyAboutContent(settings) {
 
     for (let i = 1; i <= 6; i++) {
         if (settings[`about_value${i}_icon`]) {
-            document.querySelectorAll(`[data-about="value${i}-icon"]`).forEach(el => {
-                el.className = `fas ${settings[`about_value${i}_icon`]}`;
-            });
+            const safeIcon = sanitizeIcon(settings[`about_value${i}_icon`]);
+            if (safeIcon) {
+                document.querySelectorAll(`[data-about="value${i}-icon"]`).forEach(el => {
+                    el.className = `fas ${safeIcon}`;
+                });
+            }
         }
         if (settings[`about_value${i}_title`]) {
             document.querySelectorAll(`[data-about="value${i}-title"]`).forEach(el => {
@@ -403,9 +409,12 @@ function applyJoinContent(settings) {
 
     for (let i = 1; i <= 6; i++) {
         if (settings[`join_benefit${i}_icon`]) {
-            document.querySelectorAll(`[data-join="benefit${i}-icon"]`).forEach(el => {
-                el.className = `fas ${settings[`join_benefit${i}_icon`]}`;
-            });
+            const safeIcon = sanitizeIcon(settings[`join_benefit${i}_icon`]);
+            if (safeIcon) {
+                document.querySelectorAll(`[data-join="benefit${i}-icon"]`).forEach(el => {
+                    el.className = `fas ${safeIcon}`;
+                });
+            }
         }
         if (settings[`join_benefit${i}_title`]) {
             document.querySelectorAll(`[data-join="benefit${i}-title"]`).forEach(el => {
@@ -426,8 +435,8 @@ function applyJoinContent(settings) {
     }
     if (settings.join_eligibility_content) {
         document.querySelectorAll('[data-join="eligibility-content"]').forEach(el => {
-            const items = settings.join_eligibility_content.split('\n').filter(s => s.trim());
-            el.innerHTML = items.map(item => `<li>✅ ${item}</li>`).join('');
+            const items = settings.join_eligibility_content.split(/\r?\n/).filter(s => s.trim());
+            el.innerHTML = items.map(item => `<li>✅ ${escapeHtml(item)}</li>`).join('');
         });
     }
 
@@ -438,8 +447,8 @@ function applyJoinContent(settings) {
     }
     if (settings.join_requirements_content) {
         document.querySelectorAll('[data-join="requirements-content"]').forEach(el => {
-            const items = settings.join_requirements_content.split('\n').filter(s => s.trim());
-            el.innerHTML = items.map(item => `<li>✅ ${item}</li>`).join('');
+            const items = settings.join_requirements_content.split(/\r?\n/).filter(s => s.trim());
+            el.innerHTML = items.map(item => `<li>✅ ${escapeHtml(item)}</li>`).join('');
         });
     }
 
@@ -461,5 +470,3 @@ function applyJoinContent(settings) {
         }
     }
 }
-
-console.log('📄 Site loader ready');
