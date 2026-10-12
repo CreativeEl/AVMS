@@ -21,6 +21,7 @@
             --cream: #F5F0DC;
             --cream-light: #FBF8EE;
             --border: #e3e0d2;
+            --sidebar-w: 248px;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,385 +29,598 @@
         html, body {
             min-height: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #F0EDE0;
+            background: #F4F1E4;
             color: #1a1a1a;
-            overflow-x: hidden;
-        }
-
-        /* Desktop: keep it app-sized, centered with soft side space */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(180deg, #F7F3E4 0%, #F0EDE0 100%);
-            z-index: -1;
         }
 
         /* ============================================ */
-        /* APP FRAME                                    */
+        /* GUARD SCREEN                                 */
         /* ============================================ */
-        .app-frame {
-            max-width: 560px;
-            margin: 0 auto;
-            min-height: 100vh;
+        .guard-screen {
+            position: fixed; inset: 0;
             background: #FBF8EE;
-            position: relative;
-            padding-bottom: calc(76px + env(safe-area-inset-bottom));
-            box-shadow: 0 0 60px rgba(31,78,61,0.06);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 9999; gap: 16px; padding: 24px; text-align: center;
+        }
+        .guard-screen.hidden { display: none; }
+        .guard-spinner {
+            width: 42px; height: 42px;
+            border: 3.5px solid rgba(31,78,61,0.15);
+            border-top-color: var(--green-deep);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .guard-text { font-size: 14px; color: var(--green-deep); font-weight: 600; max-width: 320px; line-height: 1.5; }
+
+        /* ============================================ */
+        /* LAYOUT                                       */
+        /* ============================================ */
+        .portal {
+            display: flex;
+            min-height: 100vh;
         }
 
         /* ============================================ */
-        /* HERO HEADER                                  */
+        /* SIDEBAR                                      */
         /* ============================================ */
-        .hero {
-            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
-            padding: max(22px, env(safe-area-inset-top)) 22px 72px;
-            position: relative;
-            overflow: hidden;
-            border-bottom-left-radius: 28px;
-            border-bottom-right-radius: 28px;
-        }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -80px; right: -80px;
-            width: 240px; height: 240px;
-            border-radius: 50%;
-            background: rgba(201,169,97,0.15);
-        }
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -100px; left: -60px;
-            width: 260px; height: 260px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-        }
-
-        .hero-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 26px;
-        }
-        .hero-greet {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
-        .hero-avatar {
-            width: 46px; height: 46px;
-            border-radius: 50%;
-            background: rgba(201,169,97,0.22);
-            border: 1.5px solid rgba(201,169,97,0.5);
-            color: #F5E5B8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-        .hero-greet-text {
-            min-width: 0;
-        }
-        .hero-greet-text .hi {
-            font-size: 11.5px;
-            color: rgba(255,255,255,0.65);
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            margin-bottom: 2px;
-        }
-        .hero-greet-text .name {
-            font-size: 17px;
-            font-weight: 700;
+        .sidebar {
+            width: var(--sidebar-w);
+            background: linear-gradient(180deg, #1F4E3D 0%, #17392c 100%);
             color: #ffffff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .hero-actions {
             display: flex;
-            gap: 8px;
-            flex-shrink: 0;
+            flex-direction: column;
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+            z-index: 100;
+            transition: transform 0.28s ease;
+            overflow-y: auto;
         }
-        .hero-icon-btn {
+        .sidebar-header {
+            padding: 22px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-logo {
             width: 40px; height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.18);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.15s, transform 0.1s;
-            text-decoration: none;
-        }
-        .hero-icon-btn:hover { background: rgba(255,255,255,0.2); }
-        .hero-icon-btn:active { transform: scale(0.94); }
-
-        .hero-title {
-            font-family: Georgia, serif;
-            font-size: 26px;
-            color: #ffffff;
-            font-weight: 700;
-            letter-spacing: -0.4px;
-            line-height: 1.15;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 4px;
-        }
-        .hero-sub {
-            font-size: 13px;
-            color: rgba(255,255,255,0.7);
-            position: relative;
-            z-index: 1;
-        }
-
-        /* ============================================ */
-        /* ID CARD (overlapping hero)                   */
-        /* ============================================ */
-        .id-card-wrap {
-            padding: 0 20px;
-            margin-top: -54px;
-            position: relative;
-            z-index: 5;
-            margin-bottom: 22px;
-        }
-        .id-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 18px 20px;
-            box-shadow: 0 10px 30px rgba(31,78,61,0.12), 0 2px 6px rgba(31,78,61,0.06);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            border: 1px solid #f0ede0;
-        }
-        .id-card-logo {
-            width: 50px; height: 50px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: Georgia, serif;
+            background: rgba(201,169,97,0.15);
+            border: 1.5px solid rgba(201,169,97,0.6);
             color: var(--gold);
-            font-weight: 700;
-            font-size: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: Georgia, serif; font-weight: 700; font-size: 14px;
             flex-shrink: 0;
-            box-shadow: 0 6px 16px rgba(31,78,61,0.2);
         }
-        .id-card-body {
+        .sidebar-brand {
+            min-width: 0;
+        }
+        .sidebar-brand h1 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.2px;
+            margin-bottom: 2px;
+        }
+        .sidebar-brand p {
+            font-size: 10.5px;
+            color: rgba(255,255,255,0.55);
+            letter-spacing: 0.3px;
+        }
+        .sidebar-close {
+            display: none;
+            margin-left: auto;
+            background: none; border: none;
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 14px 0;
+        }
+        .sidebar-section {
+            padding: 14px 20px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 20px;
+            color: rgba(255,255,255,0.82);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            border-top: none; border-right: none; border-bottom: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+        .sidebar-link i {
+            font-size: 15px;
+            width: 18px;
+            text-align: center;
+            color: rgba(201,169,97,0.85);
+        }
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: #ffffff;
+        }
+        .sidebar-link.active {
+            background: rgba(201,169,97,0.12);
+            border-left-color: var(--gold);
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .sidebar-link.active i { color: var(--gold); }
+
+        .sidebar-footer {
+            padding: 14px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-logout {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 0;
+            cursor: pointer;
+            background: none; border: none;
+            font-family: inherit;
+            width: 100%;
+            text-align: left;
+            transition: color 0.15s;
+        }
+        .sidebar-logout:hover { color: #ffb3b3; }
+        .sidebar-logout i { color: #ffb3b3; font-size: 14px; width: 18px; text-align: center; }
+
+        /* ============================================ */
+        /* OVERLAY (mobile)                             */
+        /* ============================================ */
+        .sidebar-overlay {
+            display: none;
+            position: fixed; inset: 0;
+            background: rgba(20,47,37,0.55);
+            backdrop-filter: blur(2px);
+            z-index: 99;
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .sidebar-overlay.open { opacity: 1; pointer-events: auto; }
+
+        /* ============================================ */
+        /* MAIN AREA                                    */
+        /* ============================================ */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: #FBF8EE;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .hamburger-btn {
+            display: none;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            color: var(--green-deep);
+            cursor: pointer;
+            font-size: 16px;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .topbar-title {
             flex: 1;
             min-width: 0;
         }
-        .id-card-body .label {
-            font-size: 10px;
+        .topbar-title h2 {
+            font-family: Georgia, serif;
+            font-size: 18px;
+            color: var(--green-deep);
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            margin-bottom: 2px;
+        }
+        .topbar-title p {
+            font-size: 12px;
+            color: #8a8a8a;
+        }
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        .topbar-user-info {
+            text-align: right;
+            min-width: 0;
+        }
+        .topbar-user-info .n {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-deep);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+        .topbar-user-info .r {
+            font-size: 11px;
+            color: #8a8a8a;
+        }
+        .topbar-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(31,78,61,0.2);
+        }
+
+        /* ============================================ */
+        /* CONTENT                                      */
+        /* ============================================ */
+        .content {
+            padding: 24px 28px 40px;
+            max-width: 1300px;
+            width: 100%;
+        }
+        .screen { display: none; animation: fadeUp 0.3s ease-out; }
+        .screen.active { display: block; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* WELCOME BANNER */
+        .welcome-banner {
+            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+            border-radius: 20px;
+            padding: 26px 30px;
+            color: #ffffff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 14px 32px rgba(31,78,61,0.16);
+            margin-bottom: 22px;
+        }
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.16);
+        }
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -80px; left: 30%;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.04);
+        }
+        .welcome-banner .inner { position: relative; z-index: 1; }
+        .welcome-banner .eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.65);
+            margin-bottom: 8px;
+        }
+        .welcome-banner h3 {
+            font-family: Georgia, serif;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+        .welcome-banner p {
+            font-size: 13.5px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.5;
+            max-width: 560px;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #f0ede0;
+            padding: 16px 18px;
+            box-shadow: 0 2px 8px rgba(31,78,61,0.04);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .stat-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: #ffffff;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .stat-icon.green { background: linear-gradient(135deg, #1F4E3D, #2D6B54); }
+        .stat-icon.gold { background: linear-gradient(135deg, #A88943, #C9A961); }
+        .stat-icon.red { background: linear-gradient(135deg, #8B1A1A, #b02c2c); }
+        .stat-icon.mid { background: linear-gradient(135deg, #2D6B54, #4a8b6f); }
+        .stat-body { min-width: 0; }
+        .stat-body .k {
+            font-size: 10.5px;
             font-weight: 700;
             letter-spacing: 1.2px;
             text-transform: uppercase;
             color: #8a8a8a;
             margin-bottom: 3px;
         }
-        .id-card-body .value {
+        .stat-body .v {
             font-size: 15px;
             font-weight: 700;
             color: var(--green-deep);
-            margin-bottom: 3px;
-            word-break: break-word;
-        }
-        .id-card-body .meta {
-            font-size: 12px;
-            color: #6b6b6b;
-        }
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #E8F3EC;
-            color: var(--green-deep);
-            padding: 5px 11px;
-            border-radius: 20px;
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
             white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .status-pill i { font-size: 6px; }
-
-        /* ============================================ */
-        /* SCREEN CONTAINER                             */
-        /* ============================================ */
-        .screens {
-            padding: 0 20px;
-        }
-        .screen {
-            display: none;
-            animation: fadeUp 0.32s ease-out;
-        }
-        .screen.active { display: block; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* ============================================ */
-        /* SECTION HEADER                               */
-        /* ============================================ */
+        /* SECTION HEADER */
         .section-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 4px 2px 12px;
+            margin-bottom: 14px;
         }
         .section-head h2 {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--green-deep);
-            letter-spacing: -0.1px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .section-head h2::before {
             content: '';
-            width: 3px;
-            height: 14px;
+            width: 4px; height: 16px;
             border-radius: 2px;
             background: var(--gold);
         }
         .section-head .count {
-            font-size: 11px;
+            font-size: 12px;
             color: #8a8a8a;
             font-weight: 600;
         }
+        .section-head .link {
+            font-size: 12.5px;
+            color: var(--green-mid);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .section-head .link:hover { text-decoration: underline; }
 
-        /* ============================================ */
-        /* QUICK ACTIONS GRID                           */
-        /* ============================================ */
+        /* QUICK ACTIONS */
         .quick-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 11px;
-            margin-bottom: 22px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
         }
         .quick-tile {
             background: #ffffff;
             border-radius: 16px;
-            padding: 15px 6px 13px;
-            text-align: center;
-            text-decoration: none;
-            color: var(--green-deep);
-            box-shadow: 0 3px 10px rgba(31,78,61,0.05);
             border: 1px solid #f0ede0;
-            transition: transform 0.12s, box-shadow 0.18s;
+            padding: 18px 14px 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.2s;
+            box-shadow: 0 3px 10px rgba(31,78,61,0.05);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
         }
-        .quick-tile:hover { box-shadow: 0 8px 22px rgba(31,78,61,0.12); transform: translateY(-2px); }
-        .quick-tile:active { transform: scale(0.97); }
+        .quick-tile:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(31,78,61,0.12); }
+        .quick-tile:active { transform: scale(0.98); }
         .quick-tile .icon-wrap {
-            width: 42px; height: 42px;
+            width: 44px; height: 44px;
             border-radius: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 17px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
             color: #ffffff;
         }
-        .quick-tile .label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #333;
-            line-height: 1.2;
-        }
-
-        /* Tile color accents */
         .tile-cbt .icon-wrap { background: linear-gradient(135deg, #1F4E3D, #2D6B54); }
-        .tile-ann .icon-wrap { background: linear-gradient(135deg, #A88943, #C9A961); }
-        .tile-evt .icon-wrap { background: linear-gradient(135deg, #8B1A1A, #b02c2c); }
-        .tile-dl .icon-wrap { background: linear-gradient(135deg, #2D6B54, #4a8b6f); }
+        .tile-mat .icon-wrap { background: linear-gradient(135deg, #A88943, #C9A961); }
+        .tile-ann .icon-wrap { background: linear-gradient(135deg, #8B1A1A, #b02c2c); }
+        .tile-evt .icon-wrap { background: linear-gradient(135deg, #2D6B54, #4a8b6f); }
         .tile-gal .icon-wrap { background: linear-gradient(135deg, #A88943, #d4b878); }
         .tile-giv .icon-wrap { background: linear-gradient(135deg, #8B1A1A, #A88943); }
+        .quick-tile .t {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--green-deep);
+            line-height: 1.25;
+        }
+        .quick-tile .s {
+            font-size: 11.5px;
+            color: #8a8a8a;
+            line-height: 1.35;
+            margin-top: -4px;
+        }
 
-        /* ============================================ */
-        /* CARD LIST (for content screens)              */
-        /* ============================================ */
-        .list-card {
+        /* CARD GRID (announcements / events) */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #f0ede0;
+            padding: 18px 20px;
+            box-shadow: 0 3px 10px rgba(31,78,61,0.04);
+            transition: transform 0.15s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(31,78,61,0.1); }
+        .card .tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 4px 9px;
+            border-radius: 20px;
+            background: #F7F5EC;
+            color: var(--gold-deep);
+            margin-bottom: 10px;
+        }
+        .card .tag.green { background: #E8F3EC; color: var(--green-deep); }
+        .card .tag.red { background: #FBEAEA; color: var(--red-deep); }
+        .card h4 {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--green-deep);
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+        .card p {
+            font-size: 12.5px;
+            color: #6b6b6b;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        .card .date {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gold-deep);
+            letter-spacing: 0.3px;
+        }
+
+        /* MATERIALS LIST */
+        .materials-list {
             background: #ffffff;
             border-radius: 16px;
             border: 1px solid #f0ede0;
             overflow: hidden;
             box-shadow: 0 3px 10px rgba(31,78,61,0.04);
-            margin-bottom: 18px;
+            margin-bottom: 24px;
         }
-        .list-item {
-            display: block;
-            padding: 14px 16px;
-            text-decoration: none;
-            color: #1a1a1a;
+        .material-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 15px 18px;
             border-bottom: 1px solid #f5f2e6;
+            text-decoration: none;
+            color: inherit;
             transition: background 0.15s;
         }
-        .list-item:last-child { border-bottom: none; }
-        .list-item:hover { background: #FBF8EE; }
-        .list-item .li-title {
+        .material-item:last-child { border-bottom: none; }
+        .material-item:hover { background: #FBF8EE; }
+        .material-item .m-icon {
+            width: 42px; height: 42px;
+            border-radius: 11px;
+            background: #F7F5EC;
+            color: var(--green-deep);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .material-item .m-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .material-item .m-title {
             font-size: 14px;
             font-weight: 600;
             color: var(--green-deep);
             margin-bottom: 3px;
             line-height: 1.3;
         }
-        .list-item .li-sub {
+        .material-item .m-sub {
             font-size: 12px;
             color: #8a8a8a;
             line-height: 1.4;
         }
-        .list-item .li-date {
+        .material-item .m-meta {
             font-size: 11px;
-            color: var(--gold-deep);
             font-weight: 600;
-            margin-top: 5px;
-            letter-spacing: 0.3px;
+            color: var(--gold-deep);
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
+        /* EMPTY / LOADER */
         .empty-card {
             background: #ffffff;
             border-radius: 16px;
-            border: 1px dashed #e3e0d2;
-            padding: 32px 20px;
+            border: 1px dashed var(--border);
+            padding: 34px 24px;
             text-align: center;
             color: #8a8a8a;
             font-size: 13px;
-            margin-bottom: 18px;
+            margin-bottom: 24px;
         }
         .empty-card i {
             display: block;
-            font-size: 28px;
+            font-size: 30px;
             color: #d8d4c2;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-
         .loader-card {
             background: #ffffff;
             border-radius: 16px;
             border: 1px solid #f0ede0;
-            padding: 32px 20px;
+            padding: 34px 24px;
             text-align: center;
             color: #8a8a8a;
             font-size: 13px;
-            margin-bottom: 18px;
+            margin-bottom: 24px;
         }
         .loader-spinner {
             width: 26px; height: 26px;
@@ -416,85 +630,32 @@
             animation: spin 0.8s linear infinite;
             margin: 0 auto 10px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ============================================ */
-        /* CBT SCREEN (highlight block)                 */
-        /* ============================================ */
-        .cbt-highlight {
-            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
-            border-radius: 20px;
-            padding: 22px;
-            color: #ffffff;
-            margin-bottom: 18px;
-            position: relative;
-            overflow: hidden;
+        /* PROFILE */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
         }
-        .cbt-highlight::before {
-            content: '';
-            position: absolute;
-            top: -40px; right: -40px;
-            width: 140px; height: 140px;
-            border-radius: 50%;
-            background: rgba(201,169,97,0.18);
+        @media (max-width: 900px) {
+            .profile-grid { grid-template-columns: 1fr; }
         }
-        .cbt-highlight h3 {
-            font-family: Georgia, serif;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            position: relative;
-            z-index: 1;
-        }
-        .cbt-highlight p {
-            font-size: 13px;
-            color: rgba(255,255,255,0.75);
-            line-height: 1.5;
-            margin-bottom: 16px;
-            position: relative;
-            z-index: 1;
-        }
-        .cbt-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #ffffff;
-            color: var(--green-deep);
-            padding: 12px 20px;
-            border-radius: 24px;
-            font-size: 13px;
-            font-weight: 700;
-            text-decoration: none;
-            position: relative;
-            z-index: 1;
-            transition: transform 0.12s, box-shadow 0.18s;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-        }
-        .cbt-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-        .cbt-btn:active { transform: scale(0.97); }
-
-        /* ============================================ */
-        /* PROFILE SCREEN                               */
-        /* ============================================ */
         .profile-card {
             background: #ffffff;
-            border-radius: 20px;
-            padding: 26px 22px;
+            border-radius: 18px;
             border: 1px solid #f0ede0;
-            box-shadow: 0 4px 14px rgba(31,78,61,0.05);
-            margin-bottom: 16px;
+            padding: 26px 22px;
             text-align: center;
+            box-shadow: 0 3px 10px rgba(31,78,61,0.04);
         }
         .profile-avatar {
-            width: 76px; height: 76px;
+            width: 82px; height: 82px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
             color: #ffffff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            font-weight: 700;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 700;
             margin-bottom: 14px;
             box-shadow: 0 10px 24px rgba(31,78,61,0.22);
         }
@@ -508,134 +669,162 @@
         .profile-reg {
             font-size: 13px;
             color: #8a8a8a;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
-        .profile-info {
-            text-align: left;
-            border-top: 1px solid #f0ede0;
-            margin-top: 18px;
-            padding-top: 18px;
+        .profile-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #E8F3EC;
+            color: var(--green-deep);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        .profile-info-row {
+
+        .info-card {
+            background: #ffffff;
+            border-radius: 18px;
+            border: 1px solid #f0ede0;
+            padding: 8px 22px;
+            box-shadow: 0 3px 10px rgba(31,78,61,0.04);
+        }
+        .info-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 14px 0;
             border-bottom: 1px solid #f5f2e6;
-            font-size: 13px;
-            gap: 12px;
+            font-size: 13.5px;
+            gap: 14px;
         }
-        .profile-info-row:last-child { border-bottom: none; }
-        .profile-info-row .k { color: #8a8a8a; font-weight: 600; flex-shrink: 0; }
-        .profile-info-row .v { color: #1a1a1a; font-weight: 600; text-align: right; word-break: break-word; }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .k { color: #8a8a8a; font-weight: 600; flex-shrink: 0; }
+        .info-row .v { color: #1a1a1a; font-weight: 600; text-align: right; word-break: break-word; }
 
         .btn-logout-big {
-            width: 100%;
-            height: 50px;
-            border-radius: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 44px;
+            padding: 0 24px;
+            border-radius: 22px;
             background: #ffffff;
             border: 1.5px solid #f0c8c8;
             color: var(--red-deep);
             font-family: inherit;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 700;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
             transition: background 0.15s;
         }
         .btn-logout-big:hover { background: #FBEAEA; }
 
-        /* ============================================ */
-        /* BOTTOM TAB BAR                               */
-        /* ============================================ */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 560px;
-            background: #ffffff;
-            border-top: 1px solid #f0ede0;
+        /* CBT HIGHLIGHT */
+        .cbt-highlight {
+            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+            border-radius: 20px;
+            padding: 28px 32px;
+            color: #ffffff;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: center;
-            padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
-            z-index: 100;
-            box-shadow: 0 -6px 24px rgba(31,78,61,0.06);
+            gap: 20px;
+            flex-wrap: wrap;
         }
-        .nav-tab {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            padding: 8px 4px;
-            text-decoration: none;
-            color: #a0a0a0;
-            font-size: 10.5px;
-            font-weight: 600;
-            transition: color 0.15s;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-family: inherit;
-        }
-        .nav-tab i { font-size: 18px; margin-bottom: 2px; }
-        .nav-tab.active { color: var(--green-deep); }
-        .nav-tab.active i { color: var(--green-deep); }
-        .nav-tab:active { transform: scale(0.94); }
-
-        /* ============================================ */
-        /* LOADING / GUARD                              */
-        /* ============================================ */
-        .guard-screen {
-            position: fixed;
-            inset: 0;
-            background: #FBF8EE;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            gap: 16px;
-            padding: 24px;
-            text-align: center;
-        }
-        .guard-screen.hidden { display: none; }
-        .guard-spinner {
-            width: 42px; height: 42px;
-            border: 3.5px solid rgba(31,78,61,0.15);
-            border-top-color: var(--green-deep);
+        .cbt-highlight::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 180px; height: 180px;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            background: rgba(201,169,97,0.15);
         }
-        .guard-text {
-            font-size: 14px;
-            color: var(--green-deep);
-            font-weight: 600;
-            max-width: 280px;
+        .cbt-highlight .cbt-left { position: relative; z-index: 1; flex: 1; min-width: 220px; }
+        .cbt-highlight h3 {
+            font-family: Georgia, serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .cbt-highlight p {
+            font-size: 13.5px;
+            color: rgba(255,255,255,0.78);
             line-height: 1.5;
+            max-width: 520px;
+        }
+        .cbt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: var(--green-deep);
+            padding: 13px 24px;
+            border-radius: 26px;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.12s, box-shadow 0.18s;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .cbt-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,0.22); }
+
+        /* GALLERY GRID */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .gallery-tile {
+            display: block;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(31,78,61,0.08);
+            aspect-ratio: 1;
+            background: #f0ede0;
+        }
+        .gallery-tile img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.25s;
+        }
+        .gallery-tile:hover img { transform: scale(1.05); }
+
+        /* FOOTER */
+        .portal-footer {
+            margin-top: auto;
+            padding: 18px 28px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: #8a8a8a;
+            text-align: center;
+            background: #FBF8EE;
         }
 
-        /* ============================================ */
-        /* TOAST                                        */
-        /* ============================================ */
+        /* TOAST */
         .toast {
             position: fixed;
-            top: max(20px, env(safe-area-inset-top));
+            top: 24px;
             left: 50%;
-            transform: translateX(-50%) translateY(-120%);
+            transform: translateX(-50%) translateY(-140%);
             background: var(--green-deep);
             color: #ffffff;
-            padding: 12px 20px;
+            padding: 12px 22px;
             border-radius: 24px;
             font-size: 13px;
             font-weight: 600;
             box-shadow: 0 12px 30px rgba(31,78,61,0.28);
-            z-index: 200;
+            z-index: 500;
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
             max-width: calc(100vw - 40px);
             text-align: center;
@@ -644,6 +833,28 @@
 
         .app-shell { visibility: hidden; }
         .app-shell.ready { visibility: visible; }
+
+        /* ============================================ */
+        /* MOBILE                                       */
+        /* ============================================ */
+        @media (max-width: 900px) {
+            .sidebar {
+                transform: translateX(-100%);
+                box-shadow: 4px 0 24px rgba(0,0,0,0.25);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-close { display: block; }
+            .sidebar-overlay { display: block; pointer-events: none; }
+            .main { margin-left: 0; }
+            .hamburger-btn { display: flex; }
+            .topbar { padding: 12px 16px; }
+            .topbar-user-info { display: none; }
+            .content { padding: 18px 16px 32px; }
+            .welcome-banner { padding: 22px 20px; }
+            .welcome-banner h3 { font-size: 20px; }
+            .cbt-highlight { padding: 22px 20px; }
+            .portal-footer { padding: 14px 16px; }
+        }
     </style>
 </head>
 <body>
@@ -654,192 +865,293 @@
         <div class="guard-text" id="guardText">Verifying session...</div>
     </div>
 
-    <!-- APP SHELL -->
+    <!-- PORTAL -->
     <div class="app-shell" id="appShell">
-        <div class="app-frame">
+        <div class="portal">
 
-            <!-- HERO -->
-            <div class="hero">
-                <div class="hero-top">
-                    <div class="hero-greet">
-                        <div class="hero-avatar" id="heroAvatar">AV</div>
-                        <div class="hero-greet-text">
-                            <div class="hi">Welcome back,</div>
-                            <div class="name" id="heroName">Student</div>
-                        </div>
+            <!-- SIDEBAR -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">AV</div>
+                    <div class="sidebar-brand">
+                        <h1>AVMS Portal</h1>
+                        <p>ABU Zaria</p>
                     </div>
-                    <div class="hero-actions">
-                        <a href="../index.html" class="hero-icon-btn" title="Public site" aria-label="Public site">
-                            <i class="fas fa-globe"></i>
-                        </a>
-                        <button class="hero-icon-btn" id="heroLogout" title="Logout" aria-label="Logout">
-                            <i class="fas fa-arrow-right-from-bracket"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="hero-title" id="heroTitle">Student Portal</div>
-                <div class="hero-sub">AVMS · ABU Zaria</div>
-            </div>
-
-            <!-- ID CARD -->
-            <div class="id-card-wrap">
-                <div class="id-card">
-                    <div class="id-card-logo">AV</div>
-                    <div class="id-card-body">
-                        <div class="label">AVMS Student</div>
-                        <div class="value" id="idName">—</div>
-                        <div class="meta"><span id="idReg">—</span> · <span id="idLevel">—</span></div>
-                    </div>
-                    <div class="status-pill active" id="idStatus">
-                        <i class="fas fa-circle"></i> Active
-                    </div>
-                </div>
-            </div>
-
-            <!-- SCREENS -->
-            <div class="screens">
-
-                <!-- HOME -->
-                <div class="screen active" id="screen-home">
-                    <div class="section-head">
-                        <h2>Quick Actions</h2>
-                    </div>
-                    <div class="quick-grid">
-                        <div class="quick-tile tile-cbt" data-screen="cbt">
-                            <div class="icon-wrap"><i class="fas fa-graduation-cap"></i></div>
-                            <div class="label">CBT<br>Practice</div>
-                        </div>
-                        <div class="quick-tile tile-ann" data-screen="alerts">
-                            <div class="icon-wrap"><i class="fas fa-bullhorn"></i></div>
-                            <div class="label">Announce<br>-ments</div>
-                        </div>
-                        <div class="quick-tile tile-evt" data-screen="events">
-                            <div class="icon-wrap"><i class="fas fa-calendar"></i></div>
-                            <div class="label">Events</div>
-                        </div>
-                        <div class="quick-tile tile-dl" data-screen="downloads">
-                            <div class="icon-wrap"><i class="fas fa-file-arrow-down"></i></div>
-                            <div class="label">Downloads</div>
-                        </div>
-                        <div class="quick-tile tile-gal" data-screen="gallery">
-                            <div class="icon-wrap"><i class="fas fa-images"></i></div>
-                            <div class="label">Gallery</div>
-                        </div>
-                        <div class="quick-tile tile-giv" data-give="1">
-                            <div class="icon-wrap"><i class="fas fa-hand-holding-heart"></i></div>
-                            <div class="label">Give</div>
-                        </div>
-                    </div>
-
-                    <div class="section-head">
-                        <h2>Latest Announcements</h2>
-                        <span class="count" id="homeAnnCount"></span>
-                    </div>
-                    <div id="homeAnnList">
-                        <div class="loader-card"><div class="loader-spinner"></div>Loading...</div>
-                    </div>
-                </div>
-
-                <!-- CBT -->
-                <div class="screen" id="screen-cbt">
-                    <div class="cbt-highlight">
-                        <h3>CBT Practice</h3>
-                        <p>Test your knowledge with practice questions across your courses. Login with your Registration Number and State of Origin to begin.</p>
-                        <a href="../cbt/login.html" class="cbt-btn">
-                            <i class="fas fa-play"></i> Open CBT Portal
-                        </a>
-                    </div>
-                    <div class="section-head">
-                        <h2>Available Courses</h2>
-                    </div>
-                    <div id="cbtCourseList">
-                        <div class="loader-card"><div class="loader-spinner"></div>Loading courses...</div>
-                    </div>
-                </div>
-
-                <!-- ALERTS (Announcements) -->
-                <div class="screen" id="screen-alerts">
-                    <div class="section-head">
-                        <h2>Announcements</h2>
-                    </div>
-                    <div id="alertsList">
-                        <div class="loader-card"><div class="loader-spinner"></div>Loading announcements...</div>
-                    </div>
-                </div>
-
-                <!-- EVENTS -->
-                <div class="screen" id="screen-events">
-                    <div class="section-head">
-                        <h2>Upcoming Events</h2>
-                    </div>
-                    <div id="eventsList">
-                        <div class="loader-card"><div class="loader-spinner"></div>Loading events...</div>
-                    </div>
-                </div>
-
-                <!-- DOWNLOADS -->
-                <div class="screen" id="screen-downloads">
-                    <div class="section-head">
-                        <h2>Downloads</h2>
-                    </div>
-                    <div id="downloadsList">
-                        <div class="loader-card"><div class="loader-spinner"></div>Loading downloads...</div>
-                    </div>
-                </div>
-
-                <!-- GALLERY -->
-                <div class="screen" id="screen-gallery">
-                    <div class="section-head">
-                        <h2>Gallery</h2>
-                    </div>
-                    <div id="galleryList">
-                        <div class="loader-card"><div class="loader-spinner"></div>Loading gallery...</div>
-                    </div>
-                </div>
-
-                <!-- PROFILE -->
-                <div class="screen" id="screen-profile">
-                    <div class="section-head">
-                        <h2>My Profile</h2>
-                    </div>
-                    <div class="profile-card">
-                        <div class="profile-avatar" id="profileAvatar">AV</div>
-                        <div class="profile-name" id="profileName">—</div>
-                        <div class="profile-reg" id="profileReg">—</div>
-                        <div class="profile-info">
-                            <div class="profile-info-row"><span class="k">Department</span><span class="v" id="profileDept">—</span></div>
-                            <div class="profile-info-row"><span class="k">Level</span><span class="v" id="profileLevel">—</span></div>
-                            <div class="profile-info-row"><span class="k">State of Origin</span><span class="v" id="profileState">—</span></div>
-                            <div class="profile-info-row"><span class="k">Email</span><span class="v" id="profileEmail">—</span></div>
-                            <div class="profile-info-row"><span class="k">Status</span><span class="v" id="profileStatus">Active</span></div>
-                        </div>
-                    </div>
-                    <button class="btn-logout-big" id="profileLogout">
-                        <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                    <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
 
-            </div>
+                <nav class="sidebar-nav">
+                    <div class="sidebar-section">Main</div>
+                    <button class="sidebar-link active" data-screen="home">
+                        <i class="fas fa-house"></i> <span>Dashboard</span>
+                    </button>
+                    <button class="sidebar-link" data-screen="cbt">
+                        <i class="fas fa-graduation-cap"></i> <span>CBT Practice</span>
+                    </button>
+                    <button class="sidebar-link" data-screen="materials">
+                        <i class="fas fa-book-open"></i> <span>Study Materials</span>
+                    </button>
 
-            <!-- BOTTOM NAV -->
-            <nav class="bottom-nav">
-                <button class="nav-tab active" data-screen="home">
-                    <i class="fas fa-house"></i>
-                    <span>Home</span>
-                </button>
-                <button class="nav-tab" data-screen="cbt">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>CBT</span>
-                </button>
-                <button class="nav-tab" data-screen="alerts">
-                    <i class="fas fa-bell"></i>
-                    <span>Alerts</span>
-                </button>
-                <button class="nav-tab" data-screen="profile">
-                    <i class="fas fa-user"></i>
-                    <span>Profile</span>
-                </button>
-            </nav>
+                    <div class="sidebar-section">Explore</div>
+                    <button class="sidebar-link" data-screen="announcements">
+                        <i class="fas fa-bullhorn"></i> <span>Announcements</span>
+                    </button>
+                    <button class="sidebar-link" data-screen="events">
+                        <i class="fas fa-calendar"></i> <span>Events</span>
+                    </button>
+                    <button class="sidebar-link" data-screen="gallery">
+                        <i class="fas fa-images"></i> <span>Gallery</span>
+                    </button>
+                    <button class="sidebar-link" data-screen="downloads">
+                        <i class="fas fa-file-arrow-down"></i> <span>Downloads</span>
+                    </button>
+
+                    <div class="sidebar-section">Account</div>
+                    <button class="sidebar-link" data-screen="profile">
+                        <i class="fas fa-user"></i> <span>My Profile</span>
+                    </button>
+                    <a class="sidebar-link" href="../index.html">
+                        <i class="fas fa-globe"></i> <span>Public Site</span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <button class="sidebar-logout" id="sidebarLogout">
+                        <i class="fas fa-arrow-right-from-bracket"></i> <span>Logout</span>
+                    </button>
+                </div>
+            </aside>
+
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+            <!-- MAIN -->
+            <div class="main">
+
+                <!-- TOP BAR -->
+                <header class="topbar">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="topbar-title">
+                        <h2 id="pageTitle">Dashboard</h2>
+                        <p id="pageSubtitle">Welcome back to your AVMS portal</p>
+                    </div>
+                    <div class="topbar-user">
+                        <div class="topbar-user-info">
+                            <div class="n" id="topbarName">Student</div>
+                            <div class="r" id="topbarReg">—</div>
+                        </div>
+                        <div class="topbar-avatar" id="topbarAvatar">AV</div>
+                    </div>
+                </header>
+
+                <!-- CONTENT -->
+                <main class="content">
+
+                    <!-- HOME / DASHBOARD -->
+                    <section class="screen active" id="screen-home">
+                        <div class="welcome-banner">
+                            <div class="inner">
+                                <div class="eyebrow">AVMS · ABU Zaria</div>
+                                <h3 id="welcomeName">Welcome back</h3>
+                                <p>Access your CBT practice, study materials, announcements and events — all in one place.</p>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon green"><i class="fas fa-id-card"></i></div>
+                                <div class="stat-body">
+                                    <div class="k">Reg Number</div>
+                                    <div class="v" id="statReg">—</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon gold"><i class="fas fa-layer-group"></i></div>
+                                <div class="stat-body">
+                                    <div class="k">Level</div>
+                                    <div class="v" id="statLevel">—</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon mid"><i class="fas fa-graduation-cap"></i></div>
+                                <div class="stat-body">
+                                    <div class="k">Department</div>
+                                    <div class="v" id="statDept">—</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon red"><i class="fas fa-circle-check"></i></div>
+                                <div class="stat-body">
+                                    <div class="k">Status</div>
+                                    <div class="v">Active</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-head">
+                            <h2>Quick Actions</h2>
+                        </div>
+                        <div class="quick-grid">
+                            <div class="quick-tile tile-cbt" data-screen="cbt">
+                                <div class="icon-wrap"><i class="fas fa-graduation-cap"></i></div>
+                                <div>
+                                    <div class="t">CBT Practice</div>
+                                    <div class="s">Test your knowledge</div>
+                                </div>
+                            </div>
+                            <div class="quick-tile tile-mat" data-screen="materials">
+                                <div class="icon-wrap"><i class="fas fa-book-open"></i></div>
+                                <div>
+                                    <div class="t">Study Materials</div>
+                                    <div class="s">For your level</div>
+                                </div>
+                            </div>
+                            <div class="quick-tile tile-ann" data-screen="announcements">
+                                <div class="icon-wrap"><i class="fas fa-bullhorn"></i></div>
+                                <div>
+                                    <div class="t">Announcements</div>
+                                    <div class="s">Latest updates</div>
+                                </div>
+                            </div>
+                            <div class="quick-tile tile-evt" data-screen="events">
+                                <div class="icon-wrap"><i class="fas fa-calendar"></i></div>
+                                <div>
+                                    <div class="t">Events</div>
+                                    <div class="s">Upcoming activities</div>
+                                </div>
+                            </div>
+                            <div class="quick-tile tile-gal" data-screen="gallery">
+                                <div class="icon-wrap"><i class="fas fa-images"></i></div>
+                                <div>
+                                    <div class="t">Gallery</div>
+                                    <div class="s">Photos &amp; memories</div>
+                                </div>
+                            </div>
+                            <div class="quick-tile tile-giv" data-give="1">
+                                <div class="icon-wrap"><i class="fas fa-hand-holding-heart"></i></div>
+                                <div>
+                                    <div class="t">Give</div>
+                                    <div class="s">Support AVMS</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-head">
+                            <h2>Latest Announcements</h2>
+                            <span class="link" data-screen="announcements">View all →</span>
+                        </div>
+                        <div class="card-grid" id="homeAnnGrid">
+                            <div class="loader-card" style="grid-column: 1 / -1;"><div class="loader-spinner"></div>Loading...</div>
+                        </div>
+                    </section>
+
+                    <!-- CBT -->
+                    <section class="screen" id="screen-cbt">
+                        <div class="cbt-highlight">
+                            <div class="cbt-left">
+                                <h3>CBT Practice</h3>
+                                <p>Test your knowledge with practice questions across your courses. Login with your Registration Number and State of Origin to begin.</p>
+                            </div>
+                            <a href="../cbt/login.html" class="cbt-btn">
+                                <i class="fas fa-play"></i> Open CBT Portal
+                            </a>
+                        </div>
+
+                        <div class="section-head">
+                            <h2>Available Courses</h2>
+                        </div>
+                        <div id="cbtCourseList">
+                            <div class="loader-card"><div class="loader-spinner"></div>Loading courses...</div>
+                        </div>
+                    </section>
+
+                    <!-- STUDY MATERIALS -->
+                    <section class="screen" id="screen-materials">
+                        <div class="section-head">
+                            <h2>Study Materials — <span id="materialsLevel">Your Level</span></h2>
+                            <span class="count" id="materialsCount"></span>
+                        </div>
+                        <div id="materialsList">
+                            <div class="loader-card"><div class="loader-spinner"></div>Loading materials...</div>
+                        </div>
+                    </section>
+
+                    <!-- ANNOUNCEMENTS -->
+                    <section class="screen" id="screen-announcements">
+                        <div class="section-head">
+                            <h2>All Announcements</h2>
+                        </div>
+                        <div class="card-grid" id="annGrid">
+                            <div class="loader-card" style="grid-column: 1 / -1;"><div class="loader-spinner"></div>Loading...</div>
+                        </div>
+                    </section>
+
+                    <!-- EVENTS -->
+                    <section class="screen" id="screen-events">
+                        <div class="section-head">
+                            <h2>Upcoming Events</h2>
+                        </div>
+                        <div class="card-grid" id="eventsGrid">
+                            <div class="loader-card" style="grid-column: 1 / -1;"><div class="loader-spinner"></div>Loading...</div>
+                        </div>
+                    </section>
+
+                    <!-- GALLERY -->
+                    <section class="screen" id="screen-gallery">
+                        <div class="section-head">
+                            <h2>Gallery</h2>
+                        </div>
+                        <div id="galleryList">
+                            <div class="loader-card"><div class="loader-spinner"></div>Loading gallery...</div>
+                        </div>
+                    </section>
+
+                    <!-- DOWNLOADS -->
+                    <section class="screen" id="screen-downloads">
+                        <div class="section-head">
+                            <h2>Downloads</h2>
+                        </div>
+                        <div id="downloadsList">
+                            <div class="loader-card"><div class="loader-spinner"></div>Loading downloads...</div>
+                        </div>
+                    </section>
+
+                    <!-- PROFILE -->
+                    <section class="screen" id="screen-profile">
+                        <div class="section-head">
+                            <h2>My Profile</h2>
+                        </div>
+                        <div class="profile-grid">
+                            <div class="profile-card">
+                                <div class="profile-avatar" id="profileAvatar">AV</div>
+                                <div class="profile-name" id="profileName">—</div>
+                                <div class="profile-reg" id="profileReg">—</div>
+                                <div class="profile-status-pill"><i class="fas fa-circle" style="font-size: 6px;"></i> Active</div>
+                            </div>
+                            <div class="info-card">
+                                <div class="info-row"><span class="k">Department</span><span class="v" id="profileDept">—</span></div>
+                                <div class="info-row"><span class="k">Level</span><span class="v" id="profileLevel">—</span></div>
+                                <div class="info-row"><span class="k">State of Origin</span><span class="v" id="profileState">—</span></div>
+                                <div class="info-row"><span class="k">Email</span><span class="v" id="profileEmail">—</span></div>
+                                <div class="info-row"><span class="k">Applied</span><span class="v" id="profileApplied">—</span></div>
+                                <div class="info-row"><span class="k">Status</span><span class="v" id="profileStatus">Active</span></div>
+                            </div>
+                        </div>
+                        <button class="btn-logout-big" id="profileLogout">
+                            <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                        </button>
+                    </section>
+
+                </main>
+
+                <footer class="portal-footer">
+                    &copy; <span id="year"></span> AVMS ABU Zaria · Student Portal
+                </footer>
+
+            </div>
 
         </div>
     </div>
@@ -848,6 +1160,8 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
         // ============================================
         // HELPERS
         // ============================================
@@ -864,6 +1178,16 @@
             if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
             return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
         }
+        function escapeHtml(t) {
+            if (t === null || t === undefined) return '';
+            return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        }
+        function fmtDate(d) {
+            if (!d) return '';
+            const dt = new Date(d);
+            if (isNaN(dt)) return '';
+            return dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
         function showGuard(text) {
             document.getElementById('guardText').textContent = text;
             document.getElementById('guardScreen').classList.remove('hidden');
@@ -872,16 +1196,6 @@
         function hideGuard() {
             document.getElementById('guardScreen').classList.add('hidden');
             document.getElementById('appShell').classList.add('ready');
-        }
-        function escapeHtml(t) {
-            if (!t) return '';
-            return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-        }
-        function fmtDate(d) {
-            if (!d) return '';
-            const dt = new Date(d);
-            if (isNaN(dt)) return '';
-            return dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
         }
         async function doLogout() {
             try { await supabase.auth.signOut(); } catch (e) {}
@@ -897,44 +1211,69 @@
         let currentStudent = null;
 
         // ============================================
-        // SCREEN SWITCHER
+        // SIDEBAR (mobile)
         // ============================================
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const hamburger = document.getElementById('hamburgerBtn');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('open');
+            overlay.style.pointerEvents = 'auto';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+            overlay.style.pointerEvents = 'none';
+        }
+        hamburger.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // ============================================
+        // SCREEN SWITCH
+        // ============================================
+        const titles = {
+            home: ['Dashboard', 'Welcome back to your AVMS portal'],
+            cbt: ['CBT Practice', 'Test your knowledge with practice questions'],
+            materials: ['Study Materials', 'Resources curated for your level'],
+            announcements: ['Announcements', 'Latest updates from AVMS'],
+            events: ['Events', 'Upcoming activities and programs'],
+            gallery: ['Gallery', 'Photos from AVMS events'],
+            downloads: ['Downloads', 'Documents and resources'],
+            profile: ['My Profile', 'Your student information']
+        };
+
         function showScreen(name) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             const target = document.getElementById('screen-' + name);
             if (target) target.classList.add('active');
 
-            document.querySelectorAll('.nav-tab').forEach(t => {
-                t.classList.toggle('active', t.dataset.screen === name);
+            document.querySelectorAll('.sidebar-link').forEach(l => {
+                l.classList.toggle('active', l.dataset.screen === name);
             });
 
-            const titles = {
-                home: 'Student Portal',
-                cbt: 'CBT Practice',
-                alerts: 'Announcements',
-                events: 'Events',
-                downloads: 'Downloads',
-                gallery: 'Gallery',
-                profile: 'My Profile'
-            };
-            document.getElementById('heroTitle').textContent = titles[name] || 'Student Portal';
+            const t = titles[name] || ['Dashboard', ''];
+            document.getElementById('pageTitle').textContent = t[0];
+            document.getElementById('pageSubtitle').textContent = t[1];
 
-            // Lazy load each screen on first visit
-            if (name === 'alerts' && !window.__loadedAlerts) loadAnnouncements();
+            // Lazy load
+            if (name === 'announcements' && !window.__loadedAnn) loadAllAnnouncements();
             if (name === 'events' && !window.__loadedEvents) loadEvents();
-            if (name === 'downloads' && !window.__loadedDownloads) loadDownloads();
             if (name === 'gallery' && !window.__loadedGallery) loadGallery();
+            if (name === 'downloads' && !window.__loadedDownloads) loadDownloads();
             if (name === 'cbt' && !window.__loadedCbt) loadCbtCourses();
+            if (name === 'materials' && !window.__loadedMaterials) loadMaterials();
 
+            closeSidebar();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Wire bottom tabs
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', () => showScreen(tab.dataset.screen));
+        document.querySelectorAll('.sidebar-link[data-screen]').forEach(l => {
+            l.addEventListener('click', () => showScreen(l.dataset.screen));
         });
-
-        // Wire quick tiles
         document.querySelectorAll('.quick-tile').forEach(tile => {
             tile.addEventListener('click', () => {
                 if (tile.dataset.give) {
@@ -944,9 +1283,12 @@
                 if (tile.dataset.screen) showScreen(tile.dataset.screen);
             });
         });
+        document.querySelectorAll('[data-screen].link').forEach(el => {
+            el.addEventListener('click', () => showScreen(el.dataset.screen));
+        });
 
         // ============================================
-        // GUARD + LOAD
+        // GUARD + INIT
         // ============================================
         (async function init() {
             if (typeof supabase === 'undefined' || !supabase) {
@@ -960,7 +1302,6 @@
                     window.location.href = 'login.html';
                     return;
                 }
-
                 const userId = sess.session.user.id;
 
                 const { data: student, error } = await supabase
@@ -976,7 +1317,6 @@
                     setTimeout(() => window.location.href = 'login.html', 2500);
                     return;
                 }
-
                 if (student.is_active !== true) {
                     showGuard('⏳ Your application is pending admin approval.');
                     setTimeout(() => window.location.href = 'login.html', 2500);
@@ -986,8 +1326,6 @@
                 currentStudent = student;
                 renderStudent(student);
                 hideGuard();
-
-                // Load home announcements
                 loadHomeAnnouncements();
 
             } catch (err) {
@@ -998,40 +1336,47 @@
         })();
 
         // ============================================
-        // RENDER STUDENT
+        // RENDER
         // ============================================
         function renderStudent(s) {
             const fullName = s.full_name || 'Student';
             const firstName = fullName.split(/\s+/)[0] || 'Student';
             const ini = initials(fullName);
+            const reg = s.reg_no || '—';
+            const level = s.class_level ? (s.class_level + ' Level') : '—';
 
-            document.getElementById('heroName').textContent = firstName;
-            document.getElementById('heroAvatar').textContent = ini;
-            document.getElementById('idName').textContent = fullName;
-            document.getElementById('idReg').textContent = s.reg_no || '—';
-            document.getElementById('idLevel').textContent = s.class_level ? (s.class_level + 'L') : '—';
+            document.getElementById('topbarName').textContent = fullName;
+            document.getElementById('topbarReg').textContent = reg;
+            document.getElementById('topbarAvatar').textContent = ini;
+
+            document.getElementById('welcomeName').textContent = 'Welcome, ' + firstName;
+            document.getElementById('statReg').textContent = reg;
+            document.getElementById('statLevel').textContent = level;
+            document.getElementById('statDept').textContent = s.department || 'Veterinary Medicine';
 
             document.getElementById('profileAvatar').textContent = ini;
             document.getElementById('profileName').textContent = fullName;
-            document.getElementById('profileReg').textContent = s.reg_no || '—';
+            document.getElementById('profileReg').textContent = reg;
             document.getElementById('profileDept').textContent = s.department || 'Veterinary Medicine';
-            document.getElementById('profileLevel').textContent = s.class_level ? (s.class_level + ' Level') : '—';
+            document.getElementById('profileLevel').textContent = level;
             document.getElementById('profileState').textContent = s.state_of_origin || '—';
             document.getElementById('profileEmail').textContent = s.email || '—';
-            document.getElementById('profileStatus').textContent = 'Active';
+            document.getElementById('profileApplied').textContent = s.applied_at ? fmtDate(s.applied_at) : '—';
+
+            document.getElementById('materialsLevel').textContent = level;
         }
 
         // ============================================
-        // LOGOUT WIRING
+        // LOGOUT
         // ============================================
-        document.getElementById('heroLogout').addEventListener('click', doLogout);
+        document.getElementById('sidebarLogout').addEventListener('click', doLogout);
         document.getElementById('profileLogout').addEventListener('click', doLogout);
 
         // ============================================
         // CONTENT LOADERS
         // ============================================
         async function loadHomeAnnouncements() {
-            const box = document.getElementById('homeAnnList');
+            const grid = document.getElementById('homeAnnGrid');
             try {
                 const { data, error } = await supabase
                     .from('announcements')
@@ -1040,26 +1385,25 @@
                     .limit(3);
                 if (error) throw error;
                 if (!data || data.length === 0) {
-                    box.innerHTML = `<div class="empty-card"><i class="fas fa-bullhorn"></i>No announcements yet.</div>`;
-                    document.getElementById('homeAnnCount').textContent = '';
+                    grid.innerHTML = `<div class="empty-card" style="grid-column: 1 / -1;"><i class="fas fa-bullhorn"></i>No announcements yet.</div>`;
                     return;
                 }
-                document.getElementById('homeAnnCount').textContent = data.length + ' recent';
-                box.innerHTML = `<div class="list-card">${data.map(a => `
-                    <div class="list-item">
-                        <div class="li-title">${escapeHtml(a.title || 'Untitled')}</div>
-                        <div class="li-sub">${escapeHtml((a.content || a.body || a.message || '').slice(0, 100))}${(a.content || a.body || a.message || '').length > 100 ? '…' : ''}</div>
-                        ${a.created_at ? `<div class="li-date">${fmtDate(a.created_at)}</div>` : ''}
+                grid.innerHTML = data.map(a => `
+                    <div class="card">
+                        <span class="tag">Announcement</span>
+                        <h4>${escapeHtml(a.title || 'Untitled')}</h4>
+                        <p>${escapeHtml((a.content || a.body || a.message || '').slice(0, 140))}${(a.content || a.body || a.message || '').length > 140 ? '…' : ''}</p>
+                        ${a.created_at ? `<div class="date">${fmtDate(a.created_at)}</div>` : ''}
                     </div>
-                `).join('')}</div>`;
+                `).join('');
             } catch (err) {
-                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load announcements.</div>`;
+                grid.innerHTML = `<div class="empty-card" style="grid-column: 1 / -1;"><i class="fas fa-circle-exclamation"></i>Couldn't load announcements.</div>`;
             }
         }
 
-        async function loadAnnouncements() {
-            window.__loadedAlerts = true;
-            const box = document.getElementById('alertsList');
+        async function loadAllAnnouncements() {
+            window.__loadedAnn = true;
+            const grid = document.getElementById('annGrid');
             try {
                 const { data, error } = await supabase
                     .from('announcements')
@@ -1067,24 +1411,25 @@
                     .order('created_at', { ascending: false });
                 if (error) throw error;
                 if (!data || data.length === 0) {
-                    box.innerHTML = `<div class="empty-card"><i class="fas fa-bullhorn"></i>No announcements yet.</div>`;
+                    grid.innerHTML = `<div class="empty-card" style="grid-column: 1 / -1;"><i class="fas fa-bullhorn"></i>No announcements yet.</div>`;
                     return;
                 }
-                box.innerHTML = `<div class="list-card">${data.map(a => `
-                    <div class="list-item">
-                        <div class="li-title">${escapeHtml(a.title || 'Untitled')}</div>
-                        <div class="li-sub">${escapeHtml(a.content || a.body || a.message || '')}</div>
-                        ${a.created_at ? `<div class="li-date">${fmtDate(a.created_at)}</div>` : ''}
+                grid.innerHTML = data.map(a => `
+                    <div class="card">
+                        <span class="tag">Announcement</span>
+                        <h4>${escapeHtml(a.title || 'Untitled')}</h4>
+                        <p>${escapeHtml(a.content || a.body || a.message || '')}</p>
+                        ${a.created_at ? `<div class="date">${fmtDate(a.created_at)}</div>` : ''}
                     </div>
-                `).join('')}</div>`;
+                `).join('');
             } catch (err) {
-                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load announcements.</div>`;
+                grid.innerHTML = `<div class="empty-card" style="grid-column: 1 / -1;"><i class="fas fa-circle-exclamation"></i>Couldn't load announcements.</div>`;
             }
         }
 
         async function loadEvents() {
             window.__loadedEvents = true;
-            const box = document.getElementById('eventsList');
+            const grid = document.getElementById('eventsGrid');
             try {
                 const { data, error } = await supabase
                     .from('events')
@@ -1092,18 +1437,19 @@
                     .order('event_date', { ascending: false });
                 if (error) throw error;
                 if (!data || data.length === 0) {
-                    box.innerHTML = `<div class="empty-card"><i class="fas fa-calendar"></i>No events yet.</div>`;
+                    grid.innerHTML = `<div class="empty-card" style="grid-column: 1 / -1;"><i class="fas fa-calendar"></i>No events yet.</div>`;
                     return;
                 }
-                box.innerHTML = `<div class="list-card">${data.map(ev => `
-                    <div class="list-item">
-                        <div class="li-title">${escapeHtml(ev.title || 'Untitled')}</div>
-                        <div class="li-sub">${escapeHtml(ev.description || ev.location || '')}</div>
-                        <div class="li-date">${fmtDate(ev.event_date || ev.created_at)}</div>
+                grid.innerHTML = data.map(ev => `
+                    <div class="card">
+                        <span class="tag green">Event</span>
+                        <h4>${escapeHtml(ev.title || 'Untitled')}</h4>
+                        <p>${escapeHtml(ev.description || ev.location || '')}</p>
+                        <div class="date">${fmtDate(ev.event_date || ev.created_at)}</div>
                     </div>
-                `).join('')}</div>`;
+                `).join('');
             } catch (err) {
-                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load events.</div>`;
+                grid.innerHTML = `<div class="empty-card" style="grid-column: 1 / -1;"><i class="fas fa-circle-exclamation"></i>Couldn't load events.</div>`;
             }
         }
 
@@ -1120,10 +1466,14 @@
                     box.innerHTML = `<div class="empty-card"><i class="fas fa-file-arrow-down"></i>No downloads available yet.</div>`;
                     return;
                 }
-                box.innerHTML = `<div class="list-card">${data.map(d => `
-                    <a class="list-item" href="${escapeHtml(d.file_url || '#')}" target="_blank" rel="noopener">
-                        <div class="li-title"><i class="fas fa-file-arrow-down" style="color: var(--gold-deep); margin-right: 8px;"></i>${escapeHtml(d.title || 'Document')}</div>
-                        <div class="li-sub">${escapeHtml(d.description || '')}</div>
+                box.innerHTML = `<div class="materials-list">${data.map(d => `
+                    <a class="material-item" href="${escapeHtml(d.file_url || '#')}" target="_blank" rel="noopener">
+                        <div class="m-icon"><i class="fas fa-file-arrow-down"></i></div>
+                        <div class="m-body">
+                            <div class="m-title">${escapeHtml(d.title || 'Document')}</div>
+                            <div class="m-sub">${escapeHtml(d.description || '')}</div>
+                        </div>
+                        <div class="m-meta">OPEN <i class="fas fa-arrow-up-right-from-square" style="font-size: 10px; margin-left: 4px;"></i></div>
                     </a>
                 `).join('')}</div>`;
             } catch (err) {
@@ -1139,19 +1489,17 @@
                     .from('gallery_images')
                     .select('*')
                     .order('created_at', { ascending: false })
-                    .limit(20);
+                    .limit(24);
                 if (error) throw error;
                 if (!data || data.length === 0) {
                     box.innerHTML = `<div class="empty-card"><i class="fas fa-images"></i>No images yet.</div>`;
                     return;
                 }
-                box.innerHTML = `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px;">
-                    ${data.map(img => `
-                        <a href="${escapeHtml(img.image_url || '#')}" target="_blank" rel="noopener" style="display:block; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 10px rgba(31,78,61,0.08);">
-                            <img src="${escapeHtml(img.image_url || '')}" alt="" style="width: 100%; aspect-ratio: 1; object-fit: cover; display: block;">
-                        </a>
-                    `).join('')}
-                </div>`;
+                box.innerHTML = `<div class="gallery-grid">${data.map(img => `
+                    <a href="${escapeHtml(img.image_url || '#')}" target="_blank" rel="noopener" class="gallery-tile">
+                        <img src="${escapeHtml(img.image_url || '')}" alt="" loading="lazy">
+                    </a>
+                `).join('')}</div>`;
             } catch (err) {
                 box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load gallery.</div>`;
             }
@@ -1170,14 +1518,54 @@
                     box.innerHTML = `<div class="empty-card"><i class="fas fa-book"></i>No courses available yet.</div>`;
                     return;
                 }
-                box.innerHTML = `<div class="list-card">${data.map(c => `
-                    <div class="list-item">
-                        <div class="li-title">${escapeHtml(c.course_code || '')} — ${escapeHtml(c.course_title || c.title || 'Course')}</div>
-                        <div class="li-sub">${escapeHtml(c.description || 'Practice questions available in the CBT portal.')}</div>
+                box.innerHTML = `<div class="materials-list">${data.map(c => `
+                    <div class="material-item">
+                        <div class="m-icon"><i class="fas fa-book"></i></div>
+                        <div class="m-body">
+                            <div class="m-title">${escapeHtml(c.course_code || '')} — ${escapeHtml(c.course_title || c.title || 'Course')}</div>
+                            <div class="m-sub">${escapeHtml(c.description || 'Practice questions available in the CBT portal.')}</div>
+                        </div>
                     </div>
                 `).join('')}</div>`;
             } catch (err) {
                 box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load courses.</div>`;
+            }
+        }
+
+        async function loadMaterials() {
+            window.__loadedMaterials = true;
+            const box = document.getElementById('materialsList');
+            const countEl = document.getElementById('materialsCount');
+            if (!currentStudent || !currentStudent.class_level) {
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-book-open"></i>No materials available — your level isn't set.</div>`;
+                return;
+            }
+            try {
+                const { data, error } = await supabase
+                    .from('materials')
+                    .select('*')
+                    .eq('level', currentStudent.class_level)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    box.innerHTML = `<div class="empty-card"><i class="fas fa-book-open"></i>No materials uploaded for your level yet. Check back soon.</div>`;
+                    if (countEl) countEl.textContent = '';
+                    return;
+                }
+                if (countEl) countEl.textContent = data.length + ' file' + (data.length === 1 ? '' : 's');
+                box.innerHTML = `<div class="materials-list">${data.map(m => `
+                    <a class="material-item" href="${escapeHtml(m.file_url || '#')}" target="_blank" rel="noopener">
+                        <div class="m-icon"><i class="fas fa-file-arrow-down"></i></div>
+                        <div class="m-body">
+                            <div class="m-title">${escapeHtml(m.title || 'Material')}${m.course_code ? ' · ' + escapeHtml(m.course_code) : ''}</div>
+                            <div class="m-sub">${escapeHtml(m.description || '')}</div>
+                        </div>
+                        <div class="m-meta">${m.file_size_kb ? m.file_size_kb + ' KB' : 'OPEN'}</div>
+                    </a>
+                `).join('')}</div>`;
+            } catch (err) {
+                console.warn('Materials load error:', err);
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load materials. (Did you create the 'materials' table?)</div>`;
             }
         }
     </script>
