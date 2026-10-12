@@ -7,11 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
     initForm();
 });
 
-// Store uploaded file data
 const uploadedFiles = {};
-
-// Store verified student record
 let verifiedStudent = null;
+
+// ============================================
+// CONSTANTS
+// ============================================
+const MAX_UPLOAD_BYTES = 200 * 1024; // 200 KB bucket limit
 
 // ============================================
 // HELPERS
@@ -31,6 +33,111 @@ function sanitizeFileName(name) {
     return String(name)
         .replace(/[^a-zA-Z0-9._-]/g, '_')
         .slice(-120);
+}
+
+function formatKB(bytes) {
+    return (bytes / 1024).toFixed(0) + ' KB';
+}
+function formatMB(bytes) {
+    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+}
+function prettySize(bytes) {
+    if (bytes < 1024 * 1024) return formatKB(bytes);
+    return formatMB(bytes);
+}
+
+// ============================================
+// IMAGE COMPRESSOR
+// Resizes + recompresses until under MAX_UPLOAD_BYTES.
+// Returns a File object. Throws if it can't get under limit.
+// ============================================
+async function compressImage(file, fieldLabel) {
+    if (!file.type.startsWith('image/')) return file;
+
+    const targetBytes = MAX_UPLOAD_BYTES - 8 * 1024; // leave 8 KB headroom
+
+    // If already small enough, return as-is
+    if (file.size <= targetBytes) return file;
+
+    const bitmap = await loadImage(file);
+    const origW = bitmap.width || bitmap.naturalWidth;
+    const origH = bitmap.height || bitmap.naturalHeight;
+
+    const widths = [1600, 1200, 900, 700, 500];
+    const qualities = [0.85, 0.7, 0.55, 0.4, 0.3];
+
+    for (const maxW of widths) {
+        const scale = Math.min(1, maxW / origW);
+        const w = Math.round(origW * scale);
+        const h = Math.round(origH * scale);
+
+        for (const q of qualities) {
+            const blob = await drawToBlob(bitmap, w, h, q, file.type);
+            if (blob && blob.size <= targetBytes) {
+                const ext = pickExt(file.type);
+                const baseName = (file.name || 'photo').replace(/\.[^.]+$/, '');
+                return new File([blob], `${baseName}.${ext}`, { type: blob.type });
+            }
+        }
+    }
+
+    // Last resort: strip to jpeg at low quality
+    const lastBlob = await drawToBlob(bitmap, Math.min(500, origW), Math.min(500, origH), 0.3, 'image/jpeg');
+    if (lastBlob && lastBlob.size <= targetBytes) {
+        const baseName = (file.name || 'photo').replace(/\.[^.]+$/, '');
+        return new File([lastBlob], `${baseName}.jpg`, { type: 'image/jpeg' });
+    }
+
+    throw new Error(
+        `${fieldLabel} couldn't be compressed below ${formatKB(MAX_UPLOAD_BYTES)}. Please pick a smaller image.`
+    );
+}
+
+function loadImage(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            resolve(img);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            // Fallback: createImageBitmap (works on HEIC in some browsers)
+            if (typeof createImageBitmap === 'function') {
+                createImageBitmap(file).then(resolve).catch(reject);
+            } else {
+                reject(new Error('Could not read image file.'));
+            }
+        };
+        img.src = url;
+    });
+}
+
+function drawToBlob(bitmap, w, h, quality, mime) {
+    return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(bitmap, 0, 0, w, h);
+
+        const outMime = (mime === 'image/png') ? 'image/png' : 'image/jpeg';
+        canvas.toBlob(
+            (blob) => resolve(blob),
+            outMime,
+            outMime === 'image/jpeg' ? quality : undefined
+        );
+    });
+}
+
+function pickExt(mime) {
+    if (!mime) return 'jpg';
+    if (mime.includes('png')) return 'png';
+    if (mime.includes('webp')) return 'webp';
+    return 'jpg';
 }
 
 // ============================================
@@ -210,9 +317,7 @@ function initForm() {
             if (isCompleted || isActive) {
                 currentStep = index;
                 showStep(currentStep);
-                if (currentStep === 4) {
-                    updateSummary();
-                }
+                if (currentStep === 4) updateSummary();
             } else {
                 const msgDiv = document.getElementById('formMessage');
                 if (msgDiv) {
@@ -221,9 +326,7 @@ function initForm() {
                             ⚠️ Please complete previous steps first.
                         </div>
                     `;
-                    setTimeout(() => {
-                        msgDiv.innerHTML = '';
-                    }, 3000);
+                    setTimeout(() => { msgDiv.innerHTML = ''; }, 3000);
                 }
             }
         });
@@ -235,9 +338,7 @@ function initForm() {
                 if (currentStep < totalSteps - 1) {
                     currentStep++;
                     showStep(currentStep);
-                    if (currentStep === 4) {
-                        updateSummary();
-                    }
+                    if (currentStep === 4) updateSummary();
                 }
             }
         });
@@ -278,9 +379,7 @@ function initForm() {
                     previewHtml += ` <img src="${e.target.result}" class="file-thumbnail">`;
                     previewHtml += `</div>`;
                     const existing = previewDiv.querySelector(`[data-file="${input.id}"]`);
-                    if (existing) {
-                        existing.remove();
-                    }
+                    if (existing) existing.remove();
                     const wrapper = document.createElement('div');
                     wrapper.dataset.file = input.id;
                     wrapper.innerHTML = previewHtml;
@@ -291,9 +390,7 @@ function initForm() {
             } else {
                 previewHtml += `</div>`;
                 const existing = previewDiv.querySelector(`[data-file="${input.id}"]`);
-                if (existing) {
-                    existing.remove();
-                }
+                if (existing) existing.remove();
                 const wrapper = document.createElement('div');
                 wrapper.dataset.file = input.id;
                 wrapper.innerHTML = previewHtml;
@@ -302,9 +399,7 @@ function initForm() {
             }
             
             const infoMsg = previewDiv.querySelector('p');
-            if (infoMsg) {
-                infoMsg.remove();
-            }
+            if (infoMsg) infoMsg.remove();
         });
     });
 
@@ -315,9 +410,7 @@ function initForm() {
         const totalFiles = fileInputs.length;
         
         fileInputs.forEach(input => {
-            if (input.files && input.files.length > 0) {
-                uploadedCount++;
-            }
+            if (input.files && input.files.length > 0) uploadedCount++;
         });
         
         let statusMsg = previewDiv.querySelector('.file-status-message');
@@ -348,11 +441,8 @@ function initForm() {
 
         steps.forEach((step, i) => {
             step.classList.remove('active', 'completed');
-            if (i === index) {
-                step.classList.add('active');
-            } else if (i < index) {
-                step.classList.add('completed');
-            }
+            if (i === index) step.classList.add('active');
+            else if (i < index) step.classList.add('completed');
         });
 
         document.querySelector('.membership-container').scrollIntoView({ 
@@ -443,10 +533,10 @@ function initForm() {
         const color = type === 'error' ? '#721c24' : '#856404';
         msgDiv.innerHTML = `
             <div style="background: ${bg}; color: ${color}; padding: 15px; border-radius: 8px; margin-top: 12px;">
-                ${escapeHtml(text)}
+                ${text}
             </div>
         `;
-        setTimeout(() => { msgDiv.innerHTML = ''; }, 5000);
+        setTimeout(() => { msgDiv.innerHTML = ''; }, 7000);
     }
 
     function updateSummary() {
@@ -487,9 +577,7 @@ function initForm() {
                 hasFiles = true;
             }
         });
-        if (!hasFiles) {
-            filesHtml += '<li>No files uploaded</li>';
-        }
+        if (!hasFiles) filesHtml += '<li>No files uploaded</li>';
         filesHtml += '</ul></div>';
         html += filesHtml;
 
@@ -505,9 +593,6 @@ function initForm() {
     });
 
     async function handleFormSubmit(e) {
-        // === DEBUG ALERTS ===
-        alert('DEBUG 1: Submit handler fired');
-
         const submitBtn = document.querySelector('.btn-submit');
         const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
 
@@ -530,7 +615,6 @@ function initForm() {
         if (msgDiv) msgDiv.innerHTML = '';
 
         if (!validateStep(4)) {
-            alert('DEBUG 2: validateStep(4) failed');
             if (submitBtn) {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -538,10 +622,8 @@ function initForm() {
             return;
         }
 
-        alert('DEBUG 3: About to upload files');
-
         // ============================================
-        // STEP 1: UPLOAD FILES
+        // STEP 1: COMPRESS + UPLOAD FILES
         // ============================================
         const fileFields = ['passportPhoto', 'admissionLetter', 'studentId', 'paymentReceipt'];
         const fileUrls = {
@@ -555,54 +637,60 @@ function initForm() {
 
         for (const field of fileFields) {
             const fileInput = document.getElementById(field);
-            const file = fileInput?.files[0];
-            
-            if (file) {
-                alert(`DEBUG 4.${field}: Uploading ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
-                try {
-                    const timestamp = Date.now();
-                    const safeName = sanitizeFileName(file.name);
-                    const fileName = `${timestamp}_${safeName}`;
-                    
-                    let folderPath = '';
-                    switch(field) {
-                        case 'passportPhoto': folderPath = 'passports/'; break;
-                        case 'admissionLetter': folderPath = 'admissions/'; break;
-                        case 'studentId': folderPath = 'student-ids/'; break;
-                        case 'paymentReceipt': folderPath = 'receipts/'; break;
-                    }
-                    
-                    const filePath = `${folderPath}${regSafe}_${fileName}`;
-                    
-                    const { error: upErr } = await supabase.storage
-                        .from('membership-documents')
-                        .upload(filePath, file);
+            let file = fileInput?.files[0];
+            const fieldLabel = field.replace(/([A-Z])/g, ' $1').trim();
 
-                    if (upErr) {
-                        alert(`DEBUG 5.${field}: STORAGE ERROR -> ${upErr.message}`);
-                        throw upErr;
-                    }
+            if (!file) continue;
 
-                    const { data: urlData } = supabase.storage
-                        .from('membership-documents')
-                        .getPublicUrl(filePath);
-                    
-                    fileUrls[field] = urlData?.publicUrl || '';
-                    alert(`DEBUG 6.${field}: Upload OK`);
-                    
-                } catch (error) {
-                    console.warn('Upload error:', error);
-                    showFormMessage(`⚠️ Failed to upload ${field.replace(/([A-Z])/g, ' $1').trim()}. Please try again.`, 'error');
-                    if (submitBtn) {
-                        submitBtn.innerHTML = originalText;
-                        submitBtn.disabled = false;
-                    }
-                    return;
+            try {
+                // Compress if image
+                if (file.type.startsWith('image/')) {
+                    showFormMessage(`⏳ Compressing ${fieldLabel}...`, 'warn');
+                    file = await compressImage(file, fieldLabel);
                 }
+
+                // PDF or other — check size
+                if (file.size > MAX_UPLOAD_BYTES) {
+                    throw new Error(
+                        `${fieldLabel} is ${prettySize(file.size)}. Maximum allowed is ${formatKB(MAX_UPLOAD_BYTES)}. Please upload a smaller file.`
+                    );
+                }
+
+                const timestamp = Date.now();
+                const safeName = sanitizeFileName(file.name);
+                const fileName = `${timestamp}_${safeName}`;
+
+                let folderPath = '';
+                switch (field) {
+                    case 'passportPhoto': folderPath = 'passports/'; break;
+                    case 'admissionLetter': folderPath = 'admissions/'; break;
+                    case 'studentId': folderPath = 'student-ids/'; break;
+                    case 'paymentReceipt': folderPath = 'receipts/'; break;
+                }
+
+                const filePath = `${folderPath}${regSafe}_${fileName}`;
+
+                const ok = await uploadWithRetry('membership-documents', filePath, file, 2);
+                if (!ok.success) {
+                    throw new Error(`${fieldLabel} upload failed: ${ok.error || 'network error'}. Please try again.`);
+                }
+
+                const { data: urlData } = supabase.storage
+                    .from('membership-documents')
+                    .getPublicUrl(filePath);
+
+                fileUrls[field] = urlData?.publicUrl || '';
+
+            } catch (error) {
+                console.warn('Upload error:', error);
+                showFormMessage(`⚠️ ${error.message}`, 'error');
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+                return;
             }
         }
-
-        alert('DEBUG 7: All uploads done — creating account');
 
         // ============================================
         // STEP 2: CREATE AUTH ACCOUNT
@@ -612,18 +700,13 @@ function initForm() {
 
         let authUserId = null;
         try {
-            alert(`DEBUG 8: Calling signUp for ${email}`);
             const { data: authData, error: authErr } = await supabase.auth.signUp({
                 email: email,
                 password: password
             });
 
-            if (authErr) {
-                alert(`DEBUG 9: AUTH ERROR -> ${authErr.message}`);
-                throw authErr;
-            }
+            if (authErr) throw authErr;
             authUserId = authData?.user?.id || null;
-            alert(`DEBUG 10: Auth user created. ID = ${authUserId}`);
 
         } catch (error) {
             console.warn('SignUp error:', error);
@@ -641,8 +724,6 @@ function initForm() {
             return;
         }
 
-        alert('DEBUG 11: Updating students row');
-
         // ============================================
         // STEP 3: UPDATE students ROW
         // ============================================
@@ -657,11 +738,7 @@ function initForm() {
                 })
                 .eq('id', verifiedStudent.id);
 
-            if (stuErr) {
-                alert(`DEBUG 12: STUDENTS UPDATE ERROR -> ${stuErr.message}`);
-                throw stuErr;
-            }
-            alert('DEBUG 13: students row updated');
+            if (stuErr) throw stuErr;
 
         } catch (error) {
             console.warn('students update error:', error);
@@ -672,8 +749,6 @@ function initForm() {
             }
             return;
         }
-
-        alert('DEBUG 14: Inserting membership_applications');
 
         // ============================================
         // STEP 4: INSERT membership_applications
@@ -716,12 +791,8 @@ function initForm() {
                 .from('membership_applications')
                 .insert([formData]);
 
-            if (appErr) {
-                alert(`DEBUG 15: APPLICATION INSERT ERROR -> ${appErr.message}`);
-                throw appErr;
-            }
+            if (appErr) throw appErr;
 
-            alert('DEBUG 16: All done! Showing confirmation.');
             showConfirmation(formData);
 
         } catch (error) {
@@ -731,6 +802,28 @@ function initForm() {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
+        }
+    }
+
+    // Upload with retry on network errors
+    async function uploadWithRetry(bucket, path, file, attemptsLeft) {
+        try {
+            const { error } = await supabase.storage
+                .from(bucket)
+                .upload(path, file, {
+                    contentType: file.type || 'application/octet-stream',
+                    upsert: false
+                });
+            if (error) return { success: false, error: error.message };
+            return { success: true };
+        } catch (err) {
+            const msg = (err && err.message) ? err.message : String(err);
+            const isNetwork = /fetch|network|timeout/i.test(msg);
+            if (isNetwork && attemptsLeft > 0) {
+                await new Promise(r => setTimeout(r, 800));
+                return uploadWithRetry(bucket, path, file, attemptsLeft - 1);
+            }
+            return { success: false, error: msg };
         }
     }
 
