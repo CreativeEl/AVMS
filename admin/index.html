@@ -253,10 +253,22 @@
             const errorDiv = document.getElementById('loginError');
             const submitBtn = document.getElementById('loginBtn');
 
-            // If already logged in via Supabase, restore flags then go to dashboard
-            supabase.auth.getSession().then(({ data }) => {
+            // If already logged in via Supabase, check role then redirect
+            supabase.auth.getSession().then(async ({ data }) => {
                 if (data && data.session) {
-                    console.log('✅ Existing Supabase session found — restoring bridge flags');
+                    console.log('✅ Existing Supabase session found');
+
+                    // ROLE CHECK
+                    const role = data.session.user.user_metadata?.role;
+                    if (role !== 'admin') {
+                        console.warn('🚫 Non-admin session detected — signing out');
+                        await supabase.auth.signOut();
+                        errorDiv.textContent = '🚫 Access denied. This account is not an admin.';
+                        errorDiv.classList.add('show');
+                        return;
+                    }
+
+                    console.log('✅ Admin role confirmed — restoring bridge flags');
                     localStorage.setItem('adminLoggedIn', 'true');
                     sessionStorage.setItem('adminLoggedIn', 'true');
                     sessionStorage.setItem('adminSession', JSON.stringify({
@@ -306,6 +318,20 @@
                     }
 
                     console.log('✅ Login successful for:', data.user.email);
+
+                    // ROLE CHECK — only admins allowed past this point
+                    const role = data.user.user_metadata?.role;
+                    if (role !== 'admin') {
+                        console.warn('🚫 Access denied — user is not admin');
+                        await supabase.auth.signOut();
+                        errorDiv.textContent = '🚫 Access denied. This account is not an admin.';
+                        errorDiv.classList.add('show');
+                        document.getElementById('adminPassword').value = '';
+                        document.getElementById('adminPassword').focus();
+                        return;
+                    }
+
+                    console.log('✅ Admin role confirmed');
 
                     // Store email for pre-fill on next visit
                     localStorage.setItem('adminEmail', email);
