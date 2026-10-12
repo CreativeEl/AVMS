@@ -1,13 +1,17 @@
 // ============================================
-// JOIN US PAGE - Multi-Step Form with Upload
+// JOIN US PAGE - Verify + Multi-Step Form
 // ============================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    initVerify();
     initForm();
 });
 
 // Store uploaded file data
 const uploadedFiles = {};
+
+// Store verified student record
+let verifiedStudent = null;
 
 // ============================================
 // HELPERS
@@ -29,6 +33,166 @@ function sanitizeFileName(name) {
         .slice(-120);
 }
 
+// ============================================
+// STEP 0 — VERIFY STUDENT RECORD
+// ============================================
+function initVerify() {
+    const verifyBtn = document.getElementById('verifyBtn');
+    if (!verifyBtn) return;
+
+    verifyBtn.addEventListener('click', async function() {
+        const regInput = document.getElementById('verifyRegNo');
+        const stateInput = document.getElementById('verifyState');
+        const msgDiv = document.getElementById('verifyMessage');
+
+        const regNo = (regInput?.value || '').trim();
+        const state = (stateInput?.value || '').trim().toLowerCase();
+
+        msgDiv.innerHTML = '';
+
+        if (!regNo || !state) {
+            msgDiv.innerHTML = `
+                <div class="verify-alert verify-alert-warn">
+                    ⚠️ Please enter both your Registration Number and State of Origin.
+                </div>
+            `;
+            return;
+        }
+
+        if (typeof supabase === 'undefined' || !supabase) {
+            msgDiv.innerHTML = `
+                <div class="verify-alert verify-alert-error">
+                    ⚠️ Database connection error. Please try again later.
+                </div>
+            `;
+            return;
+        }
+
+        verifyBtn.disabled = true;
+        const originalText = verifyBtn.innerHTML;
+        verifyBtn.innerHTML = `<span class="spinner"></span> Verifying...`;
+
+        try {
+            // Case-insensitive match on reg_no, lowercase match on state_of_origin
+            const { data, error } = await supabase
+                .from('students')
+                .select('*')
+                .ilike('reg_no', regNo)
+                .eq('state_of_origin', state)
+                .maybeSingle();
+
+            if (error) throw error;
+
+            // NO MATCH
+            if (!data) {
+                msgDiv.innerHTML = `
+                    <div class="verify-alert verify-alert-error">
+                        ❌ <strong>Details not found.</strong><br>
+                        We couldn't find a student record matching that Registration Number and State of Origin. Please check your details, or contact AVMS if you believe this is an error.
+                    </div>
+                `;
+                verifyBtn.innerHTML = originalText;
+                verifyBtn.disabled = false;
+                return;
+            }
+
+            // ALREADY REGISTERED
+            if (data.is_registered === true) {
+                msgDiv.innerHTML = `
+                    <div class="verify-alert verify-alert-warn">
+                        ⚠️ <strong>You have an account.</strong><br>
+                        This record has already been registered. Please log in instead.<br><br>
+                        <a href="student/login.html" class="btn-verify" style="display:inline-block; margin-top:6px;">
+                            <i class="fas fa-sign-in-alt"></i> Go to Student Login
+                        </a>
+                    </div>
+                `;
+                verifyBtn.innerHTML = originalText;
+                verifyBtn.disabled = false;
+                return;
+            }
+
+            // SUCCESS — unlock form
+            verifiedStudent = data;
+            msgDiv.innerHTML = `
+                <div class="verify-alert verify-alert-success">
+                    ✅ <strong>Record found!</strong> Welcome, ${escapeHtml(data.full_name || 'student')}.<br>
+                    Please complete the form below to finish your registration.
+                </div>
+            `;
+
+            prefillForm(data);
+            unlockForm();
+
+        } catch (err) {
+            console.warn('Verify error:', err);
+            msgDiv.innerHTML = `
+                <div class="verify-alert verify-alert-error">
+                    ⚠️ Something went wrong while verifying. Please try again.
+                </div>
+            `;
+            verifyBtn.innerHTML = originalText;
+            verifyBtn.disabled = false;
+        }
+    });
+}
+
+function prefillForm(student) {
+    // Split full_name into first + surname (last word = surname)
+    const fullName = (student.full_name || '').trim();
+    let firstName = '';
+    let surname = '';
+    if (fullName) {
+        const parts = fullName.split(/\s+/);
+        if (parts.length === 1) {
+            firstName = parts[0];
+        } else {
+            surname = parts[parts.length - 1];
+            firstName = parts.slice(0, -1).join(' ');
+        }
+    }
+
+    const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val !== undefined && val !== null) el.value = val;
+    };
+
+    setVal('firstName', firstName);
+    setVal('surname', surname);
+    setVal('stateOfOrigin', student.state_of_origin || '');
+    setVal('regNumber', student.reg_no || '');
+    setVal('level', student.class_level ? String(student.class_level) : '');
+    setVal('department', student.department || 'Veterinary Medicine');
+}
+
+function unlockForm() {
+    const verifySection = document.getElementById('verifySection');
+    const stepsIndicator = document.getElementById('stepIndicator');
+    const form = document.getElementById('membershipForm');
+
+    if (verifySection) {
+        verifySection.classList.add('verify-locked');
+        const inputs = verifySection.querySelectorAll('input, button');
+        inputs.forEach(i => i.disabled = true);
+        const successMsg = verifySection.querySelector('.verify-alert-success');
+        if (successMsg) {
+            const box = verifySection.querySelector('.verify-box');
+            box.innerHTML = '';
+            box.appendChild(successMsg);
+        }
+    }
+
+    if (stepsIndicator) stepsIndicator.style.display = '';
+    if (form) form.style.display = '';
+
+    if (form) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+// ============================================
+// MULTI-STEP FORM
+// ============================================
 function initForm() {
     const form = document.getElementById('membershipForm');
     if (!form) {
@@ -41,7 +205,6 @@ function initForm() {
     let currentStep = 0;
     const totalSteps = pages.length;
 
-    // Show first step
     showStep(0);
 
     // STEP INDICATORS - CLICK TO NAVIGATE
@@ -147,7 +310,6 @@ function initForm() {
                 updateFileStatus();
             }
             
-            // Remove "no files" message
             const infoMsg = previewDiv.querySelector('p');
             if (infoMsg) {
                 infoMsg.remove();
@@ -214,9 +376,12 @@ function initForm() {
         const inputs = currentPage.querySelectorAll('input[required], select[required]');
         let valid = true;
 
-        // Check regular required fields
         inputs.forEach(input => {
             if (input.offsetParent === null) {
+                return;
+            }
+            // Skip readonly inputs
+            if (input.readOnly) {
                 return;
             }
             
@@ -231,7 +396,24 @@ function initForm() {
             }
         });
 
-        // CHECK FILE UPLOADS ON STEP 4 (index 3)
+        // Step 3 (index 2) — password check
+        if (index === 2) {
+            const pw = document.getElementById('password');
+            const cpw = document.getElementById('confirmPassword');
+            if (pw && cpw && pw.value && cpw.value) {
+                if (pw.value.length < 6) {
+                    valid = false;
+                    pw.style.borderColor = '#e8491d';
+                    showFormMessage('⚠️ Password must be at least 6 characters.', 'error');
+                } else if (pw.value !== cpw.value) {
+                    valid = false;
+                    cpw.style.borderColor = '#e8491d';
+                    showFormMessage('⚠️ Passwords do not match.', 'error');
+                }
+            }
+        }
+
+        // Step 4 (index 3) — file uploads
         if (index === 3) {
             const fileInputs = currentPage.querySelectorAll('input[type="file"][required]');
             let allFilesUploaded = true;
@@ -253,21 +435,11 @@ function initForm() {
 
             if (!allFilesUploaded) {
                 valid = false;
-                const msgDiv = document.getElementById('formMessage');
-                if (msgDiv) {
-                    msgDiv.innerHTML = `
-                        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px;">
-                            ⚠️ Please upload ALL 4 required documents before proceeding.
-                        </div>
-                    `;
-                    setTimeout(() => {
-                        msgDiv.innerHTML = '';
-                    }, 5000);
-                }
+                showFormMessage('⚠️ Please upload ALL 4 required documents before proceeding.', 'error');
             }
         }
 
-        // Check checkbox on final step (index 4)
+        // Step 5 (index 4) — declaration checkbox
         if (index === 4) {
             const checkbox = document.getElementById('declaration');
             if (checkbox && !checkbox.checked) {
@@ -280,20 +452,25 @@ function initForm() {
         }
 
         if (!valid) {
-            const msgDiv = document.getElementById('formMessage');
-            if (msgDiv && !msgDiv.innerHTML) {
-                msgDiv.innerHTML = `
-                    <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px;">
-                        ⚠️ Please fill in all required fields before proceeding.
-                    </div>
-                `;
-                setTimeout(() => {
-                    msgDiv.innerHTML = '';
-                }, 4000);
-            }
+            showFormMessage('⚠️ Please fill in all required fields before proceeding.', 'error');
         }
 
         return valid;
+    }
+
+    function showFormMessage(text, type) {
+        const msgDiv = document.getElementById('formMessage');
+        if (!msgDiv) return;
+        const bg = type === 'error' ? '#f8d7da' : '#fff3cd';
+        const color = type === 'error' ? '#721c24' : '#856404';
+        msgDiv.innerHTML = `
+            <div style="background: ${bg}; color: ${color}; padding: 15px; border-radius: 8px; margin-top: 12px;">
+                ${escapeHtml(text)}
+            </div>
+        `;
+        setTimeout(() => {
+            msgDiv.innerHTML = '';
+        }, 5000);
     }
 
     function updateSummary() {
@@ -325,7 +502,6 @@ function initForm() {
         }
         html += '</div>';
 
-        // Check if files were uploaded
         const fileFields = ['passportPhoto', 'admissionLetter', 'studentId', 'paymentReceipt'];
         let filesHtml = '<div class="summary-item" style="grid-column: 1 / -1;"><strong>Uploaded Files:</strong><ul>';
         let hasFiles = false;
@@ -345,7 +521,7 @@ function initForm() {
     }
 
     // ============================================
-    // FORM SUBMISSION WITH LOADING SPINNER
+    // FORM SUBMISSION
     // ============================================
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -356,16 +532,13 @@ function initForm() {
         const submitBtn = document.querySelector('.btn-submit');
         const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
 
-        // Supabase availability check FIRST
+        if (!verifiedStudent) {
+            showFormMessage('⚠️ Please verify your student record first.', 'error');
+            return;
+        }
+
         if (typeof supabase === 'undefined' || !supabase) {
-            const msgDiv = document.getElementById('formMessage');
-            if (msgDiv) {
-                msgDiv.innerHTML = `
-                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                        <p>⚠️ Database connection error. Please try again later.</p>
-                    </div>
-                `;
-            }
+            showFormMessage('⚠️ Database connection error. Please try again later.', 'error');
             return;
         }
         
@@ -386,7 +559,7 @@ function initForm() {
         }
 
         // ============================================
-        // STEP 1: UPLOAD FILES TO PRIVATE STORAGE
+        // STEP 1: UPLOAD FILES
         // ============================================
         const fileFields = ['passportPhoto', 'admissionLetter', 'studentId', 'paymentReceipt'];
         const fileUrls = {
@@ -395,7 +568,8 @@ function initForm() {
             studentId: '',
             paymentReceipt: ''
         };
-        let uploadSuccess = true;
+
+        const regSafe = (verifiedStudent.reg_no || 'unknown').replace(/[^a-zA-Z0-9._-]/g, '_');
 
         for (const field of fileFields) {
             const fileInput = document.getElementById(field);
@@ -415,33 +589,23 @@ function initForm() {
                         case 'paymentReceipt': folderPath = 'receipts/'; break;
                     }
                     
-                    const filePath = `${folderPath}${fileName}`;
+                    const filePath = `${folderPath}${regSafe}_${fileName}`;
                     
-                    const { data, error } = await supabase.storage
+                    const { error: upErr } = await supabase.storage
                         .from('membership-documents')
                         .upload(filePath, file);
 
-                    if (error) {
-                        uploadSuccess = false;
-                        throw error;
-                    }
+                    if (upErr) throw upErr;
 
                     const { data: urlData } = supabase.storage
                         .from('membership-documents')
                         .getPublicUrl(filePath);
                     
-                    const publicUrl = urlData?.publicUrl;
-                    fileUrls[field] = publicUrl;
+                    fileUrls[field] = urlData?.publicUrl || '';
                     
                 } catch (error) {
-                    uploadSuccess = false;
-                    if (msgDiv) {
-                        msgDiv.innerHTML = `
-                            <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                                <p>⚠️ Failed to upload ${escapeHtml(field.replace(/([A-Z])/g, ' $1').trim())}. Please try again.</p>
-                            </div>
-                        `;
-                    }
+                    console.warn('Upload error:', error);
+                    showFormMessage(`⚠️ Failed to upload ${field.replace(/([A-Z])/g, ' $1').trim()}. Please try again.`, 'error');
                     if (submitBtn) {
                         submitBtn.innerHTML = originalText;
                         submitBtn.disabled = false;
@@ -451,7 +615,31 @@ function initForm() {
             }
         }
 
-        if (!uploadSuccess) {
+        // ============================================
+        // STEP 2: CREATE AUTH ACCOUNT
+        // ============================================
+        const email = (document.getElementById('email')?.value || '').trim();
+        const password = document.getElementById('password')?.value || '';
+
+        let authUserId = null;
+        try {
+            const { data: authData, error: authErr } = await supabase.auth.signUp({
+                email: email,
+                password: password
+            });
+
+            if (authErr) throw authErr;
+            authUserId = authData?.user?.id || null;
+
+        } catch (error) {
+            console.warn('SignUp error:', error);
+            let friendly = '⚠️ Could not create your account. ';
+            if (error.message && error.message.toLowerCase().includes('already')) {
+                friendly += 'This email is already registered. If you already applied, please log in instead.';
+            } else {
+                friendly += 'Please try again, or contact AVMS if the problem persists.';
+            }
+            showFormMessage(friendly, 'error');
             if (submitBtn) {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -460,7 +648,33 @@ function initForm() {
         }
 
         // ============================================
-        // STEP 2: SAVE APPLICATION TO DATABASE
+        // STEP 3: UPDATE students ROW
+        // ============================================
+        try {
+            const { error: stuErr } = await supabase
+                .from('students')
+                .update({
+                    email: email,
+                    auth_user_id: authUserId,
+                    is_registered: true,
+                    applied_at: new Date().toISOString()
+                })
+                .eq('id', verifiedStudent.id);
+
+            if (stuErr) throw stuErr;
+
+        } catch (error) {
+            console.warn('students update error:', error);
+            showFormMessage('⚠️ Your account was created but we could not save your application. Please contact AVMS with your Registration Number so we can complete it manually.', 'error');
+            if (submitBtn) {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+            return;
+        }
+
+        // ============================================
+        // STEP 4: INSERT membership_applications
         // ============================================
         const formData = {
             title: document.getElementById('title')?.value || '',
@@ -479,39 +693,34 @@ function initForm() {
             department: document.getElementById('department')?.value || '',
             course_of_study: document.getElementById('courseOfStudy')?.value || '',
             reg_number: document.getElementById('regNumber')?.value || '',
+            reg_no: document.getElementById('regNumber')?.value || '',
             level: document.getElementById('level')?.value || '',
             year_of_graduation: document.getElementById('yearOfGraduation')?.value || '',
             phone: document.getElementById('phone')?.value || '',
-            email: document.getElementById('email')?.value || '',
+            email: email,
             home_address: document.getElementById('homeAddress')?.value || '',
             passport_photo_url: fileUrls.passportPhoto || '',
             admission_letter_url: fileUrls.admissionLetter || '',
             student_id_url: fileUrls.studentId || '',
             payment_receipt_url: fileUrls.paymentReceipt || '',
-            status: 'pending'
+            auth_user_id: authUserId,
+            is_active: false,
+            status: 'pending',
+            applied_at: new Date().toISOString()
         };
 
         try {
-            const { data, error } = await supabase
+            const { error: appErr } = await supabase
                 .from('membership_applications')
                 .insert([formData]);
 
-            if (error) {
-                throw error;
-            }
+            if (appErr) throw appErr;
 
             showConfirmation(formData);
 
         } catch (error) {
-            console.warn('Submission error:', error);
-            if (msgDiv) {
-                msgDiv.innerHTML = `
-                    <div style="background: #f8d7da; color: #721c24; padding: 20px; border-radius: 10px;">
-                        <i class="fas fa-exclamation-circle" style="font-size: 30px;"></i>
-                        <p>⚠️ Could not submit application. Please try again, or contact AVMS if the problem persists.</p>
-                    </div>
-                `;
-            }
+            console.warn('Application insert error:', error);
+            showFormMessage('⚠️ Your account was created but we could not save your application. Please contact AVMS with your Registration Number so we can complete it manually.', 'error');
             if (submitBtn) {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
@@ -525,6 +734,9 @@ function initForm() {
         
         const indicator = document.querySelector('.steps-indicator');
         if (indicator) indicator.style.display = 'none';
+        
+        const verifySection = document.getElementById('verifySection');
+        if (verifySection) verifySection.style.display = 'none';
         
         const heading = document.querySelector('.membership-container h2');
         if (heading) heading.style.display = 'none';
@@ -542,16 +754,16 @@ function initForm() {
         if (confirmName) confirmName.textContent = (data.first_name || '') + ' ' + (data.surname || '');
         
         const confirmReg = document.getElementById('confirmReg');
-        if (confirmReg) confirmReg.textContent = data.reg_number;
+        if (confirmReg) confirmReg.textContent = data.reg_no || data.reg_number || '';
         
         const confirmLevel = document.getElementById('confirmLevel');
-        if (confirmLevel) confirmLevel.textContent = data.level;
+        if (confirmLevel) confirmLevel.textContent = data.level || '';
         
         const confirmEmail = document.getElementById('confirmEmail');
-        if (confirmEmail) confirmEmail.textContent = data.email;
+        if (confirmEmail) confirmEmail.textContent = data.email || '';
         
         const confirmPhone = document.getElementById('confirmPhone');
-        if (confirmPhone) confirmPhone.textContent = data.phone;
+        if (confirmPhone) confirmPhone.textContent = data.phone || '';
         
         if (confirmDiv) {
             confirmDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
