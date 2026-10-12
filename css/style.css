@@ -4741,3 +4741,184 @@ html, body {
         font-size: 13px;
     }
 }
+/* ============================================ */
+/* JOIN PAGE — VERIFY STEP (Session 5)          */
+/* ============================================ */
+
+.verify-section {
+    margin-bottom: 30px;
+}
+
+.verify-box {
+    background: #FBF8EE;
+    border: 1px solid #e3e0d2;
+    border-left: 4px solid #C9A961;
+    border-radius: 10px;
+    padding: 28px 26px;
+}
+
+.verify-box h3 {
+    font-family: Georgia, serif;
+    font-size: 1.25rem;
+    color: #1F4E3D;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.verify-box h3 i {
+    color: #C9A961;
+}
+
+.verify-desc {
+    color: #4a4a4a;
+    font-size: 0.94rem;
+    line-height: 1.55;
+    margin: 0 0 20px 0;
+}
+
+.verify-box .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-bottom: 6px;
+}
+
+.verify-box .form-group label {
+    display: block;
+    font-weight: 600;
+    color: #1F4E3D;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+}
+
+.verify-box .form-group input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #e3e0d2;
+    border-radius: 8px;
+    font-family: Inter, sans-serif;
+    font-size: 0.95rem;
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.verify-box .form-group input:focus {
+    outline: none;
+    border-color: #2D6B54;
+    box-shadow: 0 0 0 3px rgba(45, 107, 84, 0.12);
+}
+
+.verify-box .file-hint {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8rem;
+    color: #6b6b6b;
+}
+
+/* Verify button */
+.btn-verify {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #1F4E3D;
+    color: #F5F0DC;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 26px;
+    font-family: Inter, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-decoration: none;
+}
+
+.btn-verify:hover {
+    background: #2D6B54;
+    transform: translateY(-1px);
+}
+
+.btn-verify:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-verify .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(245, 240, 220, 0.4);
+    border-top-color: #F5F0DC;
+    border-radius: 50%;
+    animation: verifySpin 0.7s linear infinite;
+}
+
+@keyframes verifySpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Verify alert messages */
+.verify-message {
+    margin-top: 18px;
+}
+
+.verify-alert {
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    border-left: 4px solid transparent;
+}
+
+.verify-alert strong {
+    font-weight: 700;
+}
+
+.verify-alert-success {
+    background: #e8f3ec;
+    color: #1F4E3D;
+    border-left-color: #2D6B54;
+}
+
+.verify-alert-error {
+    background: #fbeaea;
+    color: #8B1A1A;
+    border-left-color: #8B1A1A;
+}
+
+.verify-alert-warn {
+    background: #FBF3DD;
+    color: #6b4a05;
+    border-left-color: #C9A961;
+}
+
+.verify-alert .btn-verify {
+    margin-top: 8px;
+    font-size: 0.88rem;
+    padding: 9px 18px;
+}
+
+/* Locked verify state after success */
+.verify-section.verify-locked .verify-box {
+    border-left-color: #2D6B54;
+    padding: 18px 22px;
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .verify-box {
+        padding: 22px 18px;
+    }
+    .verify-box .form-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .btn-verify {
+        width: 100%;
+    }
+}
