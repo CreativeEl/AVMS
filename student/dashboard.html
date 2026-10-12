@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1F4E3D">
-    <title>Student Dashboard — AVMS ABU Zaria</title>
+    <title>Student Portal — AVMS ABU Zaria</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,205 +28,234 @@
         html, body {
             min-height: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #FBF8EE;
+            background: #F0EDE0;
             color: #1a1a1a;
             overflow-x: hidden;
         }
 
-        body {
-            padding-bottom: calc(84px + env(safe-area-inset-bottom));
+        /* Desktop: keep it app-sized, centered with soft side space */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, #F7F3E4 0%, #F0EDE0 100%);
+            z-index: -1;
         }
 
         /* ============================================ */
-        /* TOP APP BAR                                  */
+        /* APP FRAME                                    */
         /* ============================================ */
-        .app-topbar {
-            position: sticky;
-            top: 0;
-            background: #FBF8EE;
-            z-index: 20;
-            padding: max(16px, env(safe-area-inset-top)) 20px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-        .greeting {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 0;
-        }
-        .avatar {
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 15px;
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(31,78,61,0.2);
-        }
-        .greeting-text {
-            min-width: 0;
-        }
-        .greeting-text .hi {
-            font-size: 12px;
-            color: #8a8a8a;
-            font-weight: 600;
-            letter-spacing: 0.3px;
-        }
-        .greeting-text .name {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--green-deep);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .topbar-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .icon-btn {
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 1px solid var(--border);
-            color: var(--green-deep);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 15px;
-            transition: background 0.15s, transform 0.1s;
-            text-decoration: none;
-        }
-        .icon-btn:active { transform: scale(0.94); background: #F7F5EC; }
-
-        /* ============================================ */
-        /* CONTENT WRAP                                 */
-        /* ============================================ */
-        .app-content {
-            max-width: 480px;
+        .app-frame {
+            max-width: 560px;
             margin: 0 auto;
-            padding: 0 20px 24px;
+            min-height: 100vh;
+            background: #FBF8EE;
+            position: relative;
+            padding-bottom: calc(76px + env(safe-area-inset-bottom));
+            box-shadow: 0 0 60px rgba(31,78,61,0.06);
         }
 
         /* ============================================ */
-        /* STUDENT ID CARD                              */
+        /* HERO HEADER                                  */
         /* ============================================ */
-        .id-card {
+        .hero {
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
-            border-radius: 22px;
-            padding: 22px;
-            color: #ffffff;
+            padding: max(22px, env(safe-area-inset-top)) 22px 72px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 16px 36px rgba(31,78,61,0.24);
-            margin-bottom: 22px;
+            border-bottom-left-radius: 28px;
+            border-bottom-right-radius: 28px;
         }
-        .id-card::before {
+        .hero::before {
             content: '';
             position: absolute;
-            top: -60px; right: -60px;
-            width: 180px; height: 180px;
+            top: -80px; right: -80px;
+            width: 240px; height: 240px;
             border-radius: 50%;
-            background: rgba(201,169,97,0.18);
+            background: rgba(201,169,97,0.15);
         }
-        .id-card::after {
+        .hero::after {
             content: '';
             position: absolute;
-            bottom: -80px; left: -40px;
-            width: 200px; height: 200px;
+            bottom: -100px; left: -60px;
+            width: 260px; height: 260px;
             border-radius: 50%;
             background: rgba(255,255,255,0.05);
         }
 
-        .id-card-top {
+        .hero-top {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 10px;
-            margin-bottom: 22px;
-            position: relative;
-            z-index: 1;
-        }
-        .id-card-label {
-            font-size: 10.5px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.65);
-            margin-bottom: 6px;
-        }
-        .id-card-name {
-            font-family: Georgia, serif;
-            font-size: 22px;
-            font-weight: 700;
-            line-height: 1.15;
-            color: #ffffff;
-            word-break: break-word;
-        }
-        .status-pill {
-            display: inline-flex;
             align-items: center;
-            gap: 5px;
-            background: rgba(201,169,97,0.22);
-            color: #F5E5B8;
-            border: 1px solid rgba(201,169,97,0.5);
-            padding: 5px 11px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .status-pill.active { background: rgba(76,175,80,0.22); border-color: rgba(76,175,80,0.55); color: #C8E6C9; }
-
-        .id-card-bottom {
-            display: flex;
             justify-content: space-between;
-            align-items: flex-end;
             gap: 12px;
             position: relative;
             z-index: 1;
+            margin-bottom: 26px;
         }
-        .id-field {
+        .hero-greet {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             min-width: 0;
         }
-        .id-field .k {
-            font-size: 10px;
+        .hero-avatar {
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.22);
+            border: 1.5px solid rgba(201,169,97,0.5);
+            color: #F5E5B8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 4px;
+            font-size: 15px;
+            flex-shrink: 0;
         }
-        .id-field .v {
-            font-size: 14px;
+        .hero-greet-text {
+            min-width: 0;
+        }
+        .hero-greet-text .hi {
+            font-size: 11.5px;
+            color: rgba(255,255,255,0.65);
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            margin-bottom: 2px;
+        }
+        .hero-greet-text .name {
+            font-size: 17px;
             font-weight: 700;
             color: #ffffff;
-            word-break: break-word;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .id-card-logo {
+        .hero-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .hero-icon-btn {
             width: 40px; height: 40px;
             border-radius: 50%;
-            background: rgba(201,169,97,0.15);
-            border: 1.5px solid rgba(201,169,97,0.6);
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.15s, transform 0.1s;
+            text-decoration: none;
+        }
+        .hero-icon-btn:hover { background: rgba(255,255,255,0.2); }
+        .hero-icon-btn:active { transform: scale(0.94); }
+
+        .hero-title {
+            font-family: Georgia, serif;
+            font-size: 26px;
+            color: #ffffff;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+            line-height: 1.15;
+            position: relative;
+            z-index: 1;
+            margin-bottom: 4px;
+        }
+        .hero-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.7);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============================================ */
+        /* ID CARD (overlapping hero)                   */
+        /* ============================================ */
+        .id-card-wrap {
+            padding: 0 20px;
+            margin-top: -54px;
+            position: relative;
+            z-index: 5;
+            margin-bottom: 22px;
+        }
+        .id-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 18px 20px;
+            box-shadow: 0 10px 30px rgba(31,78,61,0.12), 0 2px 6px rgba(31,78,61,0.06);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border: 1px solid #f0ede0;
+        }
+        .id-card-logo {
+            width: 50px; height: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: Georgia, serif;
             color: var(--gold);
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             flex-shrink: 0;
+            box-shadow: 0 6px 16px rgba(31,78,61,0.2);
+        }
+        .id-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .id-card-body .label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #8a8a8a;
+            margin-bottom: 3px;
+        }
+        .id-card-body .value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--green-deep);
+            margin-bottom: 3px;
+            word-break: break-word;
+        }
+        .id-card-body .meta {
+            font-size: 12px;
+            color: #6b6b6b;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #E8F3EC;
+            color: var(--green-deep);
+            padding: 5px 11px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .status-pill i { font-size: 6px; }
+
+        /* ============================================ */
+        /* SCREEN CONTAINER                             */
+        /* ============================================ */
+        .screens {
+            padding: 0 20px;
+        }
+        .screen {
+            display: none;
+            animation: fadeUp 0.32s ease-out;
+        }
+        .screen.active { display: block; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ============================================ */
@@ -243,14 +272,22 @@
             font-weight: 700;
             color: var(--green-deep);
             letter-spacing: -0.1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .section-head .link {
-            font-size: 12px;
-            color: var(--green-mid);
+        .section-head h2::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            border-radius: 2px;
+            background: var(--gold);
+        }
+        .section-head .count {
+            font-size: 11px;
+            color: #8a8a8a;
             font-weight: 600;
-            text-decoration: none;
         }
-        .section-head .link:hover { text-decoration: underline; }
 
         /* ============================================ */
         /* QUICK ACTIONS GRID                           */
@@ -258,97 +295,257 @@
         .quick-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 11px;
+            margin-bottom: 22px;
         }
         .quick-tile {
             background: #ffffff;
-            border-radius: 18px;
-            padding: 16px 8px 14px;
+            border-radius: 16px;
+            padding: 15px 6px 13px;
             text-align: center;
             text-decoration: none;
             color: var(--green-deep);
-            box-shadow: 0 4px 14px rgba(31,78,61,0.05);
+            box-shadow: 0 3px 10px rgba(31,78,61,0.05);
             border: 1px solid #f0ede0;
             transition: transform 0.12s, box-shadow 0.18s;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 8px;
+            cursor: pointer;
         }
-        .quick-tile:active { transform: scale(0.96); }
-        .quick-tile:hover { box-shadow: 0 8px 20px rgba(31,78,61,0.1); }
+        .quick-tile:hover { box-shadow: 0 8px 22px rgba(31,78,61,0.12); transform: translateY(-2px); }
+        .quick-tile:active { transform: scale(0.97); }
         .quick-tile .icon-wrap {
-            width: 44px; height: 44px;
-            border-radius: 14px;
-            background: linear-gradient(135deg, rgba(31,78,61,0.1), rgba(45,107,84,0.06));
+            width: 42px; height: 42px;
+            border-radius: 13px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            color: var(--green-deep);
+            font-size: 17px;
+            color: #ffffff;
         }
         .quick-tile .label {
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: 600;
             color: #333;
             line-height: 1.2;
         }
 
+        /* Tile color accents */
+        .tile-cbt .icon-wrap { background: linear-gradient(135deg, #1F4E3D, #2D6B54); }
+        .tile-ann .icon-wrap { background: linear-gradient(135deg, #A88943, #C9A961); }
+        .tile-evt .icon-wrap { background: linear-gradient(135deg, #8B1A1A, #b02c2c); }
+        .tile-dl .icon-wrap { background: linear-gradient(135deg, #2D6B54, #4a8b6f); }
+        .tile-gal .icon-wrap { background: linear-gradient(135deg, #A88943, #d4b878); }
+        .tile-giv .icon-wrap { background: linear-gradient(135deg, #8B1A1A, #A88943); }
+
         /* ============================================ */
-        /* ACTION LIST                                  */
+        /* CARD LIST (for content screens)              */
         /* ============================================ */
-        .action-list {
+        .list-card {
             background: #ffffff;
-            border-radius: 18px;
+            border-radius: 16px;
             border: 1px solid #f0ede0;
             overflow: hidden;
-            box-shadow: 0 4px 14px rgba(31,78,61,0.05);
-            margin-bottom: 22px;
+            box-shadow: 0 3px 10px rgba(31,78,61,0.04);
+            margin-bottom: 18px;
         }
-        .action-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 16px 18px;
+        .list-item {
+            display: block;
+            padding: 14px 16px;
             text-decoration: none;
             color: #1a1a1a;
             border-bottom: 1px solid #f5f2e6;
             transition: background 0.15s;
         }
-        .action-item:last-child { border-bottom: none; }
-        .action-item:hover { background: #FBF8EE; }
-        .action-item .ai-icon {
-            width: 38px; height: 38px;
-            border-radius: 12px;
-            background: #F7F5EC;
-            color: var(--green-deep);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-        .action-item .ai-text {
-            flex: 1;
-            min-width: 0;
-        }
-        .action-item .ai-title {
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: #FBF8EE; }
+        .list-item .li-title {
             font-size: 14px;
             font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 2px;
+            color: var(--green-deep);
+            margin-bottom: 3px;
+            line-height: 1.3;
         }
-        .action-item .ai-desc {
+        .list-item .li-sub {
             font-size: 12px;
             color: #8a8a8a;
-            line-height: 1.35;
+            line-height: 1.4;
         }
-        .action-item .ai-chev {
-            color: #bbb;
+        .list-item .li-date {
+            font-size: 11px;
+            color: var(--gold-deep);
+            font-weight: 600;
+            margin-top: 5px;
+            letter-spacing: 0.3px;
+        }
+
+        .empty-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px dashed #e3e0d2;
+            padding: 32px 20px;
+            text-align: center;
+            color: #8a8a8a;
             font-size: 13px;
-            flex-shrink: 0;
+            margin-bottom: 18px;
         }
+        .empty-card i {
+            display: block;
+            font-size: 28px;
+            color: #d8d4c2;
+            margin-bottom: 10px;
+        }
+
+        .loader-card {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #f0ede0;
+            padding: 32px 20px;
+            text-align: center;
+            color: #8a8a8a;
+            font-size: 13px;
+            margin-bottom: 18px;
+        }
+        .loader-spinner {
+            width: 26px; height: 26px;
+            border: 3px solid rgba(31,78,61,0.12);
+            border-top-color: var(--green-deep);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ============================================ */
+        /* CBT SCREEN (highlight block)                 */
+        /* ============================================ */
+        .cbt-highlight {
+            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+            border-radius: 20px;
+            padding: 22px;
+            color: #ffffff;
+            margin-bottom: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+        .cbt-highlight::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.18);
+        }
+        .cbt-highlight h3 {
+            font-family: Georgia, serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+        .cbt-highlight p {
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .cbt-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: var(--green-deep);
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.12s, box-shadow 0.18s;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+        .cbt-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .cbt-btn:active { transform: scale(0.97); }
+
+        /* ============================================ */
+        /* PROFILE SCREEN                               */
+        /* ============================================ */
+        .profile-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 26px 22px;
+            border: 1px solid #f0ede0;
+            box-shadow: 0 4px 14px rgba(31,78,61,0.05);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .profile-avatar {
+            width: 76px; height: 76px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            box-shadow: 0 10px 24px rgba(31,78,61,0.22);
+        }
+        .profile-name {
+            font-family: Georgia, serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--green-deep);
+            margin-bottom: 4px;
+        }
+        .profile-reg {
+            font-size: 13px;
+            color: #8a8a8a;
+            margin-bottom: 14px;
+        }
+        .profile-info {
+            text-align: left;
+            border-top: 1px solid #f0ede0;
+            margin-top: 18px;
+            padding-top: 18px;
+        }
+        .profile-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f2e6;
+            font-size: 13px;
+            gap: 12px;
+        }
+        .profile-info-row:last-child { border-bottom: none; }
+        .profile-info-row .k { color: #8a8a8a; font-weight: 600; flex-shrink: 0; }
+        .profile-info-row .v { color: #1a1a1a; font-weight: 600; text-align: right; word-break: break-word; }
+
+        .btn-logout-big {
+            width: 100%;
+            height: 50px;
+            border-radius: 25px;
+            background: #ffffff;
+            border: 1.5px solid #f0c8c8;
+            color: var(--red-deep);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.15s;
+        }
+        .btn-logout-big:hover { background: #FBEAEA; }
 
         /* ============================================ */
         /* BOTTOM TAB BAR                               */
@@ -356,8 +553,10 @@
         .bottom-nav {
             position: fixed;
             bottom: 0;
-            left: 0;
-            right: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 560px;
             background: #ffffff;
             border-top: 1px solid #f0ede0;
             display: flex;
@@ -384,10 +583,7 @@
             cursor: pointer;
             font-family: inherit;
         }
-        .nav-tab i {
-            font-size: 18px;
-            margin-bottom: 2px;
-        }
+        .nav-tab i { font-size: 18px; margin-bottom: 2px; }
         .nav-tab.active { color: var(--green-deep); }
         .nav-tab.active i { color: var(--green-deep); }
         .nav-tab:active { transform: scale(0.94); }
@@ -416,11 +612,12 @@
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
         .guard-text {
             font-size: 14px;
             color: var(--green-deep);
             font-weight: 600;
+            max-width: 280px;
+            line-height: 1.5;
         }
 
         /* ============================================ */
@@ -445,7 +642,6 @@
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
-        /* HIDDEN until authed */
         .app-shell { visibility: hidden; }
         .app-shell.ready { visibility: visible; }
     </style>
@@ -460,137 +656,192 @@
 
     <!-- APP SHELL -->
     <div class="app-shell" id="appShell">
+        <div class="app-frame">
 
-        <!-- TOP APP BAR -->
-        <div class="app-topbar">
-            <div class="greeting">
-                <div class="avatar" id="avatar">AV</div>
-                <div class="greeting-text">
-                    <div class="hi">Welcome back,</div>
-                    <div class="name" id="greetingName">Student</div>
-                </div>
-            </div>
-            <div class="topbar-actions">
-                <a href="../index.html" class="icon-btn" title="Home" aria-label="Home">
-                    <i class="fas fa-house"></i>
-                </a>
-                <button class="icon-btn" id="logoutBtn" title="Logout" aria-label="Logout">
-                    <i class="fas fa-arrow-right-from-bracket"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- CONTENT -->
-        <div class="app-content">
-
-            <!-- STUDENT ID CARD -->
-            <div class="id-card">
-                <div class="id-card-top">
-                    <div>
-                        <div class="id-card-label">AVMS Student</div>
-                        <div class="id-card-name" id="cardName">—</div>
+            <!-- HERO -->
+            <div class="hero">
+                <div class="hero-top">
+                    <div class="hero-greet">
+                        <div class="hero-avatar" id="heroAvatar">AV</div>
+                        <div class="hero-greet-text">
+                            <div class="hi">Welcome back,</div>
+                            <div class="name" id="heroName">Student</div>
+                        </div>
                     </div>
-                    <div class="status-pill active" id="cardStatus">
-                        <i class="fas fa-circle" style="font-size: 6px;"></i> Active
+                    <div class="hero-actions">
+                        <a href="../index.html" class="hero-icon-btn" title="Public site" aria-label="Public site">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                        <button class="hero-icon-btn" id="heroLogout" title="Logout" aria-label="Logout">
+                            <i class="fas fa-arrow-right-from-bracket"></i>
+                        </button>
                     </div>
                 </div>
-                <div class="id-card-bottom">
-                    <div class="id-field">
-                        <div class="k">Reg No</div>
-                        <div class="v" id="cardRegNo">—</div>
-                    </div>
-                    <div class="id-field">
-                        <div class="k">Level</div>
-                        <div class="v" id="cardLevel">—</div>
-                    </div>
+                <div class="hero-title" id="heroTitle">Student Portal</div>
+                <div class="hero-sub">AVMS · ABU Zaria</div>
+            </div>
+
+            <!-- ID CARD -->
+            <div class="id-card-wrap">
+                <div class="id-card">
                     <div class="id-card-logo">AV</div>
+                    <div class="id-card-body">
+                        <div class="label">AVMS Student</div>
+                        <div class="value" id="idName">—</div>
+                        <div class="meta"><span id="idReg">—</span> · <span id="idLevel">—</span></div>
+                    </div>
+                    <div class="status-pill active" id="idStatus">
+                        <i class="fas fa-circle"></i> Active
+                    </div>
                 </div>
             </div>
 
-            <!-- QUICK ACTIONS -->
-            <div class="section-head">
-                <h2>Quick Actions</h2>
-            </div>
-            <div class="quick-grid">
-                <a href="../cbt/login.html" class="quick-tile">
-                    <div class="icon-wrap"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="label">CBT<br>Practice</div>
-                </a>
-                <a href="../announcements.html" class="quick-tile">
-                    <div class="icon-wrap"><i class="fas fa-bullhorn"></i></div>
-                    <div class="label">Announce<br>-ments</div>
-                </a>
-                <a href="../events.html" class="quick-tile">
-                    <div class="icon-wrap"><i class="fas fa-calendar"></i></div>
-                    <div class="label">Events</div>
-                </a>
-                <a href="../downloads.html" class="quick-tile">
-                    <div class="icon-wrap"><i class="fas fa-file-arrow-down"></i></div>
-                    <div class="label">Downloads</div>
-                </a>
-                <a href="../gallery.html" class="quick-tile">
-                    <div class="icon-wrap"><i class="fas fa-images"></i></div>
-                    <div class="label">Gallery</div>
-                </a>
-                <a href="../give.html" class="quick-tile">
-                    <div class="icon-wrap"><i class="fas fa-hand-holding-heart"></i></div>
-                    <div class="label">Give</div>
-                </a>
+            <!-- SCREENS -->
+            <div class="screens">
+
+                <!-- HOME -->
+                <div class="screen active" id="screen-home">
+                    <div class="section-head">
+                        <h2>Quick Actions</h2>
+                    </div>
+                    <div class="quick-grid">
+                        <div class="quick-tile tile-cbt" data-screen="cbt">
+                            <div class="icon-wrap"><i class="fas fa-graduation-cap"></i></div>
+                            <div class="label">CBT<br>Practice</div>
+                        </div>
+                        <div class="quick-tile tile-ann" data-screen="alerts">
+                            <div class="icon-wrap"><i class="fas fa-bullhorn"></i></div>
+                            <div class="label">Announce<br>-ments</div>
+                        </div>
+                        <div class="quick-tile tile-evt" data-screen="events">
+                            <div class="icon-wrap"><i class="fas fa-calendar"></i></div>
+                            <div class="label">Events</div>
+                        </div>
+                        <div class="quick-tile tile-dl" data-screen="downloads">
+                            <div class="icon-wrap"><i class="fas fa-file-arrow-down"></i></div>
+                            <div class="label">Downloads</div>
+                        </div>
+                        <div class="quick-tile tile-gal" data-screen="gallery">
+                            <div class="icon-wrap"><i class="fas fa-images"></i></div>
+                            <div class="label">Gallery</div>
+                        </div>
+                        <div class="quick-tile tile-giv" data-give="1">
+                            <div class="icon-wrap"><i class="fas fa-hand-holding-heart"></i></div>
+                            <div class="label">Give</div>
+                        </div>
+                    </div>
+
+                    <div class="section-head">
+                        <h2>Latest Announcements</h2>
+                        <span class="count" id="homeAnnCount"></span>
+                    </div>
+                    <div id="homeAnnList">
+                        <div class="loader-card"><div class="loader-spinner"></div>Loading...</div>
+                    </div>
+                </div>
+
+                <!-- CBT -->
+                <div class="screen" id="screen-cbt">
+                    <div class="cbt-highlight">
+                        <h3>CBT Practice</h3>
+                        <p>Test your knowledge with practice questions across your courses. Login with your Registration Number and State of Origin to begin.</p>
+                        <a href="../cbt/login.html" class="cbt-btn">
+                            <i class="fas fa-play"></i> Open CBT Portal
+                        </a>
+                    </div>
+                    <div class="section-head">
+                        <h2>Available Courses</h2>
+                    </div>
+                    <div id="cbtCourseList">
+                        <div class="loader-card"><div class="loader-spinner"></div>Loading courses...</div>
+                    </div>
+                </div>
+
+                <!-- ALERTS (Announcements) -->
+                <div class="screen" id="screen-alerts">
+                    <div class="section-head">
+                        <h2>Announcements</h2>
+                    </div>
+                    <div id="alertsList">
+                        <div class="loader-card"><div class="loader-spinner"></div>Loading announcements...</div>
+                    </div>
+                </div>
+
+                <!-- EVENTS -->
+                <div class="screen" id="screen-events">
+                    <div class="section-head">
+                        <h2>Upcoming Events</h2>
+                    </div>
+                    <div id="eventsList">
+                        <div class="loader-card"><div class="loader-spinner"></div>Loading events...</div>
+                    </div>
+                </div>
+
+                <!-- DOWNLOADS -->
+                <div class="screen" id="screen-downloads">
+                    <div class="section-head">
+                        <h2>Downloads</h2>
+                    </div>
+                    <div id="downloadsList">
+                        <div class="loader-card"><div class="loader-spinner"></div>Loading downloads...</div>
+                    </div>
+                </div>
+
+                <!-- GALLERY -->
+                <div class="screen" id="screen-gallery">
+                    <div class="section-head">
+                        <h2>Gallery</h2>
+                    </div>
+                    <div id="galleryList">
+                        <div class="loader-card"><div class="loader-spinner"></div>Loading gallery...</div>
+                    </div>
+                </div>
+
+                <!-- PROFILE -->
+                <div class="screen" id="screen-profile">
+                    <div class="section-head">
+                        <h2>My Profile</h2>
+                    </div>
+                    <div class="profile-card">
+                        <div class="profile-avatar" id="profileAvatar">AV</div>
+                        <div class="profile-name" id="profileName">—</div>
+                        <div class="profile-reg" id="profileReg">—</div>
+                        <div class="profile-info">
+                            <div class="profile-info-row"><span class="k">Department</span><span class="v" id="profileDept">—</span></div>
+                            <div class="profile-info-row"><span class="k">Level</span><span class="v" id="profileLevel">—</span></div>
+                            <div class="profile-info-row"><span class="k">State of Origin</span><span class="v" id="profileState">—</span></div>
+                            <div class="profile-info-row"><span class="k">Email</span><span class="v" id="profileEmail">—</span></div>
+                            <div class="profile-info-row"><span class="k">Status</span><span class="v" id="profileStatus">Active</span></div>
+                        </div>
+                    </div>
+                    <button class="btn-logout-big" id="profileLogout">
+                        <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                    </button>
+                </div>
+
             </div>
 
-            <!-- ACCOUNT -->
-            <div class="section-head">
-                <h2>Account</h2>
-            </div>
-            <div class="action-list">
-                <a href="#" class="action-item" id="profileItem">
-                    <div class="ai-icon"><i class="fas fa-user"></i></div>
-                    <div class="ai-text">
-                        <div class="ai-title">My Profile</div>
-                        <div class="ai-desc">View your student record and contact details</div>
-                    </div>
-                    <i class="fas fa-chevron-right ai-chev"></i>
-                </a>
-                <a href="#" class="action-item" id="changePwItem">
-                    <div class="ai-icon"><i class="fas fa-key"></i></div>
-                    <div class="ai-text">
-                        <div class="ai-title">Change Password</div>
-                        <div class="ai-desc">Update your portal password</div>
-                    </div>
-                    <i class="fas fa-chevron-right ai-chev"></i>
-                </a>
-                <a href="#" class="action-item" id="logoutItem">
-                    <div class="ai-icon" style="background: #FBEAEA; color: #8B1A1A;"><i class="fas fa-arrow-right-from-bracket"></i></div>
-                    <div class="ai-text">
-                        <div class="ai-title" style="color: #8B1A1A;">Logout</div>
-                        <div class="ai-desc">Sign out of the Student Portal</div>
-                    </div>
-                    <i class="fas fa-chevron-right ai-chev"></i>
-                </a>
-            </div>
+            <!-- BOTTOM NAV -->
+            <nav class="bottom-nav">
+                <button class="nav-tab active" data-screen="home">
+                    <i class="fas fa-house"></i>
+                    <span>Home</span>
+                </button>
+                <button class="nav-tab" data-screen="cbt">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>CBT</span>
+                </button>
+                <button class="nav-tab" data-screen="alerts">
+                    <i class="fas fa-bell"></i>
+                    <span>Alerts</span>
+                </button>
+                <button class="nav-tab" data-screen="profile">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </button>
+            </nav>
 
         </div>
-
-        <!-- BOTTOM NAV -->
-        <nav class="bottom-nav">
-            <a href="dashboard.html" class="nav-tab active">
-                <i class="fas fa-house"></i>
-                <span>Home</span>
-            </a>
-            <a href="../cbt/login.html" class="nav-tab">
-                <i class="fas fa-graduation-cap"></i>
-                <span>CBT</span>
-            </a>
-            <a href="../announcements.html" class="nav-tab">
-                <i class="fas fa-bell"></i>
-                <span>Alerts</span>
-            </a>
-            <button class="nav-tab" id="profileTab">
-                <i class="fas fa-user"></i>
-                <span>Profile</span>
-            </button>
-        </nav>
-
     </div>
 
     <!-- TOAST -->
@@ -622,6 +873,16 @@
             document.getElementById('guardScreen').classList.add('hidden');
             document.getElementById('appShell').classList.add('ready');
         }
+        function escapeHtml(t) {
+            if (!t) return '';
+            return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        }
+        function fmtDate(d) {
+            if (!d) return '';
+            const dt = new Date(d);
+            if (isNaN(dt)) return '';
+            return dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
         async function doLogout() {
             try { await supabase.auth.signOut(); } catch (e) {}
             localStorage.removeItem('adminLoggedIn');
@@ -634,6 +895,55 @@
         // STATE
         // ============================================
         let currentStudent = null;
+
+        // ============================================
+        // SCREEN SWITCHER
+        // ============================================
+        function showScreen(name) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById('screen-' + name);
+            if (target) target.classList.add('active');
+
+            document.querySelectorAll('.nav-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.screen === name);
+            });
+
+            const titles = {
+                home: 'Student Portal',
+                cbt: 'CBT Practice',
+                alerts: 'Announcements',
+                events: 'Events',
+                downloads: 'Downloads',
+                gallery: 'Gallery',
+                profile: 'My Profile'
+            };
+            document.getElementById('heroTitle').textContent = titles[name] || 'Student Portal';
+
+            // Lazy load each screen on first visit
+            if (name === 'alerts' && !window.__loadedAlerts) loadAnnouncements();
+            if (name === 'events' && !window.__loadedEvents) loadEvents();
+            if (name === 'downloads' && !window.__loadedDownloads) loadDownloads();
+            if (name === 'gallery' && !window.__loadedGallery) loadGallery();
+            if (name === 'cbt' && !window.__loadedCbt) loadCbtCourses();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Wire bottom tabs
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => showScreen(tab.dataset.screen));
+        });
+
+        // Wire quick tiles
+        document.querySelectorAll('.quick-tile').forEach(tile => {
+            tile.addEventListener('click', () => {
+                if (tile.dataset.give) {
+                    window.open('../give.html', '_blank');
+                    return;
+                }
+                if (tile.dataset.screen) showScreen(tile.dataset.screen);
+            });
+        });
 
         // ============================================
         // GUARD + LOAD
@@ -677,6 +987,9 @@
                 renderStudent(student);
                 hideGuard();
 
+                // Load home announcements
+                loadHomeAnnouncements();
+
             } catch (err) {
                 console.warn('Dashboard init error:', err);
                 showGuard('Something went wrong. Redirecting...');
@@ -685,53 +998,188 @@
         })();
 
         // ============================================
-        // RENDER
+        // RENDER STUDENT
         // ============================================
         function renderStudent(s) {
             const fullName = s.full_name || 'Student';
             const firstName = fullName.split(/\s+/)[0] || 'Student';
+            const ini = initials(fullName);
 
-            document.getElementById('greetingName').textContent = firstName;
-            document.getElementById('avatar').textContent = initials(fullName);
-            document.getElementById('cardName').textContent = fullName;
-            document.getElementById('cardRegNo').textContent = s.reg_no || '—';
-            document.getElementById('cardLevel').textContent = s.class_level ? (s.class_level + 'L') : '—';
+            document.getElementById('heroName').textContent = firstName;
+            document.getElementById('heroAvatar').textContent = ini;
+            document.getElementById('idName').textContent = fullName;
+            document.getElementById('idReg').textContent = s.reg_no || '—';
+            document.getElementById('idLevel').textContent = s.class_level ? (s.class_level + 'L') : '—';
+
+            document.getElementById('profileAvatar').textContent = ini;
+            document.getElementById('profileName').textContent = fullName;
+            document.getElementById('profileReg').textContent = s.reg_no || '—';
+            document.getElementById('profileDept').textContent = s.department || 'Veterinary Medicine';
+            document.getElementById('profileLevel').textContent = s.class_level ? (s.class_level + ' Level') : '—';
+            document.getElementById('profileState').textContent = s.state_of_origin || '—';
+            document.getElementById('profileEmail').textContent = s.email || '—';
+            document.getElementById('profileStatus').textContent = 'Active';
         }
 
         // ============================================
-        // ACTIONS
+        // LOGOUT WIRING
         // ============================================
-        document.getElementById('logoutBtn').addEventListener('click', doLogout);
-        document.getElementById('logoutItem').addEventListener('click', function(e) {
-            e.preventDefault();
-            doLogout();
-        });
+        document.getElementById('heroLogout').addEventListener('click', doLogout);
+        document.getElementById('profileLogout').addEventListener('click', doLogout);
 
-        document.getElementById('profileItem').addEventListener('click', function(e) {
-            e.preventDefault();
-            const s = currentStudent || {};
-            toast(`${s.full_name || ''} · ${s.reg_no || ''} · ${s.class_level ? s.class_level + 'L' : ''}`, 3500);
-        });
-
-        document.getElementById('profileTab').addEventListener('click', function() {
-            const s = currentStudent || {};
-            toast(`${s.full_name || ''} · ${s.reg_no || ''}`, 3000);
-        });
-
-        document.getElementById('changePwItem').addEventListener('click', async function(e) {
-            e.preventDefault();
-            const email = currentStudent?.email || '';
-            if (!email) { toast('No email on file.'); return; }
+        // ============================================
+        // CONTENT LOADERS
+        // ============================================
+        async function loadHomeAnnouncements() {
+            const box = document.getElementById('homeAnnList');
             try {
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin + '/student/login.html'
-                });
+                const { data, error } = await supabase
+                    .from('announcements')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(3);
                 if (error) throw error;
-                toast('Reset link sent to your email.', 3000);
+                if (!data || data.length === 0) {
+                    box.innerHTML = `<div class="empty-card"><i class="fas fa-bullhorn"></i>No announcements yet.</div>`;
+                    document.getElementById('homeAnnCount').textContent = '';
+                    return;
+                }
+                document.getElementById('homeAnnCount').textContent = data.length + ' recent';
+                box.innerHTML = `<div class="list-card">${data.map(a => `
+                    <div class="list-item">
+                        <div class="li-title">${escapeHtml(a.title || 'Untitled')}</div>
+                        <div class="li-sub">${escapeHtml((a.content || a.body || a.message || '').slice(0, 100))}${(a.content || a.body || a.message || '').length > 100 ? '…' : ''}</div>
+                        ${a.created_at ? `<div class="li-date">${fmtDate(a.created_at)}</div>` : ''}
+                    </div>
+                `).join('')}</div>`;
             } catch (err) {
-                toast('Could not send reset email.');
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load announcements.</div>`;
             }
-        });
+        }
+
+        async function loadAnnouncements() {
+            window.__loadedAlerts = true;
+            const box = document.getElementById('alertsList');
+            try {
+                const { data, error } = await supabase
+                    .from('announcements')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    box.innerHTML = `<div class="empty-card"><i class="fas fa-bullhorn"></i>No announcements yet.</div>`;
+                    return;
+                }
+                box.innerHTML = `<div class="list-card">${data.map(a => `
+                    <div class="list-item">
+                        <div class="li-title">${escapeHtml(a.title || 'Untitled')}</div>
+                        <div class="li-sub">${escapeHtml(a.content || a.body || a.message || '')}</div>
+                        ${a.created_at ? `<div class="li-date">${fmtDate(a.created_at)}</div>` : ''}
+                    </div>
+                `).join('')}</div>`;
+            } catch (err) {
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load announcements.</div>`;
+            }
+        }
+
+        async function loadEvents() {
+            window.__loadedEvents = true;
+            const box = document.getElementById('eventsList');
+            try {
+                const { data, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .order('event_date', { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    box.innerHTML = `<div class="empty-card"><i class="fas fa-calendar"></i>No events yet.</div>`;
+                    return;
+                }
+                box.innerHTML = `<div class="list-card">${data.map(ev => `
+                    <div class="list-item">
+                        <div class="li-title">${escapeHtml(ev.title || 'Untitled')}</div>
+                        <div class="li-sub">${escapeHtml(ev.description || ev.location || '')}</div>
+                        <div class="li-date">${fmtDate(ev.event_date || ev.created_at)}</div>
+                    </div>
+                `).join('')}</div>`;
+            } catch (err) {
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load events.</div>`;
+            }
+        }
+
+        async function loadDownloads() {
+            window.__loadedDownloads = true;
+            const box = document.getElementById('downloadsList');
+            try {
+                const { data, error } = await supabase
+                    .from('documents')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    box.innerHTML = `<div class="empty-card"><i class="fas fa-file-arrow-down"></i>No downloads available yet.</div>`;
+                    return;
+                }
+                box.innerHTML = `<div class="list-card">${data.map(d => `
+                    <a class="list-item" href="${escapeHtml(d.file_url || '#')}" target="_blank" rel="noopener">
+                        <div class="li-title"><i class="fas fa-file-arrow-down" style="color: var(--gold-deep); margin-right: 8px;"></i>${escapeHtml(d.title || 'Document')}</div>
+                        <div class="li-sub">${escapeHtml(d.description || '')}</div>
+                    </a>
+                `).join('')}</div>`;
+            } catch (err) {
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load downloads.</div>`;
+            }
+        }
+
+        async function loadGallery() {
+            window.__loadedGallery = true;
+            const box = document.getElementById('galleryList');
+            try {
+                const { data, error } = await supabase
+                    .from('gallery_images')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    box.innerHTML = `<div class="empty-card"><i class="fas fa-images"></i>No images yet.</div>`;
+                    return;
+                }
+                box.innerHTML = `<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px;">
+                    ${data.map(img => `
+                        <a href="${escapeHtml(img.image_url || '#')}" target="_blank" rel="noopener" style="display:block; border-radius: 14px; overflow: hidden; box-shadow: 0 3px 10px rgba(31,78,61,0.08);">
+                            <img src="${escapeHtml(img.image_url || '')}" alt="" style="width: 100%; aspect-ratio: 1; object-fit: cover; display: block;">
+                        </a>
+                    `).join('')}
+                </div>`;
+            } catch (err) {
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load gallery.</div>`;
+            }
+        }
+
+        async function loadCbtCourses() {
+            window.__loadedCbt = true;
+            const box = document.getElementById('cbtCourseList');
+            try {
+                const { data, error } = await supabase
+                    .from('cbt_courses')
+                    .select('*')
+                    .order('course_code', { ascending: true });
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    box.innerHTML = `<div class="empty-card"><i class="fas fa-book"></i>No courses available yet.</div>`;
+                    return;
+                }
+                box.innerHTML = `<div class="list-card">${data.map(c => `
+                    <div class="list-item">
+                        <div class="li-title">${escapeHtml(c.course_code || '')} — ${escapeHtml(c.course_title || c.title || 'Course')}</div>
+                        <div class="li-sub">${escapeHtml(c.description || 'Practice questions available in the CBT portal.')}</div>
+                    </div>
+                `).join('')}</div>`;
+            } catch (err) {
+                box.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load courses.</div>`;
+            }
+        }
     </script>
 
 </body>
