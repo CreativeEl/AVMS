@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ============================================
-// AUTH CHECK
+// AUTH CHECK — with admin role verification
 // ============================================
 async function checkAuth() {
     try {
@@ -35,6 +35,22 @@ async function checkAuth() {
 
         if (data && data.session && data.session.user) {
             console.log('✅ Supabase session found:', data.session.user.email);
+
+            // ROLE CHECK
+            const role = data.session.user.user_metadata?.role;
+            if (role !== 'admin') {
+                console.warn('🚫 Non-admin session — signing out');
+                await supabase.auth.signOut();
+                sessionStorage.removeItem('adminSession');
+                sessionStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminLoggedIn');
+                localStorage.removeItem('adminEmail');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            console.log('✅ Admin role confirmed');
+
             const email = data.session.user.email || '';
             const nameEl = document.getElementById('adminName');
             if (nameEl) nameEl.textContent = email.split('@')[0];
@@ -57,13 +73,30 @@ async function checkAuth() {
             return;
         }
 
-        // 2. Fallback: accept old bridge flag (only for pages mid-migration)
+        // 2. Fallback: accept old bridge flag — but ONLY if a valid Supabase
+        //    session also exists. (Bridge is now just a cache, not the source
+        //    of truth. Kept for backwards compatibility during migration.)
         const legacy = sessionStorage.getItem('adminSession');
         if (legacy) {
             try {
                 const parsed = JSON.parse(legacy);
                 if (parsed && parsed.loggedIn) {
-                    console.log('⚠️ Using legacy session bridge');
+                    console.log('⚠️ Legacy bridge found — verifying with Supabase');
+
+                    // Re-verify against Supabase
+                    const { data: recheck } = await supabase.auth.getUser();
+                    const role = recheck?.user?.user_metadata?.role;
+
+                    if (role !== 'admin') {
+                        console.warn('🚫 Legacy bridge invalid — user is not admin');
+                        sessionStorage.clear();
+                        localStorage.removeItem('adminLoggedIn');
+                        localStorage.removeItem('adminEmail');
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    console.log('✅ Legacy bridge validated');
                     const nameEl = document.getElementById('adminName');
                     if (nameEl) nameEl.textContent = (parsed.email || '').split('@')[0];
 
