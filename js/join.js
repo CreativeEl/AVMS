@@ -73,7 +73,6 @@ function initVerify() {
         verifyBtn.innerHTML = `<span class="spinner"></span> Verifying...`;
 
         try {
-            // Case-insensitive match on reg_no, lowercase match on state_of_origin
             const { data, error } = await supabase
                 .from('students')
                 .select('*')
@@ -83,7 +82,6 @@ function initVerify() {
 
             if (error) throw error;
 
-            // NO MATCH
             if (!data) {
                 msgDiv.innerHTML = `
                     <div class="verify-alert verify-alert-error">
@@ -96,7 +94,6 @@ function initVerify() {
                 return;
             }
 
-            // ALREADY REGISTERED
             if (data.is_registered === true) {
                 msgDiv.innerHTML = `
                     <div class="verify-alert verify-alert-warn">
@@ -112,7 +109,6 @@ function initVerify() {
                 return;
             }
 
-            // SUCCESS — unlock form
             verifiedStudent = data;
             msgDiv.innerHTML = `
                 <div class="verify-alert verify-alert-success">
@@ -138,7 +134,6 @@ function initVerify() {
 }
 
 function prefillForm(student) {
-    // Split full_name into first + surname (last word = surname)
     const fullName = (student.full_name || '').trim();
     let firstName = '';
     let surname = '';
@@ -207,7 +202,6 @@ function initForm() {
 
     showStep(0);
 
-    // STEP INDICATORS - CLICK TO NAVIGATE
     steps.forEach((step, index) => {
         step.addEventListener('click', function() {
             const isCompleted = this.classList.contains('completed');
@@ -235,7 +229,6 @@ function initForm() {
         });
     });
 
-    // Next buttons
     document.querySelectorAll('.btn-next').forEach(btn => {
         btn.addEventListener('click', function() {
             if (validateStep(currentStep)) {
@@ -250,7 +243,6 @@ function initForm() {
         });
     });
 
-    // Previous buttons
     document.querySelectorAll('.btn-prev').forEach(btn => {
         btn.addEventListener('click', function() {
             if (currentStep > 0) {
@@ -260,7 +252,6 @@ function initForm() {
         });
     });
 
-    // FILE INPUTS - Show preview with status
     document.querySelectorAll('input[type="file"]').forEach(input => {
         input.addEventListener('change', function() {
             const fileName = this.files[0]?.name || 'No file chosen';
@@ -317,7 +308,6 @@ function initForm() {
         });
     });
 
-    // Update file status function
     function updateFileStatus() {
         const previewDiv = document.getElementById('filePreview');
         const fileInputs = document.querySelectorAll('input[type="file"][required]');
@@ -377,26 +367,18 @@ function initForm() {
         let valid = true;
 
         inputs.forEach(input => {
-            if (input.offsetParent === null) {
-                return;
-            }
-            // Skip readonly inputs
-            if (input.readOnly) {
-                return;
-            }
+            if (input.offsetParent === null) return;
+            if (input.readOnly) return;
             
             if (!input.value.trim()) {
                 valid = false;
                 input.style.borderColor = '#e8491d';
-                setTimeout(() => {
-                    input.style.borderColor = '';
-                }, 3000);
+                setTimeout(() => { input.style.borderColor = ''; }, 3000);
             } else {
                 input.style.borderColor = '';
             }
         });
 
-        // Step 3 (index 2) — password check
         if (index === 2) {
             const pw = document.getElementById('password');
             const cpw = document.getElementById('confirmPassword');
@@ -413,7 +395,6 @@ function initForm() {
             }
         }
 
-        // Step 4 (index 3) — file uploads
         if (index === 3) {
             const fileInputs = currentPage.querySelectorAll('input[type="file"][required]');
             let allFilesUploaded = true;
@@ -439,15 +420,12 @@ function initForm() {
             }
         }
 
-        // Step 5 (index 4) — declaration checkbox
         if (index === 4) {
             const checkbox = document.getElementById('declaration');
             if (checkbox && !checkbox.checked) {
                 valid = false;
                 checkbox.style.outline = '2px solid #e8491d';
-                setTimeout(() => {
-                    checkbox.style.outline = '';
-                }, 3000);
+                setTimeout(() => { checkbox.style.outline = ''; }, 3000);
             }
         }
 
@@ -468,9 +446,7 @@ function initForm() {
                 ${escapeHtml(text)}
             </div>
         `;
-        setTimeout(() => {
-            msgDiv.innerHTML = '';
-        }, 5000);
+        setTimeout(() => { msgDiv.innerHTML = ''; }, 5000);
     }
 
     function updateSummary() {
@@ -529,6 +505,9 @@ function initForm() {
     });
 
     async function handleFormSubmit(e) {
+        // === DEBUG ALERTS ===
+        alert('DEBUG 1: Submit handler fired');
+
         const submitBtn = document.querySelector('.btn-submit');
         const originalText = submitBtn ? submitBtn.innerHTML : 'Submit Application';
 
@@ -551,12 +530,15 @@ function initForm() {
         if (msgDiv) msgDiv.innerHTML = '';
 
         if (!validateStep(4)) {
+            alert('DEBUG 2: validateStep(4) failed');
             if (submitBtn) {
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
             return;
         }
+
+        alert('DEBUG 3: About to upload files');
 
         // ============================================
         // STEP 1: UPLOAD FILES
@@ -576,6 +558,7 @@ function initForm() {
             const file = fileInput?.files[0];
             
             if (file) {
+                alert(`DEBUG 4.${field}: Uploading ${file.name} (${(file.size/1024).toFixed(1)} KB)`);
                 try {
                     const timestamp = Date.now();
                     const safeName = sanitizeFileName(file.name);
@@ -595,13 +578,17 @@ function initForm() {
                         .from('membership-documents')
                         .upload(filePath, file);
 
-                    if (upErr) throw upErr;
+                    if (upErr) {
+                        alert(`DEBUG 5.${field}: STORAGE ERROR -> ${upErr.message}`);
+                        throw upErr;
+                    }
 
                     const { data: urlData } = supabase.storage
                         .from('membership-documents')
                         .getPublicUrl(filePath);
                     
                     fileUrls[field] = urlData?.publicUrl || '';
+                    alert(`DEBUG 6.${field}: Upload OK`);
                     
                 } catch (error) {
                     console.warn('Upload error:', error);
@@ -615,6 +602,8 @@ function initForm() {
             }
         }
 
+        alert('DEBUG 7: All uploads done — creating account');
+
         // ============================================
         // STEP 2: CREATE AUTH ACCOUNT
         // ============================================
@@ -623,13 +612,18 @@ function initForm() {
 
         let authUserId = null;
         try {
+            alert(`DEBUG 8: Calling signUp for ${email}`);
             const { data: authData, error: authErr } = await supabase.auth.signUp({
                 email: email,
                 password: password
             });
 
-            if (authErr) throw authErr;
+            if (authErr) {
+                alert(`DEBUG 9: AUTH ERROR -> ${authErr.message}`);
+                throw authErr;
+            }
             authUserId = authData?.user?.id || null;
+            alert(`DEBUG 10: Auth user created. ID = ${authUserId}`);
 
         } catch (error) {
             console.warn('SignUp error:', error);
@@ -647,6 +641,8 @@ function initForm() {
             return;
         }
 
+        alert('DEBUG 11: Updating students row');
+
         // ============================================
         // STEP 3: UPDATE students ROW
         // ============================================
@@ -661,7 +657,11 @@ function initForm() {
                 })
                 .eq('id', verifiedStudent.id);
 
-            if (stuErr) throw stuErr;
+            if (stuErr) {
+                alert(`DEBUG 12: STUDENTS UPDATE ERROR -> ${stuErr.message}`);
+                throw stuErr;
+            }
+            alert('DEBUG 13: students row updated');
 
         } catch (error) {
             console.warn('students update error:', error);
@@ -672,6 +672,8 @@ function initForm() {
             }
             return;
         }
+
+        alert('DEBUG 14: Inserting membership_applications');
 
         // ============================================
         // STEP 4: INSERT membership_applications
@@ -714,8 +716,12 @@ function initForm() {
                 .from('membership_applications')
                 .insert([formData]);
 
-            if (appErr) throw appErr;
+            if (appErr) {
+                alert(`DEBUG 15: APPLICATION INSERT ERROR -> ${appErr.message}`);
+                throw appErr;
+            }
 
+            alert('DEBUG 16: All done! Showing confirmation.');
             showConfirmation(formData);
 
         } catch (error) {
