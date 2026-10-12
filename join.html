@@ -93,10 +93,40 @@
         <div class="container">
             <div class="membership-container">
                 <h2>Membership Registration Form</h2>
-                <p class="form-intro" data-join="form-intro">Welcome to AVMS, ABU Zaria. Please fill out the form below to register as a member.</p>
+                <p class="form-intro" data-join="form-intro">Welcome to AVMS, ABU Zaria. First, verify your student record, then complete the form below to register as a member.</p>
 
-                <!-- Progress Steps -->
-                <div class="steps-indicator" id="stepIndicator">
+                <!-- ============================================ -->
+                <!-- STEP 0: VERIFY STUDENT RECORD               -->
+                <!-- ============================================ -->
+                <div id="verifySection" class="verify-section">
+                    <div class="verify-box">
+                        <h3><i class="fas fa-id-card"></i> Step 1 — Verify Your Student Record</h3>
+                        <p class="verify-desc">Enter your Registration Number and State of Origin exactly as submitted to the department. This confirms you are an eligible AVMS student.</p>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="verifyRegNo">Registration Number *</label>
+                                <input type="text" id="verifyRegNo" name="verifyRegNo" placeholder="e.g., VET/2021/001" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="verifyState">State of Origin *</label>
+                                <input type="text" id="verifyState" name="verifyState" placeholder="e.g., Kaduna" autocomplete="off">
+                                <small class="file-hint">Enter your state of origin (not case sensitive)</small>
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="btn-verify" id="verifyBtn">
+                                <i class="fas fa-search"></i> Verify My Record
+                            </button>
+                        </div>
+
+                        <div id="verifyMessage" class="verify-message"></div>
+                    </div>
+                </div>
+
+                <!-- Progress Steps (hidden until verified) -->
+                <div class="steps-indicator" id="stepIndicator" style="display: none;">
                     <div class="step-item active" data-step="1">
                         <span class="step-circle">1</span>
                         <span class="step-text">Personal</span>
@@ -119,7 +149,7 @@
                     </div>
                 </div>
 
-                <form id="membershipForm" enctype="multipart/form-data">
+                <form id="membershipForm" enctype="multipart/form-data" style="display: none;">
 
                     <!-- STEP 1: PERSONAL INFORMATION -->
                     <div class="form-page active" data-step="1">
@@ -177,7 +207,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="stateOfOrigin">State of Origin *</label>
-                                <input type="text" id="stateOfOrigin" name="stateOfOrigin" required placeholder="Enter your state of origin">
+                                <input type="text" id="stateOfOrigin" name="stateOfOrigin" required readonly>
+                                <small class="file-hint">Confirmed from verification step</small>
                             </div>
                         </div>
 
@@ -231,7 +262,8 @@
                             </div>
                             <div class="form-group">
                                 <label for="regNumber">Registration Number *</label>
-                                <input type="text" id="regNumber" name="regNumber" required placeholder="Enter your registration number">
+                                <input type="text" id="regNumber" name="regNumber" required readonly>
+                                <small class="file-hint">Confirmed from verification step</small>
                             </div>
                         </div>
 
@@ -263,7 +295,7 @@
                     <!-- STEP 3: CONTACT INFORMATION -->
                     <div class="form-page" data-step="3">
                         <h3>Contact Information</h3>
-                        <p class="section-desc">How can we reach you?</p>
+                        <p class="section-desc">How can we reach you? You'll also set your portal password here.</p>
 
                         <div class="form-row">
                             <div class="form-group">
@@ -273,6 +305,18 @@
                             <div class="form-group">
                                 <label for="email">Email Address *</label>
                                 <input type="email" id="email" name="email" required placeholder="Enter your email address">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="password">Portal Password *</label>
+                                <input type="password" id="password" name="password" required minlength="6" placeholder="Minimum 6 characters">
+                                <small class="file-hint">You'll use this to log in to the Student Portal after approval</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password *</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6" placeholder="Re-enter your password">
                             </div>
                         </div>
 
@@ -368,7 +412,7 @@
                     <div class="confirmation-content">
                         <i class="fas fa-check-circle" style="font-size: 60px; color: #C9A961;"></i>
                         <h2>✅ Application Submitted!</h2>
-                        <p>Thank you for joining AVMS, ABU Zaria!</p>
+                        <p>Thank you for applying to join AVMS, ABU Zaria!</p>
                         <div class="confirmation-details">
                             <p><strong>Name:</strong> <span id="confirmName"></span></p>
                             <p><strong>Registration Number:</strong> <span id="confirmReg"></span></p>
@@ -376,7 +420,8 @@
                             <p><strong>Email:</strong> <span id="confirmEmail"></span></p>
                             <p><strong>Phone:</strong> <span id="confirmPhone"></span></p>
                         </div>
-                        <p class="confirmation-note">We will contact you soon with further instructions.</p>
+                        <p class="confirmation-note"><strong>⏳ Wait for admin confirmation.</strong> Your account has been created but is inactive until an admin approves your application. You'll receive an email from AVMS once approved.</p>
+                        <p class="confirmation-note">After approval, log in at the <a href="student/login.html">Student Portal</a>.</p>
                         <a href="index.html" class="btn">🏠 Return to Home</a>
                     </div>
                 </div>
