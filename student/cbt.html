@@ -91,7 +91,6 @@
 
         .portal { display: flex; min-height: 100vh; }
 
-        /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-w);
             background: linear-gradient(180deg, #1F4E3D 0%, #17392c 100%);
@@ -166,7 +165,6 @@
         .sidebar-logout:hover { color: #ffb3b3; }
         .sidebar-logout i { color: #ffb3b3; font-size: 14px; width: 18px; text-align: center; }
 
-        /* MOBILE HERO */
         .mobile-hero {
             display: none;
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
@@ -234,7 +232,6 @@
             position: relative; z-index: 1; margin-top: 3px;
         }
 
-        /* MAIN */
         .main {
             flex: 1;
             margin-left: var(--sidebar-w);
@@ -796,7 +793,6 @@
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // THEME
         function applyThemeIcons() {
             const isDark = document.documentElement.classList.contains('dark');
             const icon = isDark ? 'fa-sun' : 'fa-moon';
@@ -813,7 +809,6 @@
         document.getElementById('mThemeBtn').addEventListener('click', toggleTheme);
         applyThemeIcons();
 
-        // HELPERS
         function initials(name) {
             if (!name) return 'AV';
             const parts = name.trim().split(/\s+/);
@@ -843,12 +838,10 @@
             window.location.href = 'login.html';
         }
 
-        // STATE
         let currentStudent = null;
         let questionCounts = {};
         let loadedCourses = [];
 
-        // GUARD
         (async function init() {
             if (typeof supabase === 'undefined' || !supabase) {
                 showGuard('Connection error. Please refresh.');
@@ -901,7 +894,6 @@
         document.getElementById('sidebarLogout').addEventListener('click', doLogout);
         document.getElementById('mHeroLogout').addEventListener('click', doLogout);
 
-        // MAIN RENDER
         async function renderCbt() {
             const container = document.getElementById('cbtContent');
             const level = currentStudent.class_level;
@@ -1006,7 +998,8 @@
                 const qCount = questionCounts[course.id] || 0;
                 const canTest = qCount >= 40;
                 const canExam = qCount >= 60;
-                const safeCode = JSON.stringify(String(course.code || ''));
+                // FIXED: single-quoted safe string for onclick attribute
+                const safeCode = "'" + String(course.code || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
 
                 return `
                     <article class="course-card">
@@ -1045,7 +1038,6 @@
             }).join('');
         }
 
-        // START TEST / EXAM — synchronous, reuses existing CBT files
         function startMode(mode, courseId, courseCode) {
             try {
                 const requiredQs = mode === 'test' ? 40 : 60;
@@ -1062,7 +1054,6 @@
 
                 const cachedCourse = loadedCourses.find(c => c.id === courseId);
 
-                // Populate CBT session so existing CBT portal works without login
                 const cbtStudent = {
                     id: currentStudent.id,
                     reg_no: currentStudent.reg_no,
@@ -1085,7 +1076,6 @@
                 };
                 sessionStorage.setItem('cbt_current_mode', JSON.stringify(modeConfig));
 
-                // Redirect to existing CBT test/exam page
                 const target = mode === 'test' ? '../cbt/test.html' : '../cbt/exam.html';
                 window.location.href = target;
             } catch (err) {
