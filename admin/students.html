@@ -326,7 +326,6 @@
         </main>
     </div>
 
-    <!-- Add/Edit Student Modal -->
     <div class="modal" id="studentModal">
         <div class="modal-content">
             <h2 id="modalTitle">Add Student</h2>
@@ -371,7 +370,6 @@
         </div>
     </div>
 
-    <!-- Bulk Upload Modal -->
     <div class="modal" id="bulkModal">
         <div class="modal-content">
             <h2>Bulk Upload Roster (CSV)</h2>
@@ -406,7 +404,7 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
         // EDGE FUNCTION ENDPOINT
         // ============================================
         const SUPABASE_URL = 'https://tlkqzhudnpdnbxaltwbs.supabase.co';
-        const SUPABASE_ANON_KEY = 'PASTE_YOUR_ANON_KEY_HERE';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsa3F6aHVkbnBkbmJ4YWx0d2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjgxMjEsImV4cCI6MjEwNDQ0NDEyMX0.wfFQX9TmXx4a0VqRrEK97BUsUncf_5vf61B3gdc5DH0';
         const DELETE_STUDENT_URL = SUPABASE_URL + '/functions/v1/delete-student';
 
         // ============================================
@@ -477,9 +475,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             }
         }
 
-        // ============================================
-        // STATS
-        // ============================================
         function updateStats() {
             const total = allStudents.length;
             const registered = allStudents.filter(s => s.is_registered).length;
@@ -491,9 +486,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             document.getElementById('statActive').textContent = active;
         }
 
-        // ============================================
-        // DISPLAY STUDENTS
-        // ============================================
         function displayStudents() {
             const tbody = document.getElementById('studentsTableBody');
             let filtered = allStudents;
@@ -548,9 +540,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             }).join('');
         }
 
-        // ============================================
-        // FILTER / SEARCH
-        // ============================================
         function filterStudents(filter, btn) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -592,9 +581,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             document.getElementById('studentModal').classList.remove('show');
         }
 
-        // ============================================
-        // SAVE STUDENT
-        // ============================================
         document.getElementById('studentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
@@ -654,7 +640,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             if (!confirm(confirmMsg)) return;
 
             try {
-                // Get session token for the Edge Function call
                 const { data: sess } = await supabase.auth.getSession();
                 const token = sess?.session?.access_token;
                 if (!token) throw new Error('No active admin session. Please log in again.');
