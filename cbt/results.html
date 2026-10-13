@@ -8,19 +8,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('avms-theme') || 'light';
+                if (t === 'dark') document.documentElement.classList.add('dark');
+            } catch(e){}
+        })();
+    </script>
     <style>
+        :root {
+            --bg: #F5F0DC;
+            --surface: #ffffff;
+            --surface-2: #FBF8EE;
+            --text: #1a1a1a;
+            --text-soft: #666;
+            --text-muted: #888;
+            --border: #e3e0d2;
+            --border-hair: #f0ede0;
+            --icon-bg: #F7F5EC;
+            --hover-bg: #F5F0DC;
+        }
+
+        html.dark {
+            --bg: #0f1714;
+            --surface: #182420;
+            --surface-2: #1e2c26;
+            --text: #e8f0ea;
+            --text-soft: #a8b5ac;
+            --text-muted: #7a8a80;
+            --border: #24352e;
+            --border-hair: #1e2c26;
+            --icon-bg: #1e2c26;
+            --hover-bg: #1e2c26;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #F5F0DC;
-            color: #1a1a1a;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
 
-        /* ============================================
-           TOP BAR
-           ============================================ */
+        /* TOP BAR */
         .topbar {
             background: #1F4E3D;
             color: white;
@@ -28,6 +61,7 @@
             box-shadow: 0 2px 10px rgba(31,78,61,0.2);
             border-bottom: 3px solid #C9A961;
         }
+        html.dark .topbar { background: #0a120f; }
         .topbar-inner {
             max-width: 1200px;
             margin: 0 auto;
@@ -65,6 +99,32 @@
             font-size: 11px;
             color: rgba(255,255,255,0.7);
         }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.22); }
+        .theme-toggle:active { transform: scale(0.94); }
+
         .btn-dashboard {
             background: #C9A961;
             color: #1F4E3D;
@@ -79,6 +139,7 @@
             align-items: center;
             gap: 8px;
             text-decoration: none;
+            white-space: nowrap;
         }
         .btn-dashboard:hover {
             background: #A88943;
@@ -86,18 +147,14 @@
             box-shadow: 0 4px 12px rgba(201,169,97,0.35);
         }
 
-        /* ============================================
-           MAIN
-           ============================================ */
+        /* MAIN */
         .main {
             max-width: 1100px;
             margin: 0 auto;
             padding: 30px 20px 60px;
         }
 
-        /* ============================================
-           SCORE CARD
-           ============================================ */
+        /* SCORE CARD */
         .score-card {
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
             color: white;
@@ -108,6 +165,9 @@
             overflow: hidden;
             text-align: center;
             border-top: 4px solid #C9A961;
+        }
+        html.dark .score-card {
+            background: linear-gradient(135deg, #0a120f 0%, #122620 100%);
         }
         .score-card::before {
             content: '';
@@ -142,7 +202,6 @@
             margin-bottom: 25px;
         }
 
-        /* Circular score */
         .score-circle-wrap {
             display: flex;
             justify-content: center;
@@ -173,7 +232,6 @@
             margin-top: 5px;
         }
 
-        /* Pass / fail label */
         .result-label {
             display: inline-block;
             padding: 8px 24px;
@@ -193,7 +251,6 @@
             box-shadow: 0 4px 15px rgba(139, 26, 26, 0.4);
         }
 
-        /* Score meta line */
         .score-meta {
             display: flex;
             justify-content: center;
@@ -212,9 +269,7 @@
             color: #C9A961;
         }
 
-        /* ============================================
-           STATS ROW
-           ============================================ */
+        /* STATS ROW */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -222,13 +277,14 @@
             margin-bottom: 30px;
         }
         .stat-card {
-            background: white;
+            background: var(--surface);
             padding: 20px;
             border-radius: 15px;
             text-align: center;
-            border: 1px solid #e3e0d2;
+            border: 1px solid var(--border);
             border-top: 4px solid #2D6B54;
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
+            transition: background 0.3s, border-color 0.3s;
         }
         .stat-card.correct { border-top-color: #28a745; }
         .stat-card.wrong { border-top-color: #dc3545; }
@@ -247,17 +303,16 @@
             font-weight: 800;
             margin-bottom: 4px;
         }
+        html.dark .stat-card h3 { color: #C9A961; }
         .stat-card p {
-            color: #888;
+            color: var(--text-muted);
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 600;
         }
 
-        /* ============================================
-           ACTION BUTTONS
-           ============================================ */
+        /* ACTIONS */
         .actions-row {
             display: flex;
             gap: 12px;
@@ -298,19 +353,20 @@
             box-shadow: 0 6px 20px rgba(139,26,26,0.3);
         }
         .btn-ghost {
-            background: white;
-            color: #1F4E3D;
-            border: 2px solid #1F4E3D;
+            background: var(--surface);
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        html.dark .btn-ghost {
+            color: #C9A961;
+            border-color: #C9A961;
         }
         .btn-ghost:hover {
-            background: #FBF8EE;
+            background: var(--hover-bg);
             border-color: #C9A961;
-            color: #1F4E3D;
         }
 
-        /* ============================================
-           REVIEW SECTION
-           ============================================ */
+        /* REVIEW */
         .review-header {
             display: flex;
             justify-content: space-between;
@@ -321,13 +377,14 @@
         }
         .review-header h2 {
             font-family: Georgia, 'Times New Roman', serif;
-            color: #1F4E3D;
+            color: var(--text);
             font-size: 22px;
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: 700;
         }
+        html.dark .review-header h2 { color: #C9A961; }
         .review-header h2 i { color: #C9A961; }
 
         .review-filters {
@@ -337,24 +394,29 @@
         }
         .filter-pill {
             padding: 8px 18px;
-            border: 2px solid #e3e0d2;
-            background: white;
+            border: 2px solid var(--border);
+            background: var(--surface);
             border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
             font-size: 13px;
             transition: all 0.3s;
             font-family: inherit;
-            color: #555;
+            color: var(--text-soft);
         }
         .filter-pill:hover {
             border-color: #C9A961;
-            color: #1F4E3D;
+            color: var(--text);
         }
         .filter-pill.active {
             background: #1F4E3D;
             color: white;
             border-color: #1F4E3D;
+        }
+        html.dark .filter-pill.active {
+            background: #C9A961;
+            color: #1a1a1a;
+            border-color: #C9A961;
         }
 
         .review-list {
@@ -364,12 +426,13 @@
         }
 
         .review-item {
-            background: white;
+            background: var(--surface);
             border-radius: 15px;
             padding: 25px;
-            border: 1px solid #e3e0d2;
-            border-left: 5px solid #e3e0d2;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--border);
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
+            transition: background 0.3s, border-color 0.3s;
         }
         .review-item.correct { border-left-color: #28a745; }
         .review-item.wrong { border-left-color: #dc3545; }
@@ -386,7 +449,7 @@
         .review-item-number {
             font-size: 12px;
             font-weight: 700;
-            color: #888;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -405,23 +468,36 @@
             background: #d4edda;
             color: #155724;
         }
+        html.dark .review-status-badge.correct {
+            background: rgba(40,167,69,0.2);
+            color: #9ddfa6;
+        }
         .review-status-badge.wrong {
             background: #f8d7da;
             color: #721c24;
         }
+        html.dark .review-status-badge.wrong {
+            background: rgba(220,53,69,0.2);
+            color: #ff8a8a;
+        }
         .review-status-badge.skipped {
             background: #e2e3e5;
             color: #383d41;
+        }
+        html.dark .review-status-badge.skipped {
+            background: rgba(136,136,136,0.2);
+            color: #a8b5ac;
         }
 
         .review-question {
             font-family: Georgia, 'Times New Roman', serif;
             font-size: 16px;
             font-weight: 600;
-            color: #1F4E3D;
+            color: var(--text);
             line-height: 1.6;
             margin-bottom: 18px;
         }
+        html.dark .review-question { color: #e8f0ea; }
 
         .review-options {
             display: flex;
@@ -436,26 +512,29 @@
             align-items: center;
             gap: 12px;
             font-size: 14px;
-            background: #FBF8EE;
-            border: 2px solid #e3e0d2;
-            color: #1a1a1a;
+            background: var(--surface-2);
+            border: 2px solid var(--border);
+            color: var(--text);
         }
         .review-option .option-letter {
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: #e3e0d2;
+            background: var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 13px;
             flex-shrink: 0;
-            color: #555;
+            color: var(--text-soft);
         }
         .review-option.is-correct {
             background: #d4edda;
             border-color: #28a745;
+        }
+        html.dark .review-option.is-correct {
+            background: rgba(40,167,69,0.15);
         }
         .review-option.is-correct .option-letter {
             background: #28a745;
@@ -465,6 +544,9 @@
             background: #f8d7da;
             border-color: #dc3545;
         }
+        html.dark .review-option.user-chose-wrong {
+            background: rgba(220,53,69,0.15);
+        }
         .review-option.user-chose-wrong .option-letter {
             background: #dc3545;
             color: white;
@@ -473,6 +555,9 @@
             background: #d4edda;
             border-color: #28a745;
             box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+        }
+        html.dark .review-option.user-chose-correct {
+            background: rgba(40,167,69,0.2);
         }
 
         .option-tag {
@@ -498,7 +583,7 @@
         }
 
         .solution-box {
-            background: #FBF8EE;
+            background: var(--surface-2);
             border-left: 4px solid #C9A961;
             padding: 15px 18px;
             border-radius: 8px;
@@ -507,7 +592,7 @@
         .solution-box-header {
             font-size: 12px;
             font-weight: 700;
-            color: #1F4E3D;
+            color: var(--text);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
@@ -515,29 +600,31 @@
             align-items: center;
             gap: 8px;
         }
+        html.dark .solution-box-header { color: #C9A961; }
         .solution-box-header i { color: #C9A961; }
         .solution-box p {
-            color: #1F4E3D;
+            color: var(--text);
             font-size: 14px;
             line-height: 1.6;
         }
 
         .user-answer-note {
             font-size: 13px;
-            color: #666;
+            color: var(--text-soft);
             margin-top: 10px;
         }
         .user-answer-note strong {
-            color: #1F4E3D;
+            color: var(--text);
         }
+        html.dark .user-answer-note strong { color: #C9A961; }
 
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: #888;
-            background: white;
+            color: var(--text-muted);
+            background: var(--surface);
             border-radius: 15px;
-            border: 1px solid #e3e0d2;
+            border: 1px solid var(--border);
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
         }
         .empty-state i {
@@ -562,19 +649,26 @@
         }
 
         @media print {
-            body { background: white; }
-            .topbar, .actions-row, .review-filters { display: none !important; }
+            body { background: white !important; color: #1a1a1a !important; }
+            .topbar, .actions-row, .review-filters, .theme-toggle { display: none !important; }
             .score-card {
                 background: #1F4E3D !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+            .stat-card, .review-item, .review-option, .solution-box {
+                background: white !important;
+                color: #1a1a1a !important;
+            }
+            .stat-card h3, .review-header h2, .review-question, .solution-box p {
+                color: #1F4E3D !important;
+            }
+            .review-question { color: #1a1a1a !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- TOP BAR -->
     <div class="topbar">
         <div class="topbar-inner">
             <a href="dashboard.html" class="topbar-brand">
@@ -584,21 +678,36 @@
                     <p>Association of Veterinary Medical Students</p>
                 </div>
             </a>
-            <a href="dashboard.html" class="btn-dashboard">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+            <div class="topbar-actions">
+                <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <a href="dashboard.html" class="btn-dashboard">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- MAIN -->
     <div class="main" id="mainContent">
-        <!-- Populated by JS -->
     </div>
 
     <script>
-        // ============================================
+        // THEME
+        function applyThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('avms-theme', isDark ? 'dark' : 'light'); } catch(e){}
+            applyThemeIcon();
+        }
+        document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+        applyThemeIcon();
+
         // SESSION CHECK
-        // ============================================
         const studentJson = sessionStorage.getItem('cbt_student');
         const resultJson = sessionStorage.getItem('cbt_last_result');
 
@@ -615,14 +724,8 @@
         const student = JSON.parse(studentJson);
         const result = JSON.parse(resultJson);
 
-        // ============================================
-        // STATE
-        // ============================================
         let currentFilter = 'all';
 
-        // ============================================
-        // HELPERS
-        // ============================================
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
@@ -639,9 +742,6 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // ============================================
-        // COMPUTE SUMMARY
-        // ============================================
         let correctCount = 0;
         let wrongCount = 0;
         let skippedCount = 0;
@@ -655,9 +755,6 @@
         const percentage = result.percentage;
         const passed = percentage >= 50;
 
-        // ============================================
-        // EMOJI + MESSAGE
-        // ============================================
         let emoji, title, subtitle;
         if (percentage >= 80) {
             emoji = '🏆';
@@ -681,9 +778,6 @@
             subtitle = 'Study the solutions carefully, then retake the test.';
         }
 
-        // ============================================
-        // BUILD MAIN CONTENT
-        // ============================================
         const main = document.getElementById('mainContent');
 
         main.innerHTML = `
@@ -770,9 +864,6 @@
             <div class="review-list" id="reviewList"></div>
         `;
 
-        // ============================================
-        // RENDER REVIEW LIST
-        // ============================================
         function renderReview() {
             const list = document.getElementById('reviewList');
             let filtered = result.answers;
@@ -866,9 +957,6 @@
             }).join('');
         }
 
-        // ============================================
-        // FILTER
-        // ============================================
         function filterReview(type, btn) {
             currentFilter = type;
             document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
@@ -876,9 +964,6 @@
             renderReview();
         }
 
-        // ============================================
-        // RETAKE
-        // ============================================
         function retake() {
             const storageKey = `cbt_test_${result.course_id}_${result.mode}`;
             localStorage.removeItem(storageKey);
@@ -888,9 +973,6 @@
             window.location.href = goTo;
         }
 
-        // ============================================
-        // INIT
-        // ============================================
         renderReview();
     </script>
 </body>
