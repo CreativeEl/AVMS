@@ -48,6 +48,8 @@
         .document-links h4 { color: #1F4E3D; margin-bottom: 10px; font-family: Georgia, serif; }
         .document-links a { display: inline-block; margin: 5px 10px 5px 0; padding: 8px 15px; background: #2D6B54; color: white; text-decoration: none; border-radius: 5px; font-size: 13px; font-weight: 600; transition: background 0.2s; }
         .document-links a:hover { background: #1F4E3D; }
+        .document-links a.loading { background: #A88943; cursor: wait; pointer-events: none; opacity: 0.8; }
+        .document-links a.error { background: #8B1A1A; cursor: not-allowed; }
 
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
         .btn-close { background: transparent; color: #555; padding: 11px 24px; border: 2px solid #e3e0d2; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
@@ -119,7 +121,7 @@
 
         body.dark .empty-state { color: #8A8A8A; }
 
-        /* ===== AUTH GUARD — hide content until verified ===== */
+        /* ===== AUTH GUARD ===== */
         body:not(.authed) .admin-wrapper { display: none; }
         body.authed .auth-checking { display: none; }
         .auth-checking {
@@ -134,7 +136,7 @@
         }
         body.dark .auth-checking { background: #0F1F19; color: #C9A961; }
 
-        /* ===== MOBILE SIDEBAR (HAMBURGER DRAWER) ===== */
+        /* ===== MOBILE SIDEBAR ===== */
         .admin-hamburger,
         .admin-overlay { display: none; }
 
@@ -192,11 +194,9 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <!-- ===== OVERVIEW ===== -->
                 <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
-                <!-- ===== CONTENT ===== -->
                 <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
@@ -209,25 +209,21 @@
                 <a href="students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a>
                 <a href="materials.html"><i class="fas fa-book-open"></i> <span>Materials</span></a>
 
-                <!-- ===== PAGES ===== -->
                 <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
 
-                <!-- ===== CBT PORTAL ===== -->
                 <div class="sidebar-section-label">CBT Portal</div>
                 <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
                 <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
                 <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
 
-                <!-- ===== ENGAGEMENT ===== -->
                 <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html" class="active"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
 
-                <!-- ===== SYSTEM ===== -->
                 <div class="sidebar-section-label">System</div>
                 <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -276,7 +272,6 @@
         </main>
     </div>
 
-    <!-- View Details Modal -->
     <div class="modal" id="applicationModal">
         <div class="modal-content">
             <h2>Application Details</h2>
@@ -291,7 +286,7 @@
     <script src="js/admin-guard.js"></script>
     <script>
         // ============================================
-        // THEME TOGGLE (dark mode)
+        // THEME TOGGLE
         // ============================================
         (function initTheme() {
             const saved = localStorage.getItem('avms-theme');
@@ -311,7 +306,7 @@
         });
 
         // ============================================
-        // AUTH GUARD (real Supabase session, with legacy flag bridge)
+        // AUTH GUARD
         // ============================================
         (async function initAuth() {
             const nameEl = document.getElementById('adminName');
@@ -322,7 +317,7 @@
                     if (nameEl) nameEl.textContent = (data.session.user?.email || 'Admin').split('@')[0];
                     return;
                 }
-            } catch (e) { /* fall through to legacy bridge */ }
+            } catch (e) { /* fall through */ }
 
             const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
             if (legacy) {
@@ -341,6 +336,24 @@
         let allApplications = [];
         let currentFilter = 'all';
         let currentSearch = '';
+
+        // ============================================
+        // STORAGE PATH EXTRACTOR
+        // Accepts either a full public URL or a raw path,
+        // returns the storage-relative path (e.g. passports/xxx.jpg)
+        // ============================================
+        function extractStoragePath(input) {
+            if (!input) return null;
+            const str = String(input).trim();
+            if (!str) return null;
+            const marker = '/membership-documents/';
+            const idx = str.indexOf(marker);
+            if (idx !== -1) {
+                return str.substring(idx + marker.length);
+            }
+            // Already a relative path
+            return str;
+        }
 
         // ============================================
         // LOGOUT
@@ -437,6 +450,44 @@
         }
 
         // ============================================
+        // DOCUMENT LINK HANDLER
+        // ============================================
+        async function openDocument(btnEl, storedValue, docName) {
+            if (!storedValue) return;
+            const originalHtml = btnEl.innerHTML;
+            btnEl.classList.add('loading');
+            btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+
+            try {
+                const path = extractStoragePath(storedValue);
+                if (!path) throw new Error('Invalid path');
+
+                const { data, error } = await supabase.storage
+                    .from('membership-documents')
+                    .createSignedUrl(path, 3600); // 1 hour
+
+                if (error) throw error;
+                if (!data || !data.signedUrl) throw new Error('Could not sign URL');
+
+                btnEl.classList.remove('loading');
+                btnEl.classList.remove('error');
+                btnEl.innerHTML = originalHtml;
+
+                window.open(data.signedUrl, '_blank', 'noopener');
+            } catch (err) {
+                console.warn('Signed URL error for ' + docName + ':', err);
+                btnEl.classList.remove('loading');
+                btnEl.classList.add('error');
+                btnEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Not found';
+
+                setTimeout(() => {
+                    btnEl.classList.remove('error');
+                    btnEl.innerHTML = originalHtml;
+                }, 3000);
+            }
+        }
+
+        // ============================================
         // VIEW APPLICATION
         // ============================================
         function viewApplication(id) {
@@ -460,17 +511,17 @@
 
                 <div class="document-links">
                     <h4>📎 Uploaded Documents</h4>
-                    ${app.passport_photo_url ? `<a href="${app.passport_photo_url}" target="_blank"><i class="fas fa-image"></i> Passport Photo</a>` : '<p style="color: #888; font-size: 13px;">No passport photo</p>'}
-                    ${app.admission_letter_url ? `<a href="${app.admission_letter_url}" target="_blank"><i class="fas fa-file-pdf"></i> Admission Letter</a>` : ''}
-                    ${app.student_id_url ? `<a href="${app.student_id_url}" target="_blank"><i class="fas fa-id-card"></i> Student ID</a>` : ''}
-                    ${app.payment_receipt_url ? `<a href="${app.payment_receipt_url}" target="_blank"><i class="fas fa-receipt"></i> Payment Receipt</a>` : ''}
+                    ${app.passport_photo_url ? `<a href="#" onclick="openDocument(this, '${(app.passport_photo_url || '').replace(/'/g, "\\'")}', 'Passport Photo'); return false;"><i class="fas fa-image"></i> Passport Photo</a>` : '<p style="color: #888; font-size: 13px;">No passport photo</p>'}
+                    ${app.admission_letter_url ? `<a href="#" onclick="openDocument(this, '${(app.admission_letter_url || '').replace(/'/g, "\\'")}', 'Admission Letter'); return false;"><i class="fas fa-file-pdf"></i> Admission Letter</a>` : ''}
+                    ${app.student_id_url ? `<a href="#" onclick="openDocument(this, '${(app.student_id_url || '').replace(/'/g, "\\'")}', 'Student ID'); return false;"><i class="fas fa-id-card"></i> Student ID</a>` : ''}
+                    ${app.payment_receipt_url ? `<a href="#" onclick="openDocument(this, '${(app.payment_receipt_url || '').replace(/'/g, "\\'")}', 'Payment Receipt'); return false;"><i class="fas fa-receipt"></i> Payment Receipt</a>` : ''}
                 </div>
             `;
             document.getElementById('applicationModal').classList.add('show');
         }
 
         // ============================================
-        // UPDATE STATUS (approve activates student; reject deactivates)
+        // UPDATE STATUS
         // ============================================
         async function updateStatus(id, status) {
             const confirmMsg = status === 'approved'
@@ -479,13 +530,11 @@
             if (!confirm(confirmMsg)) return;
 
             try {
-                // Find the application first so we can get auth_user_id + reg_no
                 const app = allApplications.find(a => a.id === id);
                 if (!app) throw new Error('Application not found in local state.');
 
                 const nowIso = new Date().toISOString();
 
-                // 1) Update membership_applications
                 const { error: appErr } = await supabase
                     .from('membership_applications')
                     .update({
@@ -496,7 +545,6 @@
 
                 if (appErr) throw appErr;
 
-                // 2) Sync students row if we have a link
                 const authId = app.auth_user_id;
                 const regNo = app.reg_no || app.reg_number;
 
@@ -511,7 +559,6 @@
 
                     if (stuErr) {
                         console.warn('students update by auth_user_id failed:', stuErr);
-                        // Fallback: try by reg_no
                         if (regNo) {
                             const { error: stuErr2 } = await supabase
                                 .from('students')
