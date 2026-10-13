@@ -117,6 +117,73 @@
             border-left: 4px solid #C9A961;
         }
 
+        /* ===== THEME TOGGLE (bottom-right) ===== */
+        .theme-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1200;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #C9A961;
+            background: #1F4E3D;
+            color: #C9A961;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 6px 18px rgba(31,78,61,0.35);
+            transition: transform 0.18s, background 0.18s, color 0.18s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .theme-toggle:hover { background: #2D6B54; transform: scale(1.06); }
+        .theme-toggle:active { transform: scale(0.94); }
+        @media (max-width: 768px) {
+            .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; }
+        }
+
+        /* ===== DARK MODE ===== */
+        body.dark { background: #0F1F19; color: #E8E8E8; }
+        body.dark .admin-main { background: #0F1F19; }
+        body.dark .admin-header { border-bottom-color: #1F4E3D; }
+        body.dark .admin-header h1 { color: #C9A961; }
+        body.dark .admin-user { color: #B8B8B8; }
+        body.dark .admin-user i { color: #C9A961; }
+        body.dark .page-header p { color: #8A8A8A; }
+
+        body.dark .table-container { background: #15271F; border-color: #1F4E3D; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        body.dark table th { background: #1A2E24; color: #C9A961; border-bottom-color: #C9A961; }
+        body.dark table td { color: #E0E0E0; border-bottom-color: #1F4E3D; }
+        body.dark table tr:hover { background: #1A2E24; }
+        body.dark table tr:last-child td { border-bottom: none; }
+        body.dark table td i.fa-image { color: #C9A961 !important; }
+
+        body.dark .modal-content { background: #15271F; color: #E8E8E8; }
+        body.dark .modal-content h2 { color: #C9A961; border-bottom-color: #C9A961; }
+        body.dark .modal-content label { color: #C9A961; }
+        body.dark .modal-content input,
+        body.dark .modal-content select,
+        body.dark .modal-content textarea { background: #0F1F19; color: #E8E8E8; border-color: #1F4E3D; }
+        body.dark .modal-content input:focus,
+        body.dark .modal-content select:focus,
+        body.dark .modal-content textarea:focus { border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.25); }
+
+        body.dark .image-upload-area { background: #1A2E24; border-color: #C9A961; }
+        body.dark .image-upload-area:hover { background: #15271F; }
+        body.dark .image-upload-area p { color: #C9A961; }
+        body.dark .image-preview-box { background: #1A2E24; border-color: #C9A961; }
+        body.dark .image-preview-box p { color: #8A8A8A !important; }
+        body.dark .existing-image-info { background: #1A2E24; color: #C9A961; border-left-color: #C9A961; }
+
+        body.dark .btn-cancel { color: #C9A961; border-color: #1F4E3D; }
+        body.dark .btn-cancel:hover { background: #1A2E24; border-color: #C9A961; }
+
+        body.dark .checkbox-group label { color: #B8B8B8; }
+
+        body.dark .empty-state { color: #8A8A8A; }
+
         /* ===== AUTH GUARD — hide content until verified ===== */
         body:not(.authed) .admin-wrapper { display: none; }
         body.authed .auth-checking { display: none; }
@@ -130,6 +197,7 @@
             font-weight: 600;
             background: #FBF8EE;
         }
+        body.dark .auth-checking { background: #0F1F19; color: #C9A961; }
 
         /* ===== MOBILE SIDEBAR (HAMBURGER DRAWER) ===== */
         .admin-hamburger,
@@ -182,6 +250,10 @@
     </style>
 </head>
 <body class="">
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <div class="auth-checking">🔐 Verifying session...</div>
 
     <div class="admin-wrapper">
@@ -361,6 +433,26 @@
     <script src="../js/config.js"></script>
     <script src="js/admin-guard.js"></script>
     <script>
+        // ============================================
+        // THEME TOGGLE (dark mode)
+        // ============================================
+        (function initTheme() {
+            const saved = localStorage.getItem('avms-theme');
+            if (saved === 'dark') {
+                document.body.classList.add('dark');
+                const icon = document.querySelector('#themeToggle i');
+                if (icon) icon.className = 'fas fa-sun';
+            }
+        })();
+
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('avms-theme', isDark ? 'dark' : 'light');
+            const icon = this.querySelector('i');
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        });
+
         // ============================================
         // AUTH GUARD (real Supabase session, with legacy flag bridge)
         // ============================================
