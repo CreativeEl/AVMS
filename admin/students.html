@@ -137,80 +137,6 @@
             white-space: pre;
         }
 
-        /* ===== THEME TOGGLE (bottom-right) ===== */
-        .theme-toggle {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 1200;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid #C9A961;
-            background: #1F4E3D;
-            color: #C9A961;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            box-shadow: 0 6px 18px rgba(31,78,61,0.35);
-            transition: transform 0.18s, background 0.18s, color 0.18s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .theme-toggle:hover { background: #2D6B54; transform: scale(1.06); }
-        .theme-toggle:active { transform: scale(0.94); }
-        @media (max-width: 768px) {
-            .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; }
-        }
-
-        /* ===== DARK MODE ===== */
-        body.dark { background: #0F1F19; color: #E8E8E8; }
-        body.dark .admin-main { background: #0F1F19; }
-        body.dark .admin-header { border-bottom-color: #1F4E3D; }
-        body.dark .admin-header h1 { color: #C9A961; }
-        body.dark .admin-user { color: #B8B8B8; }
-        body.dark .admin-user i { color: #C9A961; }
-
-        body.dark .info-box { background: #15271F; color: #E0E0E0; border-left-color: #C9A961; }
-        body.dark .bulk-info { background: #15271F; color: #E0E0E0; border-left-color: #C9A961; }
-
-        body.dark .stat-mini { background: #15271F; border-color: #1F4E3D; border-top-color: #C9A961; }
-        body.dark .stat-mini h3 { color: #C9A961; }
-        body.dark .stat-mini p { color: #8A8A8A; }
-        body.dark .stat-mini i { color: #C9A961; }
-
-        body.dark .table-container { background: #15271F; border-color: #1F4E3D; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        body.dark table th { background: #1A2E24; color: #C9A961; border-bottom-color: #C9A961; }
-        body.dark table td { color: #E0E0E0; border-bottom-color: #1F4E3D; }
-        body.dark table tr:hover { background: #1A2E24; }
-        body.dark table tr:last-child td { border-bottom: none; }
-        body.dark table code { background: #1A2E24 !important; color: #C9A961 !important; border-color: #1F4E3D !important; }
-
-        body.dark .modal-content { background: #15271F; color: #E8E8E8; }
-        body.dark .modal-content h2 { color: #C9A961; border-bottom-color: #C9A961; }
-        body.dark .modal-content label { color: #C9A961; }
-        body.dark .modal-content input,
-        body.dark .modal-content select,
-        body.dark .modal-content textarea { background: #0F1F19; color: #E8E8E8; border-color: #1F4E3D; }
-        body.dark .modal-content input:focus,
-        body.dark .modal-content select:focus,
-        body.dark .modal-content textarea:focus { border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.25); }
-        body.dark .modal-content small { color: #8A8A8A; }
-
-        body.dark .btn-cancel { color: #C9A961; border-color: #1F4E3D; }
-        body.dark .btn-cancel:hover { background: #1A2E24; border-color: #C9A961; }
-
-        body.dark .filter-btn { background: #15271F; color: #C9A961; border-color: #1F4E3D; }
-        body.dark .filter-btn:hover { border-color: #C9A961; color: #fff; }
-        body.dark .filter-btn.active { background: #C9A961; color: #0F1F19; border-color: #C9A961; }
-
-        body.dark .search-box { background: #15271F; color: #E8E8E8; border-color: #1F4E3D; }
-        body.dark .search-box::placeholder { color: #8A8A8A; }
-        body.dark .search-box:focus { border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.2); }
-
-        body.dark .empty-state { color: #8A8A8A; }
-
         /* ===== AUTH GUARD — hide content until verified ===== */
         body:not(.authed) .admin-wrapper { display: none; }
         body.authed .auth-checking { display: none; }
@@ -224,7 +150,6 @@
             font-weight: 600;
             background: #FBF8EE;
         }
-        body.dark .auth-checking { background: #0F1F19; color: #C9A961; }
 
         /* ===== MOBILE SIDEBAR (HAMBURGER DRAWER) ===== */
         .admin-hamburger,
@@ -277,10 +202,6 @@
     </style>
 </head>
 <body class="">
-    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
-        <i class="fas fa-moon"></i>
-    </button>
-
     <div class="auth-checking">🔐 Verifying session...</div>
 
     <div class="admin-wrapper">
@@ -336,7 +257,7 @@
 
             <div class="info-box">
                 <i class="fas fa-info-circle"></i>
-                This is the <strong>eligibility roster</strong> for AVMS membership. Only students listed here can register on the Join page. They verify with <strong>Reg No</strong> + <strong>State of Origin</strong> (lowercase).
+                This is the <strong>eligibility roster</strong> for AVMS membership. Only students listed here can register on the Join page. They verify with <strong>Reg No</strong> + <strong>State of Origin</strong> (lowercase). Deleting a student also removes their application, uploads, and login account.
             </div>
 
             <div class="stats-row">
@@ -482,24 +403,11 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
     <script src="js/admin-guard.js"></script>
     <script>
         // ============================================
-        // THEME TOGGLE (dark mode)
+        // EDGE FUNCTION ENDPOINT
         // ============================================
-        (function initTheme() {
-            const saved = localStorage.getItem('avms-theme');
-            if (saved === 'dark') {
-                document.body.classList.add('dark');
-                const icon = document.querySelector('#themeToggle i');
-                if (icon) icon.className = 'fas fa-sun';
-            }
-        })();
-
-        document.getElementById('themeToggle').addEventListener('click', function() {
-            document.body.classList.toggle('dark');
-            const isDark = document.body.classList.contains('dark');
-            localStorage.setItem('avms-theme', isDark ? 'dark' : 'light');
-            const icon = this.querySelector('i');
-            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-        });
+        const SUPABASE_URL = 'https://tlkqzhudnpdnbxaltwbs.supabase.co';
+        const SUPABASE_ANON_KEY = 'PASTE_YOUR_ANON_KEY_HERE';
+        const DELETE_STUDENT_URL = SUPABASE_URL + '/functions/v1/delete-student';
 
         // ============================================
         // AUTH GUARD
@@ -712,7 +620,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                     result = await supabase.from('students').insert([data]);
                 }
                 if (result.error) {
-                    // Friendly message for duplicate Reg No
                     if (result.error.message.includes('duplicate') || result.error.code === '23505') {
                         throw new Error('This Registration Number already exists in the roster.');
                     }
@@ -731,17 +638,56 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
         });
 
         // ============================================
-        // DELETE STUDENT
+        // DELETE STUDENT (cascade via Edge Function)
         // ============================================
         async function deleteStudent(id) {
-            if (!confirm('Remove this student from the roster? They will no longer be able to register.')) return;
+            const confirmMsg =
+                'Delete this student COMPLETELY?\n\n' +
+                'This will remove:\n' +
+                '  • The roster row\n' +
+                '  • Their membership application\n' +
+                '  • Their uploaded documents\n' +
+                '  • Their CBT attempts\n' +
+                '  • Their login account (email + password)\n\n' +
+                'They can register again from scratch afterward.\n\n' +
+                'Continue?';
+            if (!confirm(confirmMsg)) return;
+
             try {
-                const { error } = await supabase.from('students').delete().eq('id', id);
-                if (error) throw error;
+                // Get session token for the Edge Function call
+                const { data: sess } = await supabase.auth.getSession();
+                const token = sess?.session?.access_token;
+                if (!token) throw new Error('No active admin session. Please log in again.');
+
+                const res = await fetch(DELETE_STUDENT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token,
+                        'apikey': SUPABASE_ANON_KEY
+                    },
+                    body: JSON.stringify({ student_id: id })
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || ('HTTP ' + res.status));
+                }
+
+                const d = (data.summary && data.summary.deleted) || {};
                 loadStudents();
-                alert('✅ Student removed from roster.');
+                alert(
+                    '✅ Student deleted completely.\n\n' +
+                    'Roster row: ' + (d.student_row ? '✔' : '✖') + '\n' +
+                    'Application: ' + (d.applications || 0) + '\n' +
+                    'Uploads removed: ' + (d.files || 0) + '\n' +
+                    'CBT attempts: ' + (d.attempts || 0) + '\n' +
+                    'Login account: ' + (d.auth_user ? '✔' : '✖ (may need manual delete)')
+                );
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                console.error('Delete error:', error);
+                alert('❌ Could not delete:\n\n' + error.message);
             }
         }
 
@@ -774,7 +720,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                 return;
             }
 
-            // Detect and skip header
             let startIndex = 0;
             const firstLine = lines[0].toLowerCase();
             if (firstLine.includes('reg_no') || firstLine.includes('registration')) {
@@ -817,7 +762,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             try {
                 const { error } = await supabase.from('students').insert(students);
                 if (error) {
-                    // Friendly duplicate message
                     if (error.message.includes('duplicate') || error.code === '23505') {
                         throw new Error('One or more Reg Nos already exist in the roster. Nothing was imported. Remove duplicates from your CSV and try again.');
                     }
