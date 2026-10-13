@@ -18,17 +18,11 @@
     </script>
     <style>
         :root {
-            --green-deep: #1F4E3D;
-            --green-mid: #2D6B54;
-            --gold: #C9A961;
-            --red-deep: #8B1A1A;
-
             --bg-a: radial-gradient(circle at 20% 20%, rgba(201,169,97,0.15) 0%, transparent 45%);
             --bg-b: radial-gradient(circle at 80% 80%, rgba(45,107,84,0.35) 0%, transparent 50%);
             --bg-c: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
 
             --card-bg: #FBF8EE;
-            --card-border-top: #C9A961;
             --text-strong: #1F4E3D;
             --text-soft: #666;
             --text-muted: #888;
@@ -36,7 +30,6 @@
             --input-border: #e3e0d2;
             --input-text: #1a1a1a;
             --note-bg: #F5F0DC;
-            --note-border: #C9A961;
             --note-text: #1F4E3D;
             --divider: #e3e0d2;
         }
@@ -47,7 +40,6 @@
             --bg-c: linear-gradient(135deg, #0a120f 0%, #122620 100%);
 
             --card-bg: #182420;
-            --card-border-top: #C9A961;
             --text-strong: #C9A961;
             --text-soft: #a8b5ac;
             --text-muted: #7a8a80;
@@ -55,7 +47,6 @@
             --input-border: #24352e;
             --input-text: #e8f0ea;
             --note-bg: #1e2c26;
-            --note-border: #C9A961;
             --note-text: #e8f0ea;
             --divider: #24352e;
         }
@@ -78,7 +69,6 @@
             max-width: 480px;
         }
 
-        /* Back row */
         .back-row {
             display: flex;
             align-items: center;
@@ -119,16 +109,15 @@
             transition: background 0.2s, transform 0.1s;
             flex-shrink: 0;
         }
-        .theme-toggle:hover { background: rgba(255,255,255,0.2); }
+        .theme-toggle:hover { background: rgba(255,255,255,0.22); }
         .theme-toggle:active { transform: scale(0.94); }
 
-        /* Main login card */
         .login-card {
             background: var(--card-bg);
             border-radius: 20px;
             padding: 40px 35px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            border-top: 4px solid var(--card-border-top);
+            border-top: 4px solid #C9A961;
             transition: background 0.3s;
         }
 
@@ -158,7 +147,6 @@
             font-size: 26px;
             margin-bottom: 8px;
             font-weight: 700;
-            letter-spacing: -0.2px;
             transition: color 0.3s;
         }
 
@@ -169,10 +157,9 @@
             transition: color 0.3s;
         }
 
-        /* Welcome note */
         .welcome-note {
             background: var(--note-bg);
-            border-left: 4px solid var(--note-border);
+            border-left: 4px solid #C9A961;
             padding: 15px 18px;
             border-radius: 8px;
             margin-bottom: 25px;
@@ -186,10 +173,7 @@
             margin-right: 6px;
         }
 
-        /* Form */
-        .form-group {
-            margin-bottom: 18px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         .form-group label {
             display: block;
@@ -205,13 +189,9 @@
             margin-right: 6px;
             width: 16px;
         }
-        html.dark .form-group label i {
-            color: #C9A961;
-        }
+        html.dark .form-group label i { color: #C9A961; }
 
-        .input-wrapper {
-            position: relative;
-        }
+        .input-wrapper { position: relative; }
 
         .form-group input {
             width: 100%;
@@ -232,9 +212,7 @@
             box-shadow: 0 0 0 3px rgba(201,169,97,0.18);
         }
 
-        .form-group input::placeholder {
-            color: var(--text-muted);
-        }
+        .form-group input::placeholder { color: var(--text-muted); }
 
         .input-wrapper .toggle-visibility {
             position: absolute;
@@ -250,9 +228,7 @@
             transition: color 0.2s;
         }
 
-        .input-wrapper .toggle-visibility:hover {
-            color: var(--text-strong);
-        }
+        .input-wrapper .toggle-visibility:hover { color: var(--text-strong); }
 
         .form-hint {
             display: block;
@@ -265,11 +241,8 @@
             color: #c04545;
             font-weight: 600;
         }
-        html.dark .form-hint.warning {
-            color: #ff8a8a;
-        }
+        html.dark .form-hint.warning { color: #ff8a8a; }
 
-        /* Error message */
         .error-msg {
             background: #f8d7da;
             color: #721c24;
@@ -294,7 +267,6 @@
             75% { transform: translateX(5px); }
         }
 
-        /* Login button */
         .btn-login {
             width: 100%;
             padding: 15px;
@@ -320,12 +292,8 @@
             box-shadow: 0 8px 20px rgba(31, 78, 61, 0.35);
         }
 
-        .btn-login:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
+        .btn-login:disabled { opacity: 0.7; cursor: not-allowed; }
 
-        /* Spinner */
         .spinner {
             display: inline-block;
             width: 18px;
@@ -335,11 +303,8 @@
             border-top-color: #fff;
             animation: spin 0.8s ease-in-out infinite;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Footer note */
         .login-footer {
             text-align: center;
             margin-top: 25px;
@@ -359,14 +324,9 @@
             text-decoration: none;
             font-weight: 600;
         }
-        html.dark .login-footer a {
-            color: #C9A961;
-        }
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
+        html.dark .login-footer a { color: #C9A961; }
+        .login-footer a:hover { text-decoration: underline; }
 
-        /* Success message */
         .success-msg {
             background: #d4edda;
             color: #155724;
@@ -393,18 +353,9 @@
         }
 
         @media (max-width: 480px) {
-            .login-card {
-                padding: 30px 22px;
-                border-radius: 16px;
-            }
-            .login-header h1 {
-                font-size: 22px;
-            }
-            .logo-circle {
-                width: 65px;
-                height: 65px;
-                font-size: 28px;
-            }
+            .login-card { padding: 30px 22px; border-radius: 16px; }
+            .login-header h1 { font-size: 22px; }
+            .logo-circle { width: 65px; height: 65px; font-size: 28px; }
         }
     </style>
 </head>
@@ -414,7 +365,7 @@
             <a href="../index.html" class="back-link">
                 <i class="fas fa-arrow-left"></i> Back to AVMS Homepage
             </a>
-            <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+            <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode" type="button">
                 <i class="fas fa-moon" id="themeIcon"></i>
             </button>
         </div>
@@ -473,9 +424,7 @@
     </div>
 
     <script>
-        // ============================================
         // THEME
-        // ============================================
         function applyThemeIcon() {
             const isDark = document.documentElement.classList.contains('dark');
             const icon = document.getElementById('themeIcon');
@@ -489,10 +438,7 @@
         document.getElementById('themeBtn').addEventListener('click', toggleTheme);
         applyThemeIcon();
 
-        // ============================================
-        // LOGIN PAGE LOGIC
-        // ============================================
-
+        // LOGIN
         const form = document.getElementById('loginForm');
         const errorMsg = document.getElementById('errorMsg');
         const successMsg = document.getElementById('successMsg');
@@ -500,9 +446,6 @@
         const regNoInput = document.getElementById('regNo');
         const stateInput = document.getElementById('stateOfOrigin');
 
-        // ============================================
-        // SHOW / HIDE STATE OF ORIGIN
-        // ============================================
         function togglePassword() {
             const eyeIcon = document.getElementById('eyeIcon');
             if (stateInput.type === 'password') {
@@ -516,23 +459,14 @@
             }
         }
 
-        // ============================================
-        // AUTO-LOWERCASE STATE OF ORIGIN AS USER TYPES
-        // ============================================
         stateInput.addEventListener('input', function() {
             this.value = this.value.toLowerCase();
         });
 
-        // ============================================
-        // TRIM REG NO, REMOVE SPACES, AUTO-UPPERCASE
-        // ============================================
         regNoInput.addEventListener('input', function() {
             this.value = this.value.replace(/\s+/g, '').toUpperCase();
         });
 
-        // ============================================
-        // SHOW ERROR MESSAGE
-        // ============================================
         function showError(message) {
             errorMsg.innerHTML = '<i class="fas fa-times-circle"></i> ' + message;
             errorMsg.classList.add('show');
@@ -543,18 +477,12 @@
             errorMsg.classList.remove('show');
         }
 
-        // ============================================
-        // SHOW SUCCESS
-        // ============================================
         function showSuccess(message) {
             document.getElementById('successText').textContent = message;
             successMsg.classList.add('show');
             errorMsg.classList.remove('show');
         }
 
-        // ============================================
-        // LOADING STATE ON BUTTON
-        // ============================================
         function setLoading(isLoading) {
             if (isLoading) {
                 loginBtn.disabled = true;
@@ -565,9 +493,6 @@
             }
         }
 
-        // ============================================
-        // FORM SUBMIT
-        // ============================================
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
             hideMessages();
@@ -575,13 +500,11 @@
             const regNo = regNoInput.value.trim().toUpperCase();
             const stateOfOrigin = stateInput.value.trim().toLowerCase();
 
-            // Basic validation
             if (!regNo) {
                 showError('Please enter your Registration Number.');
                 regNoInput.focus();
                 return;
             }
-
             if (!stateOfOrigin) {
                 showError('Please enter your State of Origin.');
                 stateInput.focus();
@@ -591,7 +514,6 @@
             setLoading(true);
 
             try {
-                // Query the cbt_students table
                 const { data, error } = await supabase
                     .from('cbt_students')
                     .select('*')
@@ -613,7 +535,6 @@
                     return;
                 }
 
-                // SUCCESS — store session
                 sessionStorage.setItem('cbt_student', JSON.stringify({
                     id: data.id,
                     reg_no: data.reg_no,
@@ -624,13 +545,11 @@
                     logged_in_at: new Date().toISOString()
                 }));
 
-                // Also set in localStorage for "remember" across tabs (optional)
                 localStorage.setItem('cbt_last_reg_no', data.reg_no);
 
                 const firstName = data.full_name ? String(data.full_name).split(' ')[0] : 'Student';
                 showSuccess(`Welcome, ${firstName}! Redirecting...`);
 
-                // Redirect after short delay
                 setTimeout(() => {
                     window.location.href = 'dashboard.html';
                 }, 1200);
@@ -642,9 +561,6 @@
             }
         });
 
-        // ============================================
-        // AUTO-FILL REG NO IF REMEMBERED
-        // ============================================
         const lastRegNo = localStorage.getItem('cbt_last_reg_no');
         if (lastRegNo) {
             regNoInput.value = lastRegNo;
@@ -653,10 +569,7 @@
             regNoInput.focus();
         }
 
-        // ============================================
-        // CLEAR OLD SESSION ON LOGIN PAGE
-        // ============================================
-        (So the student is forced to log in again)
+        // Clear old session on login page (forces re-login)
         sessionStorage.removeItem('cbt_student');
     </script>
 </body>
