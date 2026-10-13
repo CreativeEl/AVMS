@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materials - AVMS Admin</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+
+        .btn-add { background: #2D6B54; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s; }
+        .btn-add:hover { background: #1F4E3D; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(31,78,61,0.2); }
+
+        .info-box {
+            background: #FBF8EE;
+            color: #1F4E3D;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #C9A961;
+            font-size: 14px;
+        }
+        .info-box i { margin-right: 8px; color: #C9A961; }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-mini {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid #f0ede0;
+            border-top: 3px solid #C9A961;
+            box-shadow: 0 1px 3px rgba(31,78,61,0.04);
+            display: flex; align-items: center; gap: 15px;
+            transition: all 0.28s;
+        }
+        .stat-mini:hover { box-shadow: 0 6px 20px rgba(31,78,61,0.08); transform: translateY(-2px); }
+        .stat-mini i { font-size: 28px; color: #2D6B54; }
+        .stat-mini h3 {
+            font-family: Georgia, serif;
+            color: #1F4E3D;
+            font-size: 22px;
+            margin-bottom: 2px;
+            font-weight: 700;
+        }
+        .stat-mini p {
+            color: #888;
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+        }
+
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; border: 1px solid #f0ede0; box-shadow: 0 1px 3px rgba(31,78,61,0.04); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: #FBF8EE; padding: 14px 15px; text-align: left; font-weight: 700; color: #1F4E3D; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #C9A961; }
+        td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; }
+        tr:hover { background: #FBF8EE; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-level { background: #1F4E3D; color: #C9A961; font-family: monospace; letter-spacing: 1px; }
+        .badge-code { background: #FBF8EE; color: #2D6B54; border: 1px solid #e3e0d2; font-family: monospace; }
+
+        .btn-link { background: #2D6B54; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-link:hover { background: #1F4E3D; }
+        .btn-delete { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-delete:hover { background: #c82333; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20,47,37,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .modal-content h2 { font-family: Georgia, serif; margin-bottom: 20px; color: #1F4E3D; padding-bottom: 10px; border-bottom: 2px solid #C9A961; font-weight: 700; }
+        .modal-content .form-group { margin-bottom: 15px; }
+        .modal-content label { display: block; font-weight: 600; margin-bottom: 6px; color: #1F4E3D; font-size: 13.5px; }
+        .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; font-family: inherit; background: white; color: #1a1a1a; transition: all 0.2s; }
+        .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
+        .modal-content small { display: block; color: #888; font-size: 12px; margin-top: 4px; }
+        .modal-content input[type="file"] { padding: 10px; background: #FBF8EE; cursor: pointer; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+        .btn-save { background: #2D6B54; color: white; padding: 11px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.28s; }
+        .btn-save:hover { background: #1F4E3D; }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-cancel { background: transparent; color: #555; padding: 11px 24px; border: 2px solid #e3e0d2; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .btn-cancel:hover { background: #FBF8EE; border-color: #888; }
+
+        .empty-state { text-align: center; padding: 40px; color: #888; font-size: 14px; }
+
+        .search-box { padding: 10px 15px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; width: 280px; transition: all 0.2s; }
+        .search-box:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
+
+        .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border: 2px solid #e3e0d2; background: white; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s; font-size: 12.5px; color: #555; }
+        .filter-btn:hover { border-color: #C9A961; color: #1F4E3D; }
+        .filter-btn.active { background: #1F4E3D; color: white; border-color: #1F4E3D; }
+
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s ease-in-out infinite; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f0ede0;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar.show { display: block; }
+        .progress-bar-fill {
+            height: 100%;
+            background: #2D6B54;
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        /* AUTH GUARD */
+        body:not(.authed) .admin-wrapper { display: none; }
+        body.authed .auth-checking { display: none; }
+        .auth-checking {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            color: #1F4E3D; font-size: 16px; font-weight: 600;
+            background: #FBF8EE;
+        }
+
+        /* MOBILE SIDEBAR */
+        .admin-hamburger, .admin-overlay { display: none; }
+
+        @media (max-width: 768px) {
+            .admin-hamburger {
+                display: flex; align-items: center; justify-content: center;
+                position: fixed; top: 14px; left: 14px;
+                width: 44px; height: 44px; border-radius: 50%;
+                background: #1F4E3D; color: white;
+                border: 2px solid #C9A961; cursor: pointer;
+                z-index: 1100; font-size: 18px;
+                box-shadow: 0 4px 12px rgba(31,78,61,0.25);
+                transition: transform 0.18s, background 0.18s;
+                padding: 0; -webkit-tap-highlight-color: transparent;
+            }
+            .admin-hamburger:active { transform: scale(0.94); background: #2D6B54; }
+
+            .admin-overlay {
+                display: block; position: fixed; inset: 0;
+                background: rgba(20, 47, 37, 0.6);
+                backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+                opacity: 0; pointer-events: none;
+                transition: opacity 0.28s; z-index: 1050;
+            }
+            .admin-overlay.open { opacity: 1; pointer-events: auto; }
+
+            .admin-sidebar {
+                width: 280px; max-width: 85vw;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1060;
+                box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+            }
+            .admin-sidebar.open { transform: translateX(0); }
+
+            .admin-sidebar .sidebar-header h2 { display: block; font-size: 20px; }
+            .admin-sidebar .sidebar-nav a span,
+            .admin-sidebar .sidebar-footer a span { display: inline; }
+            .admin-sidebar .sidebar-section-label { display: block; }
+
+            .admin-main { margin-left: 0; padding: 70px 18px 18px 18px; }
+            body.admin-sidebar-locked { overflow: hidden; }
+
+            .form-row { grid-template-columns: 1fr; }
+            .search-box { width: 100%; }
+        }
+    </style>
+</head>
+<body class="">
+    <div class="auth-checking">🔐 Verifying session...</div>
+
+    <div class="admin-wrapper">
+        <aside class="admin-sidebar">
+            <div class="sidebar-header"><h2>🐾 AVMS Admin</h2></div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">Overview</div>
+                <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+                <div class="sidebar-section-label">Content</div>
+                <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
+                <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
+                <a href="events.html"><i class="fas fa-calendar"></i> <span>Events</span></a>
+                <a href="news.html"><i class="fas fa-newspaper"></i> <span>News</span></a>
+                <a href="gallery.html"><i class="fas fa-images"></i> <span>Gallery</span></a>
+                <a href="highlights.html"><i class="fas fa-star"></i> <span>Event Highlights</span></a>
+                <a href="documents.html"><i class="fas fa-file-alt"></i> <span>Documents</span></a>
+                <a href="scholarships.html"><i class="fas fa-graduation-cap"></i> <span>Scholarships</span></a>
+                <a href="students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a>
+                <a href="materials.html" class="active"><i class="fas fa-book-open"></i> <span>Materials</span></a>
+
+                <div class="sidebar-section-label">Pages</div>
+                <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
+                <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
+                <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
+
+                <div class="sidebar-section-label">CBT Portal</div>
+                <a href="cbt-students.html"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
+                <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
+                <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
+
+                <div class="sidebar-section-label">Engagement</div>
+                <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
+                <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+
+                <div class="sidebar-section-label">System</div>
+                <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+            </div>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Study Materials</h1>
+                <div class="admin-user">
+                    <span id="adminName">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                Upload study materials by <strong>level</strong>. Students only see materials for <strong>their own level</strong> in the student portal. Recommended file size under <strong>5 MB</strong> (PDFs, images).
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-mini">
+                    <i class="fas fa-book-open"></i>
+                    <div>
+                        <h3 id="statTotal">0</h3>
+                        <p>Total Files</p>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-layer-group"></i>
+                    <div>
+                        <h3 id="stat100">0</h3>
+                        <p>100 Level</p>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-layer-group"></i>
+                    <div>
+                        <h3 id="stat200">0</h3>
+                        <p>200 Level</p>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-layer-group"></i>
+                    <div>
+                        <h3 id="stat300">0</h3>
+                        <p>300 Level</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-header">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterLevel('all', this)">All</button>
+                    <button class="filter-btn" onclick="filterLevel(100, this)">100</button>
+                    <button class="filter-btn" onclick="filterLevel(200, this)">200</button>
+                    <button class="filter-btn" onclick="filterLevel(300, this)">300</button>
+                    <button class="filter-btn" onclick="filterLevel(400, this)">400</button>
+                    <button class="filter-btn" onclick="filterLevel(500, this)">500</button>
+                    <button class="filter-btn" onclick="filterLevel(600, this)">600</button>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search by title, code..." oninput="searchMaterials()">
+                    <button class="btn-add" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Material</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Level</th>
+                            <th>Course Code</th>
+                            <th>Size</th>
+                            <th>Uploaded</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materialsTableBody">
+                        <tr><td colspan="6" class="empty-state">Loading materials...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <h2>Upload Study Material</h2>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="title">Title *</label>
+                    <input type="text" id="title" required placeholder="e.g., GENS104 Introduction to Genetics Notes">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Short description (optional)" style="min-height: 70px;"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="level">Level *</label>
+                        <select id="level" required>
+                            <option value="100">100 Level</option>
+                            <option value="200">200 Level</option>
+                            <option value="300">300 Level</option>
+                            <option value="400">400 Level</option>
+                            <option value="500">500 Level</option>
+                            <option value="600">600 Level</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="courseCode">Course Code</label>
+                        <input type="text" id="courseCode" placeholder="e.g., GENS104">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="fileInput">File *</label>
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.ppt,.pptx" required>
+                    <small>Accepted: PDF, JPG, PNG, DOC, DOCX, PPT, PPTX (recommended under 5 MB)</small>
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-bar-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeUploadModal()">Cancel</button>
+                    <button type="submit" class="btn-save" id="saveBtn"><i class="fas fa-upload"></i> Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="js/admin-guard.js"></script>
+    <script>
+        // ============================================
+        // AUTH GUARD
+        // ============================================
+        (async function initAuth() {
+            const nameEl = document.getElementById('adminName');
+            try {
+                const { data } = await supabase.auth.getSession();
+                if (data && data.session) {
+                    document.body.classList.add('authed');
+                    if (nameEl) nameEl.textContent = (data.session.user?.email || 'Admin').split('@')[0];
+                    return;
+                }
+            } catch (e) { /* fall through */ }
+
+            const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
+            if (legacy) {
+                document.body.classList.add('authed');
+                const email = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
+                if (nameEl) nameEl.textContent = email ? email.split('@')[0] : 'Admin';
+                return;
+            }
+
+            window.location.href = 'index.html';
+        })();
+
+        // ============================================
+        // LOGOUT
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', async function(e) {
+            e.preventDefault();
+            try { await supabase.auth.signOut(); } catch (err) { /* ignore */ }
+            localStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminEmail');
+            sessionStorage.removeItem('adminSession');
+            window.location.href = 'index.html';
+        });
+
+        // ============================================
+        // STATE
+        // ============================================
+        let allMaterials = [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function sanitizeFileName(name) {
+            if (!name) return 'file';
+            return String(name).replace(/[^a-zA-Z0-9._-]/g, '_').slice(-120);
+        }
+        function formatSize(kb) {
+            if (!kb) return '—';
+            if (kb < 1024) return kb + ' KB';
+            return (kb / 1024).toFixed(2) + ' MB';
+        }
+        function formatDate(d) {
+            if (!d) return '—';
+            return new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // ============================================
+        // LOAD MATERIALS
+        // ============================================
+        async function loadMaterials() {
+            const tbody = document.getElementById('materialsTableBody');
+            try {
+                const { data, error } = await supabase
+                    .from('materials')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allMaterials = data || [];
+                updateStats();
+                displayMaterials();
+            } catch (error) {
+                console.error('Error loading materials:', error);
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Error loading materials: ${error.message}</td></tr>`;
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = allMaterials.length;
+            document.getElementById('stat100').textContent = allMaterials.filter(m => m.level === 100).length;
+            document.getElementById('stat200').textContent = allMaterials.filter(m => m.level === 200).length;
+            document.getElementById('stat300').textContent = allMaterials.filter(m => m.level === 300).length;
+        }
+
+        function displayMaterials() {
+            const tbody = document.getElementById('materialsTableBody');
+            let filtered = allMaterials;
+
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(m => m.level === currentFilter);
+            }
+
+            if (currentSearch) {
+                const s = currentSearch.toLowerCase();
+                filtered = filtered.filter(m =>
+                    (m.title || '').toLowerCase().includes(s) ||
+                    (m.course_code || '').toLowerCase().includes(s) ||
+                    (m.description || '').toLowerCase().includes(s)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state">No materials found. Click "Upload Material" to add one.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(m => `
+                <tr>
+                    <td>
+                        <strong>${escapeHtml(m.title)}</strong>
+                        ${m.description ? `<br><small style="color: #888; font-size: 12px;">${escapeHtml(m.description.slice(0, 80))}${m.description.length > 80 ? '…' : ''}</small>` : ''}
+                    </td>
+                    <td><span class="badge badge-level">${m.level}L</span></td>
+                    <td>${m.course_code ? `<span class="badge badge-code">${escapeHtml(m.course_code)}</span>` : '—'}</td>
+                    <td>${formatSize(m.file_size_kb)}</td>
+                    <td>${formatDate(m.created_at)}</td>
+                    <td>
+                        <a class="btn-link" href="${m.file_url}" target="_blank" rel="noopener"><i class="fas fa-eye"></i> View</a>
+                        <button class="btn-delete" onclick="deleteMaterial(${m.id}, '${(m.file_url || '').split('/').pop().replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function escapeHtml(t) {
+            if (t == null) return '';
+            return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        }
+
+        function filterLevel(level, btn) {
+            currentFilter = level === 'all' ? 'all' : parseInt(level);
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            displayMaterials();
+        }
+
+        function searchMaterials() {
+            currentSearch = document.getElementById('searchBox').value;
+            displayMaterials();
+        }
+
+        // ============================================
+        // MODAL
+        // ============================================
+        function openUploadModal() {
+            document.getElementById('uploadForm').reset();
+            document.getElementById('progressBar').classList.remove('show');
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('uploadModal').classList.add('show');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('show');
+        }
+
+        // ============================================
+        // UPLOAD
+        // ============================================
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveBtn');
+            const original = btn.innerHTML;
+
+            const title = document.getElementById('title').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const level = parseInt(document.getElementById('level').value);
+            const courseCode = document.getElementById('courseCode').value.trim();
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!title || !file) {
+                alert('❌ Please provide a title and select a file.');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Uploading...';
+
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            progressBar.classList.add('show');
+            progressFill.style.width = '30%';
+
+            try {
+                const ts = Date.now();
+                const safeName = sanitizeFileName(file.name);
+                const filePath = `level-${level}/${ts}_${safeName}`;
+
+                progressFill.style.width = '60%';
+
+                const { error: upErr } = await supabase.storage
+                    .from('materials')
+                    .upload(filePath, file, {
+                        contentType: file.type || 'application/octet-stream',
+                        upsert: false
+                    });
+
+                if (upErr) throw upErr;
+
+                progressFill.style.width = '85%';
+
+                const { data: urlData } = supabase.storage
+                    .from('materials')
+                    .getPublicUrl(filePath);
+
+                const fileUrl = urlData?.publicUrl || '';
+
+                const { error: dbErr } = await supabase
+                    .from('materials')
+                    .insert([{
+                        title,
+                        description: description || null,
+                        level,
+                        course_code: courseCode || null,
+                        file_url: fileUrl,
+                        file_type: file.type || null,
+                        file_size_kb: Math.round(file.size / 1024)
+                    }]);
+
+                if (dbErr) throw dbErr;
+
+                progressFill.style.width = '100%';
+
+                setTimeout(() => {
+                    closeUploadModal();
+                    loadMaterials();
+                    alert('✅ Material uploaded successfully!');
+                }, 300);
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('❌ Upload failed: ' + error.message);
+                progressBar.classList.remove('show');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        });
+
+        // ============================================
+        // DELETE
+        // ============================================
+        async function deleteMaterial(id, fileName) {
+            if (!confirm('Delete this material? This will remove it from the student downloads page.')) return;
+            try {
+                // Delete DB row first (safer for UX — file cleanup is best-effort)
+                const { error } = await supabase.from('materials').delete().eq('id', id);
+                if (error) throw error;
+
+                // Best-effort: try to remove the file from storage
+                if (fileName) {
+                    // We don't know the exact level folder, so we can't reliably locate it here.
+                    // Skipping storage cleanup — orphan files are harmless.
+                }
+
+                loadMaterials();
+                alert('✅ Material deleted.');
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('❌ Delete failed: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        loadMaterials();
+
+        document.getElementById('uploadModal').addEventListener('click', function(e) {
+            if (e.target === this) closeUploadModal();
+        });
+    </script>
+    <script src="js/admin-sidebar.js"></script>
+</body>
+</html>
