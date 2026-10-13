@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1F4E3D">
+    <title>Events — Student Portal | AVMS ABU Zaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('avms-theme') || 'light';
+                if (t === 'dark') document.documentElement.classList.add('dark');
+            } catch(e){}
+        })();
+    </script>
+    <style>
+        :root {
+            --green-deep: #1F4E3D;
+            --green-mid: #2D6B54;
+            --gold: #C9A961;
+            --gold-deep: #A88943;
+            --red-deep: #8B1A1A;
+
+            --bg: #F4F1E4;
+            --surface: #ffffff;
+            --surface-2: #FBF8EE;
+            --text: #1a1a1a;
+            --text-soft: #6b6b6b;
+            --text-muted: #8a8a8a;
+            --border: #e3e0d2;
+            --border-soft: #f0ede0;
+            --border-hair: #f5f2e6;
+            --shadow-1: 0 3px 10px rgba(31,78,61,0.05);
+            --icon-bg: #F7F5EC;
+
+            --sidebar-w: 248px;
+        }
+
+        html.dark {
+            --bg: #0f1714;
+            --surface: #182420;
+            --surface-2: #131d19;
+            --text: #e8f0ea;
+            --text-soft: #a8b5ac;
+            --text-muted: #7a8a80;
+            --border: #24352e;
+            --border-soft: #24352e;
+            --border-hair: #1e2c26;
+            --shadow-1: 0 3px 10px rgba(0,0,0,0.35);
+            --icon-bg: #1e2c26;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            min-height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.25s, color 0.25s;
+        }
+
+        .guard-screen {
+            position: fixed; inset: 0;
+            background: var(--surface-2);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 9999; gap: 16px; padding: 24px; text-align: center;
+        }
+        .guard-screen.hidden { display: none; }
+        .guard-spinner {
+            width: 42px; height: 42px;
+            border: 3.5px solid rgba(31,78,61,0.15);
+            border-top-color: var(--green-deep);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        html.dark .guard-spinner {
+            border: 3.5px solid rgba(201,169,97,0.2);
+            border-top-color: var(--gold);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .guard-text { font-size: 14px; color: var(--green-deep); font-weight: 600; max-width: 320px; line-height: 1.5; }
+        html.dark .guard-text { color: var(--gold); }
+
+        .portal { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: linear-gradient(180deg, #1F4E3D 0%, #17392c 100%);
+            color: #ffffff;
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 100; overflow-y: auto;
+        }
+        html.dark .sidebar {
+            background: linear-gradient(180deg, #0b1411 0%, #0a120f 100%);
+            border-right: 1px solid var(--border-soft);
+        }
+        .sidebar-header {
+            padding: 22px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.15);
+            border: 1.5px solid rgba(201,169,97,0.6);
+            color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-family: Georgia, serif; font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+        }
+        .sidebar-brand h1 { font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+        .sidebar-brand p { font-size: 10.5px; color: rgba(255,255,255,0.55); letter-spacing: 0.3px; }
+
+        .sidebar-nav { flex: 1; padding: 14px 0; }
+        .sidebar-section {
+            padding: 14px 20px 6px;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 1.4px; text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 20px;
+            color: rgba(255,255,255,0.82);
+            text-decoration: none;
+            font-size: 13.5px; font-weight: 500;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            background: none; border-top: none; border-right: none; border-bottom: none;
+            width: 100%; text-align: left; font-family: inherit;
+        }
+        .sidebar-link i { font-size: 15px; width: 18px; text-align: center; color: rgba(201,169,97,0.85); }
+        .sidebar-link:hover { background: rgba(255,255,255,0.05); color: #ffffff; }
+        .sidebar-link.active {
+            background: rgba(201,169,97,0.12);
+            border-left-color: var(--gold);
+            color: #ffffff; font-weight: 600;
+        }
+        .sidebar-link.active i { color: var(--gold); }
+
+        .sidebar-footer {
+            padding: 14px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-logout {
+            display: flex; align-items: center; gap: 12px;
+            color: rgba(255,255,255,0.75);
+            font-size: 13px; font-weight: 600;
+            padding: 10px 0;
+            cursor: pointer; background: none; border: none;
+            font-family: inherit; width: 100%; text-align: left;
+            transition: color 0.15s;
+        }
+        .sidebar-logout:hover { color: #ffb3b3; }
+        .sidebar-logout i { color: #ffb3b3; font-size: 14px; width: 18px; text-align: center; }
+
+        /* MOBILE HERO */
+        .mobile-hero {
+            display: none;
+            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+            padding: max(18px, env(safe-area-inset-top)) 18px 60px;
+            position: relative; overflow: hidden;
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
+        }
+        html.dark .mobile-hero {
+            background: linear-gradient(135deg, #0b1411 0%, #123527 100%);
+        }
+        .mobile-hero::before {
+            content: ''; position: absolute;
+            top: -70px; right: -70px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.15);
+        }
+        .mobile-hero-top {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; position: relative; z-index: 1;
+            margin-bottom: 22px;
+        }
+        .mobile-hero-greet { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .mobile-hero-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.22);
+            border: 1.5px solid rgba(201,169,97,0.5);
+            color: #F5E5B8;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+        }
+        .mobile-hero-greet .hi {
+            font-size: 11.5px; color: rgba(255,255,255,0.65);
+            font-weight: 600; letter-spacing: 0.4px; margin-bottom: 2px;
+        }
+        .mobile-hero-greet .name {
+            font-size: 16px; font-weight: 700; color: #ffffff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .mobile-hero-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .mobile-hero-icon-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 14px;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .mobile-hero-icon-btn:active { transform: scale(0.94); }
+        .mobile-hero-title {
+            font-family: Georgia, serif;
+            font-size: 24px;
+            color: #ffffff; font-weight: 700;
+            letter-spacing: -0.4px;
+            position: relative; z-index: 1;
+            line-height: 1.15;
+        }
+        .mobile-hero-sub {
+            font-size: 12.5px; color: rgba(255,255,255,0.7);
+            position: relative; z-index: 1; margin-top: 3px;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            min-width: 0;
+            display: flex; flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            display: flex; align-items: center; gap: 16px;
+            position: sticky; top: 0; z-index: 50;
+            transition: background 0.25s, border-color 0.25s;
+        }
+        .topbar-title { flex: 1; min-width: 0; }
+        .topbar-title h2 {
+            font-family: Georgia, serif;
+            font-size: 18px;
+            color: var(--green-deep);
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            margin-bottom: 2px;
+            transition: color 0.25s;
+        }
+        html.dark .topbar-title h2 { color: var(--gold); }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); }
+        .topbar-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .theme-btn {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--green-deep);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 14px;
+            transition: background 0.15s, transform 0.1s, color 0.15s;
+        }
+        html.dark .theme-btn { color: var(--gold); }
+        .theme-btn:hover { background: var(--icon-bg); }
+        .theme-btn:active { transform: scale(0.94); }
+        .topbar-user { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .topbar-user-info { text-align: right; min-width: 0; }
+        .topbar-user-info .n {
+            font-size: 13px; font-weight: 700; color: var(--green-deep);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 180px; transition: color 0.25s;
+        }
+        html.dark .topbar-user-info .n { color: var(--gold); }
+        .topbar-user-info .r { font-size: 11px; color: var(--text-muted); }
+        .topbar-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(31,78,61,0.2);
+        }
+
+        .content {
+            padding: 24px 28px 40px;
+            max-width: 1300px;
+            width: 100%;
+        }
+
+        .section-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 14px;
+            margin-top: 4px;
+        }
+        .section-head:first-child { margin-top: 0; }
+        .section-head h2 {
+            font-size: 16px; font-weight: 700;
+            color: var(--green-deep);
+            display: flex; align-items: center; gap: 10px;
+            transition: color 0.25s;
+        }
+        html.dark .section-head h2 { color: var(--gold); }
+        .section-head h2::before {
+            content: ''; width: 4px; height: 16px;
+            border-radius: 2px; background: var(--gold);
+        }
+        .section-head .count { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+
+        .section-spacer { height: 32px; }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab {
+            padding: 9px 20px;
+            border-radius: 22px;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            color: var(--text-soft);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .tab:hover { border-color: var(--green-mid); color: var(--green-deep); }
+        html.dark .tab:hover { border-color: var(--gold); color: var(--gold); }
+        .tab.active {
+            background: var(--green-deep);
+            border-color: var(--green-deep);
+            color: #ffffff;
+        }
+        html.dark .tab.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: #1a1a1a;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .event-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border-soft);
+            overflow: hidden;
+            box-shadow: var(--shadow-1);
+            transition: transform 0.15s, box-shadow 0.2s, background 0.25s, border-color 0.25s;
+            display: flex;
+            flex-direction: column;
+        }
+        .event-card:hover { transform: translateY(-3px); box-shadow: 0 12px 26px rgba(31,78,61,0.12); }
+
+        .event-head {
+            padding: 18px 20px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            border-bottom: 1px solid var(--border-hair);
+        }
+        .event-date-box {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+            color: #ffffff;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        html.dark .event-date-box {
+            background: linear-gradient(135deg, #a88943, #c9a961);
+            color: #1a1a1a;
+        }
+        .event-date-box .d {
+            font-size: 20px; font-weight: 800;
+            line-height: 1;
+        }
+        .event-date-box .m {
+            font-size: 9.5px; font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 3px;
+            opacity: 0.9;
+        }
+        .event-head-body { flex: 1; min-width: 0; }
+        .event-head-body .tag {
+            display: inline-block;
+            font-size: 9.5px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 3px 8px; border-radius: 20px;
+            background: var(--icon-bg); color: var(--gold-deep);
+            margin-bottom: 8px;
+        }
+        html.dark .event-head-body .tag { color: var(--gold); }
+        .event-head-body .tag.soon {
+            background: #E8F3EC; color: var(--green-deep);
+        }
+        html.dark .event-head-body .tag.soon {
+            background: rgba(201,169,97,0.15); color: var(--gold);
+        }
+        .event-title {
+            font-size: 15.5px; font-weight: 700;
+            color: var(--green-deep);
+            line-height: 1.3;
+            margin-bottom: 4px;
+            transition: color 0.25s;
+        }
+        html.dark .event-title { color: var(--text); }
+
+        .event-body {
+            padding: 14px 20px 16px;
+            flex: 1;
+            display: flex; flex-direction: column;
+            gap: 10px;
+        }
+        .event-desc {
+            font-size: 13px;
+            color: var(--text-soft);
+            line-height: 1.55;
+        }
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+        .event-meta span {
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .event-meta i { color: var(--gold-deep); font-size: 11px; }
+        html.dark .event-meta i { color: var(--gold); }
+
+        .empty-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px dashed var(--border);
+            padding: 40px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13.5px;
+            grid-column: 1 / -1;
+        }
+        .empty-card i {
+            display: block;
+            font-size: 32px;
+            color: var(--text-muted);
+            opacity: 0.4;
+            margin-bottom: 12px;
+        }
+        .loader-card {
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border-soft);
+            padding: 40px 24px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13.5px;
+            grid-column: 1 / -1;
+        }
+        .loader-spinner {
+            width: 26px; height: 26px;
+            border: 3px solid rgba(31,78,61,0.12);
+            border-top-color: var(--green-deep);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 10px;
+        }
+        html.dark .loader-spinner {
+            border: 3px solid rgba(201,169,97,0.15);
+            border-top-color: var(--gold);
+        }
+
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border-soft);
+            justify-content: space-around; align-items: center;
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+            z-index: 200;
+            box-shadow: 0 -6px 24px rgba(31,78,61,0.06);
+            transition: background 0.25s, border-color 0.25s;
+        }
+        html.dark .bottom-nav { box-shadow: 0 -6px 24px rgba(0,0,0,0.4); }
+        .nav-tab {
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 3px;
+            padding: 8px 4px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10.5px; font-weight: 600;
+            transition: color 0.15s;
+            border: none; background: none; cursor: pointer;
+            font-family: inherit;
+        }
+        .nav-tab i { font-size: 18px; margin-bottom: 2px; }
+        .nav-tab.active { color: var(--green-deep); }
+        .nav-tab.active i { color: var(--green-deep); }
+        html.dark .nav-tab.active,
+        html.dark .nav-tab.active i { color: var(--gold); }
+        .nav-tab:active { transform: scale(0.94); }
+
+        .portal-footer {
+            margin-top: auto;
+            padding: 18px 28px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            background: var(--surface-2);
+            transition: background 0.25s, border-color 0.25s;
+        }
+
+        .app-shell { visibility: hidden; }
+        .app-shell.ready { visibility: visible; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .topbar { display: none; }
+            .mobile-hero { display: block; }
+            .bottom-nav { display: flex; }
+            .content { padding: 20px 16px calc(88px + env(safe-area-inset-bottom)); }
+            .section-head h2 { font-size: 15px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .portal-footer { padding: 14px 16px calc(80px + env(safe-area-inset-bottom)); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="guard-screen" id="guardScreen">
+        <div class="guard-spinner"></div>
+        <div class="guard-text" id="guardText">Verifying session...</div>
+    </div>
+
+    <div class="app-shell" id="appShell">
+        <div class="portal">
+
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">AV</div>
+                    <div class="sidebar-brand">
+                        <h1>AVMS Portal</h1>
+                        <p>ABU Zaria</p>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="sidebar-section">Main</div>
+                    <a class="sidebar-link" href="dashboard.html">
+                        <i class="fas fa-house"></i> <span>Dashboard</span>
+                    </a>
+                    <a class="sidebar-link" href="cbt.html">
+                        <i class="fas fa-graduation-cap"></i> <span>CBT Practice</span>
+                    </a>
+                    <a class="sidebar-link" href="downloads.html">
+                        <i class="fas fa-file-arrow-down"></i> <span>Downloads</span>
+                    </a>
+
+                    <div class="sidebar-section">Explore</div>
+                    <a class="sidebar-link" href="announcements.html">
+                        <i class="fas fa-bullhorn"></i> <span>Announcements</span>
+                    </a>
+                    <a class="sidebar-link active" href="events.html">
+                        <i class="fas fa-calendar"></i> <span>Events</span>
+                    </a>
+                    <a class="sidebar-link" href="gallery.html">
+                        <i class="fas fa-images"></i> <span>Gallery</span>
+                    </a>
+
+                    <div class="sidebar-section">Account</div>
+                    <a class="sidebar-link" href="profile.html">
+                        <i class="fas fa-user"></i> <span>My Profile</span>
+                    </a>
+                    <a class="sidebar-link" href="../index.html">
+                        <i class="fas fa-globe"></i> <span>Public Site</span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <button class="sidebar-logout" id="sidebarLogout">
+                        <i class="fas fa-arrow-right-from-bracket"></i> <span>Logout</span>
+                    </button>
+                </div>
+            </aside>
+
+            <div class="main">
+
+                <div class="mobile-hero">
+                    <div class="mobile-hero-top">
+                        <div class="mobile-hero-greet">
+                            <div class="mobile-hero-avatar" id="mHeroAvatar">AV</div>
+                            <div>
+                                <div class="hi">Welcome back,</div>
+                                <div class="name" id="mHeroName">Student</div>
+                            </div>
+                        </div>
+                        <div class="mobile-hero-actions">
+                            <button class="mobile-hero-icon-btn" id="mThemeBtn" aria-label="Toggle dark mode">
+                                <i class="fas fa-moon" id="mThemeIcon"></i>
+                            </button>
+                            <button class="mobile-hero-icon-btn" id="mHeroLogout" aria-label="Logout">
+                                <i class="fas fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-hero-title">Events</div>
+                    <div class="mobile-hero-sub">Upcoming activities and programs</div>
+                </div>
+
+                <header class="topbar">
+                    <div class="topbar-title">
+                        <h2>Events</h2>
+                        <p>Upcoming activities and programs</p>
+                    </div>
+                    <div class="topbar-actions">
+                        <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </div>
+                    <div class="topbar-user">
+                        <div class="topbar-user-info">
+                            <div class="n" id="topbarName">Student</div>
+                            <div class="r" id="topbarReg">—</div>
+                        </div>
+                        <div class="topbar-avatar" id="topbarAvatar">AV</div>
+                    </div>
+                </header>
+
+                <main class="content">
+
+                    <div class="tabs">
+                        <button class="tab active" data-tab="upcoming" id="tabUpcoming">Upcoming</button>
+                        <button class="tab" data-tab="past" id="tabPast">Past</button>
+                        <button class="tab" data-tab="all" id="tabAll">All</button>
+                    </div>
+
+                    <div class="section-head">
+                        <h2 id="eventSectionTitle">Upcoming Events</h2>
+                        <span class="count" id="eventCount"></span>
+                    </div>
+
+                    <div class="card-grid" id="eventsGrid">
+                        <div class="loader-card"><div class="loader-spinner"></div>Loading events...</div>
+                    </div>
+
+                </main>
+
+                <footer class="portal-footer">
+                    &copy; <span id="year"></span> AVMS ABU Zaria · Student Portal
+                </footer>
+
+            </div>
+
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a class="nav-tab" href="dashboard.html">
+            <i class="fas fa-house"></i><span>Home</span>
+        </a>
+        <a class="nav-tab" href="cbt.html">
+            <i class="fas fa-graduation-cap"></i><span>CBT</span>
+        </a>
+        <a class="nav-tab active" href="announcements.html">
+            <i class="fas fa-bell"></i><span>Alerts</span>
+        </a>
+        <a class="nav-tab" href="profile.html">
+            <i class="fas fa-user"></i><span>Profile</span>
+        </a>
+    </nav>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // THEME
+        function applyThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = isDark ? 'fa-sun' : 'fa-moon';
+            document.querySelectorAll('#themeIcon, #mThemeIcon').forEach(el => {
+                el.className = 'fas ' + icon;
+            });
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('avms-theme', isDark ? 'dark' : 'light'); } catch(e){}
+            applyThemeIcons();
+        }
+        document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+        document.getElementById('mThemeBtn').addEventListener('click', toggleTheme);
+        applyThemeIcons();
+
+        // HELPERS
+        function initials(name) {
+            if (!name) return 'AV';
+            const parts = name.trim().split(/\s+/);
+            if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        function escapeHtml(t) {
+            if (t === null || t === undefined) return '';
+            return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        }
+        function fmtDate(d) {
+            if (!d) return '';
+            const dt = new Date(d);
+            if (isNaN(dt)) return '';
+            return dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        function monthShort(d) {
+            const dt = new Date(d);
+            if (isNaN(dt)) return '';
+            return dt.toLocaleDateString(undefined, { month: 'short' });
+        }
+        function dayNum(d) {
+            const dt = new Date(d);
+            if (isNaN(dt)) return '—';
+            return dt.getDate();
+        }
+        function showGuard(text) {
+            document.getElementById('guardText').textContent = text;
+            document.getElementById('guardScreen').classList.remove('hidden');
+            document.getElementById('appShell').classList.remove('ready');
+        }
+        function hideGuard() {
+            document.getElementById('guardScreen').classList.add('hidden');
+            document.getElementById('appShell').classList.add('ready');
+        }
+        async function doLogout() {
+            try { await supabase.auth.signOut(); } catch (e) {}
+            localStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminSession');
+            window.location.href = 'login.html';
+        }
+
+        let allEvents = [];
+        let currentTab = 'upcoming';
+        let currentStudent = null;
+
+        // GUARD
+        (async function init() {
+            if (typeof supabase === 'undefined' || !supabase) {
+                showGuard('Connection error. Please refresh.');
+                return;
+            }
+            try {
+                const { data: sess } = await supabase.auth.getSession();
+                if (!sess || !sess.session) { window.location.href = 'login.html'; return; }
+                const userId = sess.session.user.id;
+
+                const { data: student, error } = await supabase
+                    .from('students').select('*').eq('auth_user_id', userId).maybeSingle();
+
+                if (error) throw error;
+                if (!student) {
+                    showGuard('No student record linked to this account. Contact AVMS.');
+                    setTimeout(() => window.location.href = 'login.html', 2500);
+                    return;
+                }
+                if (student.is_active !== true) {
+                    showGuard('⏳ Your application is pending admin approval.');
+                    setTimeout(() => window.location.href = 'login.html', 2500);
+                    return;
+                }
+
+                currentStudent = student;
+                renderStudent(student);
+                hideGuard();
+                loadEvents();
+            } catch (err) {
+                console.warn('Init error:', err);
+                showGuard('Something went wrong. Redirecting...');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            }
+        })();
+
+        function renderStudent(s) {
+            const fullName = s.full_name || 'Student';
+            const firstName = fullName.split(/\s+/)[0] || 'Student';
+            const ini = initials(fullName);
+            const reg = s.reg_no || '—';
+
+            document.getElementById('topbarName').textContent = fullName;
+            document.getElementById('topbarReg').textContent = reg;
+            document.getElementById('topbarAvatar').textContent = ini;
+            document.getElementById('mHeroName').textContent = firstName;
+            document.getElementById('mHeroAvatar').textContent = ini;
+        }
+
+        document.getElementById('sidebarLogout').addEventListener('click', doLogout);
+        document.getElementById('mHeroLogout').addEventListener('click', doLogout);
+
+        // TABS
+        document.querySelectorAll('.tab').forEach(t => {
+            t.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+                t.classList.add('active');
+                currentTab = t.dataset.tab;
+                renderEvents();
+            });
+        });
+
+        // LOAD
+        async function loadEvents() {
+            const grid = document.getElementById('eventsGrid');
+            try {
+                const { data, error } = await supabase
+                    .from('events').select('*')
+                    .order('event_date', { ascending: false });
+                if (error) throw error;
+                allEvents = data || [];
+                renderEvents();
+            } catch (err) {
+                console.warn('Events error:', err);
+                grid.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load events.</div>`;
+            }
+        }
+
+        function renderEvents() {
+            const grid = document.getElementById('eventsGrid');
+            const countEl = document.getElementById('eventCount');
+            const titleEl = document.getElementById('eventSectionTitle');
+
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            let list = [...allEvents];
+            if (currentTab === 'upcoming') {
+                list = list.filter(ev => {
+                    const d = ev.event_date ? new Date(ev.event_date) : null;
+                    return d && d >= now;
+                }).sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+                titleEl.textContent = 'Upcoming Events';
+            } else if (currentTab === 'past') {
+                list = list.filter(ev => {
+                    const d = ev.event_date ? new Date(ev.event_date) : null;
+                    return d && d < now;
+                }).sort((a, b) => new Date(b.event_date) - new Date(a.event_date));
+                titleEl.textContent = 'Past Events';
+            } else {
+                list = list.sort((a, b) => {
+                    const da = a.event_date ? new Date(a.event_date) : 0;
+                    const db = b.event_date ? new Date(b.event_date) : 0;
+                    return db - da;
+                });
+                titleEl.textContent = 'All Events';
+            }
+
+            if (countEl) countEl.textContent = list.length + ' event' + (list.length === 1 ? '' : 's');
+
+            if (list.length === 0) {
+                grid.innerHTML = `<div class="empty-card"><i class="fas fa-calendar"></i>${
+                    currentTab === 'upcoming' ? 'No upcoming events scheduled.' :
+                    currentTab === 'past' ? 'No past events to show.' :
+                    'No events yet.'
+                }</div>`;
+                return;
+            }
+
+            grid.innerHTML = list.map(ev => {
+                const d = ev.event_date || ev.created_at;
+                const isUpcoming = ev.event_date && new Date(ev.event_date) >= now;
+                const body = ev.description || '';
+                return `
+                    <article class="event-card">
+                        <div class="event-head">
+                            <div class="event-date-box">
+                                <div class="d">${dayNum(d)}</div>
+                                <div class="m">${monthShort(d)}</div>
+                            </div>
+                            <div class="event-head-body">
+                                <span class="tag ${isUpcoming ? 'soon' : ''}">${isUpcoming ? 'Upcoming' : 'Past'}</span>
+                                <div class="event-title">${escapeHtml(ev.title || 'Untitled')}</div>
+                            </div>
+                        </div>
+                        <div class="event-body">
+                            ${body ? `<p class="event-desc">${escapeHtml(body)}</p>` : ''}
+                            <div class="event-meta">
+                                ${ev.event_date ? `<span><i class="fas fa-calendar-day"></i> ${fmtDate(ev.event_date)}</span>` : ''}
+                                ${ev.event_time ? `<span><i class="fas fa-clock"></i> ${escapeHtml(ev.event_time)}</span>` : ''}
+                                ${ev.location ? `<span><i class="fas fa-location-dot"></i> ${escapeHtml(ev.location)}</span>` : ''}
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+    </script>
+
+</body>
+</html>
