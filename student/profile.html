@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1F4E3D">
+    <title>My Profile — Student Portal | AVMS ABU Zaria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/config.js"></script>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('avms-theme') || 'light';
+                if (t === 'dark') document.documentElement.classList.add('dark');
+            } catch(e){}
+        })();
+    </script>
+    <style>
+        :root {
+            --green-deep: #1F4E3D;
+            --green-mid: #2D6B54;
+            --gold: #C9A961;
+            --gold-deep: #A88943;
+            --red-deep: #8B1A1A;
+
+            --bg: #F4F1E4;
+            --surface: #ffffff;
+            --surface-2: #FBF8EE;
+            --text: #1a1a1a;
+            --text-soft: #6b6b6b;
+            --text-muted: #8a8a8a;
+            --border: #e3e0d2;
+            --border-soft: #f0ede0;
+            --border-hair: #f5f2e6;
+            --shadow-1: 0 3px 10px rgba(31,78,61,0.05);
+            --icon-bg: #F7F5EC;
+
+            --sidebar-w: 248px;
+        }
+
+        html.dark {
+            --bg: #0f1714;
+            --surface: #182420;
+            --surface-2: #131d19;
+            --text: #e8f0ea;
+            --text-soft: #a8b5ac;
+            --text-muted: #7a8a80;
+            --border: #24352e;
+            --border-soft: #24352e;
+            --border-hair: #1e2c26;
+            --shadow-1: 0 3px 10px rgba(0,0,0,0.35);
+            --icon-bg: #1e2c26;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body {
+            min-height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.25s, color 0.25s;
+        }
+
+        .guard-screen {
+            position: fixed; inset: 0;
+            background: var(--surface-2);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 9999; gap: 16px; padding: 24px; text-align: center;
+        }
+        .guard-screen.hidden { display: none; }
+        .guard-spinner {
+            width: 42px; height: 42px;
+            border: 3.5px solid rgba(31,78,61,0.15);
+            border-top-color: var(--green-deep);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        html.dark .guard-spinner {
+            border: 3.5px solid rgba(201,169,97,0.2);
+            border-top-color: var(--gold);
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .guard-text { font-size: 14px; color: var(--green-deep); font-weight: 600; max-width: 320px; line-height: 1.5; }
+        html.dark .guard-text { color: var(--gold); }
+
+        .portal { display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: linear-gradient(180deg, #1F4E3D 0%, #17392c 100%);
+            color: #ffffff;
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; bottom: 0; left: 0;
+            z-index: 100; overflow-y: auto;
+        }
+        html.dark .sidebar {
+            background: linear-gradient(180deg, #0b1411 0%, #0a120f 100%);
+            border-right: 1px solid var(--border-soft);
+        }
+        .sidebar-header {
+            padding: 22px 20px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sidebar-logo {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.15);
+            border: 1.5px solid rgba(201,169,97,0.6);
+            color: var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-family: Georgia, serif; font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+        }
+        .sidebar-brand h1 { font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 2px; }
+        .sidebar-brand p { font-size: 10.5px; color: rgba(255,255,255,0.55); letter-spacing: 0.3px; }
+
+        .sidebar-nav { flex: 1; padding: 14px 0; }
+        .sidebar-section {
+            padding: 14px 20px 6px;
+            font-size: 10px; font-weight: 700;
+            letter-spacing: 1.4px; text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 20px;
+            color: rgba(255,255,255,0.82);
+            text-decoration: none;
+            font-size: 13.5px; font-weight: 500;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            background: none; border-top: none; border-right: none; border-bottom: none;
+            width: 100%; text-align: left; font-family: inherit;
+        }
+        .sidebar-link i { font-size: 15px; width: 18px; text-align: center; color: rgba(201,169,97,0.85); }
+        .sidebar-link:hover { background: rgba(255,255,255,0.05); color: #ffffff; }
+        .sidebar-link.active {
+            background: rgba(201,169,97,0.12);
+            border-left-color: var(--gold);
+            color: #ffffff; font-weight: 600;
+        }
+        .sidebar-link.active i { color: var(--gold); }
+
+        .sidebar-footer {
+            padding: 14px 20px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-logout {
+            display: flex; align-items: center; gap: 12px;
+            color: rgba(255,255,255,0.75);
+            font-size: 13px; font-weight: 600;
+            padding: 10px 0;
+            cursor: pointer; background: none; border: none;
+            font-family: inherit; width: 100%; text-align: left;
+            transition: color 0.15s;
+        }
+        .sidebar-logout:hover { color: #ffb3b3; }
+        .sidebar-logout i { color: #ffb3b3; font-size: 14px; width: 18px; text-align: center; }
+
+        /* MOBILE HERO */
+        .mobile-hero {
+            display: none;
+            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+            padding: max(18px, env(safe-area-inset-top)) 18px 60px;
+            position: relative; overflow: hidden;
+            border-bottom-left-radius: 26px;
+            border-bottom-right-radius: 26px;
+        }
+        html.dark .mobile-hero {
+            background: linear-gradient(135deg, #0b1411 0%, #123527 100%);
+        }
+        .mobile-hero::before {
+            content: ''; position: absolute;
+            top: -70px; right: -70px;
+            width: 220px; height: 220px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.15);
+        }
+        .mobile-hero-top {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; position: relative; z-index: 1;
+            margin-bottom: 22px;
+        }
+        .mobile-hero-greet { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .mobile-hero-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(201,169,97,0.22);
+            border: 1.5px solid rgba(201,169,97,0.5);
+            color: #F5E5B8;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+        }
+        .mobile-hero-greet .hi {
+            font-size: 11.5px; color: rgba(255,255,255,0.65);
+            font-weight: 600; letter-spacing: 0.4px; margin-bottom: 2px;
+        }
+        .mobile-hero-greet .name {
+            font-size: 16px; font-weight: 700; color: #ffffff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .mobile-hero-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .mobile-hero-icon-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 14px;
+            transition: background 0.15s, transform 0.1s;
+        }
+        .mobile-hero-icon-btn:active { transform: scale(0.94); }
+        .mobile-hero-title {
+            font-family: Georgia, serif;
+            font-size: 24px;
+            color: #ffffff; font-weight: 700;
+            letter-spacing: -0.4px;
+            position: relative; z-index: 1;
+            line-height: 1.15;
+        }
+        .mobile-hero-sub {
+            font-size: 12.5px; color: rgba(255,255,255,0.7);
+            position: relative; z-index: 1; margin-top: 3px;
+        }
+
+        /* MAIN */
+        .main {
+            flex: 1;
+            margin-left: var(--sidebar-w);
+            min-width: 0;
+            display: flex; flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background: var(--surface-2);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 28px;
+            display: flex; align-items: center; gap: 16px;
+            position: sticky; top: 0; z-index: 50;
+            transition: background 0.25s, border-color 0.25s;
+        }
+        .topbar-title { flex: 1; min-width: 0; }
+        .topbar-title h2 {
+            font-family: Georgia, serif;
+            font-size: 18px;
+            color: var(--green-deep);
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            margin-bottom: 2px;
+            transition: color 0.25s;
+        }
+        html.dark .topbar-title h2 { color: var(--gold); }
+        .topbar-title p { font-size: 12px; color: var(--text-muted); }
+        .topbar-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .theme-btn {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--green-deep);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 14px;
+            transition: background 0.15s, transform 0.1s, color 0.15s;
+        }
+        html.dark .theme-btn { color: var(--gold); }
+        .theme-btn:hover { background: var(--icon-bg); }
+        .theme-btn:active { transform: scale(0.94); }
+        .topbar-user { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .topbar-user-info { text-align: right; min-width: 0; }
+        .topbar-user-info .n {
+            font-size: 13px; font-weight: 700; color: var(--green-deep);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 180px; transition: color 0.25s;
+        }
+        html.dark .topbar-user-info .n { color: var(--gold); }
+        .topbar-user-info .r { font-size: 11px; color: var(--text-muted); }
+        .topbar-avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+            color: #ffffff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(31,78,61,0.2);
+        }
+
+        .content {
+            padding: 24px 28px 40px;
+            max-width: 1300px;
+            width: 100%;
+        }
+
+        .section-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 14px;
+        }
+        .section-head h2 {
+            font-size: 16px; font-weight: 700;
+            color: var(--green-deep);
+            display: flex; align-items: center; gap: 10px;
+            transition: color 0.25s;
+        }
+        html.dark .section-head h2 { color: var(--gold); }
+        .section-head h2::before {
+            content: ''; width: 4px; height: 16px;
+            border-radius: 2px; background: var(--gold);
+        }
+
+        /* PROFILE GRID */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 1000px) {
+            .profile-grid { grid-template-columns: 1fr; }
+        }
+
+        .profile-card {
+            background: var(--surface);
+            border-radius: 20px;
+            border: 1px solid var(--border-soft);
+            padding: 30px 24px;
+            text-align: center;
+            box-shadow: var(--shadow-1);
+            transition: background 0.25s, border-color 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 90px;
+            background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        html.dark .profile-card::before {
+            background: linear-gradient(135deg, #0b1411 0%, #123527 100%);
+        }
+        .profile-avatar {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+            color: #ffffff;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 32px; font-weight: 700;
+            margin-top: 30px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            border: 4px solid var(--surface);
+            box-shadow: 0 10px 24px rgba(31,78,61,0.25);
+        }
+        .profile-name {
+            font-family: Georgia, serif;
+            font-size: 21px; font-weight: 700;
+            color: var(--green-deep);
+            margin-bottom: 6px;
+            transition: color 0.25s;
+        }
+        html.dark .profile-name { color: var(--text); }
+        .profile-reg {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+        .profile-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #E8F3EC;
+            color: var(--green-deep);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        html.dark .profile-status-pill {
+            background: rgba(201,169,97,0.15);
+            color: var(--gold);
+        }
+        .profile-status-pill i { font-size: 6px; }
+
+        /* INFO CARD */
+        .info-card {
+            background: var(--surface);
+            border-radius: 20px;
+            border: 1px solid var(--border-soft);
+            padding: 6px 26px;
+            box-shadow: var(--shadow-1);
+            transition: background 0.25s, border-color 0.25s;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-hair);
+            font-size: 13.5px;
+            gap: 14px;
+            align-items: center;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .k {
+            color: var(--text-muted);
+            font-weight: 600;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-row .k i {
+            color: var(--gold-deep);
+            font-size: 13px;
+            width: 16px;
+            text-align: center;
+        }
+        html.dark .info-row .k i { color: var(--gold); }
+        .info-row .v {
+            color: var(--text);
+            font-weight: 600;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        /* ACTION BUTTONS */
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            height: 52px;
+            padding: 0 22px;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s;
+            border: 1.5px solid transparent;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .action-btn.primary {
+            background: var(--green-deep);
+            color: #ffffff;
+            border-color: var(--green-deep);
+            box-shadow: 0 6px 16px rgba(31,78,61,0.2);
+        }
+        .action-btn.primary:hover {
+            background: var(--green-mid);
+            border-color: var(--green-mid);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(31,78,61,0.28);
+        }
+        .action-btn.outline {
+            background: var(--surface);
+            color: var(--green-deep);
+            border-color: var(--border);
+        }
+        html.dark .action-btn.outline { color: var(--gold); border-color: var(--border-soft); }
+        .action-btn.outline:hover {
+            background: var(--icon-bg);
+        }
+        .action-btn.danger {
+            background: var(--surface);
+            color: var(--red-deep);
+            border-color: #f0c8c8;
+        }
+        html.dark .action-btn.danger {
+            color: #ff8a8a;
+            border-color: rgba(200,60,60,0.35);
+        }
+        .action-btn.danger:hover {
+            background: #FBEAEA;
+        }
+        html.dark .action-btn.danger:hover {
+            background: rgba(200,60,60,0.12);
+        }
+
+        /* SECTION SPACER */
+        .section-spacer { height: 32px; }
+
+        /* EDIT MODE */
+        .edit-form {
+            display: none;
+        }
+        .edit-form.active { display: block; }
+        .view-mode.hidden { display: none; }
+
+        .form-field {
+            margin-bottom: 16px;
+        }
+        .form-field label {
+            display: block;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--green-deep);
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            transition: color 0.25s;
+        }
+        html.dark .form-field label { color: var(--gold); }
+        .form-field input {
+            width: 100%;
+            height: 50px;
+            padding: 0 18px;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            background: var(--surface-2);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.18s, box-shadow 0.18s, background 0.25s;
+        }
+        .form-field input:focus {
+            outline: none;
+            border-color: var(--green-mid);
+            background: var(--surface);
+            box-shadow: 0 0 0 4px rgba(45,107,84,0.1);
+        }
+        html.dark .form-field input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(201,169,97,0.12);
+        }
+        .form-field input:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-140%);
+            background: var(--green-deep);
+            color: #ffffff;
+            padding: 13px 24px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 12px 30px rgba(31,78,61,0.28);
+            z-index: 500;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-width: calc(100vw - 40px);
+            text-align: center;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.error { background: var(--red-deep); }
+
+        /* BOTTOM NAV */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--surface);
+            border-top: 1px solid var(--border-soft);
+            justify-content: space-around; align-items: center;
+            padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+            z-index: 200;
+            box-shadow: 0 -6px 24px rgba(31,78,61,0.06);
+            transition: background 0.25s, border-color 0.25s;
+        }
+        html.dark .bottom-nav { box-shadow: 0 -6px 24px rgba(0,0,0,0.4); }
+        .nav-tab {
+            flex: 1;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 3px;
+            padding: 8px 4px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 10.5px; font-weight: 600;
+            transition: color 0.15s;
+            border: none; background: none; cursor: pointer;
+            font-family: inherit;
+        }
+        .nav-tab i { font-size: 18px; margin-bottom: 2px; }
+        .nav-tab.active { color: var(--green-deep); }
+        .nav-tab.active i { color: var(--green-deep); }
+        html.dark .nav-tab.active,
+        html.dark .nav-tab.active i { color: var(--gold); }
+        .nav-tab:active { transform: scale(0.94); }
+
+        .portal-footer {
+            margin-top: auto;
+            padding: 18px 28px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            background: var(--surface-2);
+            transition: background 0.25s, border-color 0.25s;
+        }
+
+        .app-shell { visibility: hidden; }
+        .app-shell.ready { visibility: visible; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; }
+            .topbar { display: none; }
+            .mobile-hero { display: block; }
+            .bottom-nav { display: flex; }
+            .content { padding: 20px 16px calc(88px + env(safe-area-inset-bottom)); }
+            .section-head h2 { font-size: 15px; }
+            .profile-grid { grid-template-columns: 1fr; }
+            .portal-footer { padding: 14px 16px calc(80px + env(safe-area-inset-bottom)); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="guard-screen" id="guardScreen">
+        <div class="guard-spinner"></div>
+        <div class="guard-text" id="guardText">Verifying session...</div>
+    </div>
+
+    <div class="app-shell" id="appShell">
+        <div class="portal">
+
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">AV</div>
+                    <div class="sidebar-brand">
+                        <h1>AVMS Portal</h1>
+                        <p>ABU Zaria</p>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="sidebar-section">Main</div>
+                    <a class="sidebar-link" href="dashboard.html">
+                        <i class="fas fa-house"></i> <span>Dashboard</span>
+                    </a>
+                    <a class="sidebar-link" href="cbt.html">
+                        <i class="fas fa-graduation-cap"></i> <span>CBT Practice</span>
+                    </a>
+                    <a class="sidebar-link" href="downloads.html">
+                        <i class="fas fa-file-arrow-down"></i> <span>Downloads</span>
+                    </a>
+
+                    <div class="sidebar-section">Explore</div>
+                    <a class="sidebar-link" href="announcements.html">
+                        <i class="fas fa-bullhorn"></i> <span>Announcements</span>
+                    </a>
+                    <a class="sidebar-link" href="events.html">
+                        <i class="fas fa-calendar"></i> <span>Events</span>
+                    </a>
+                    <a class="sidebar-link" href="gallery.html">
+                        <i class="fas fa-images"></i> <span>Gallery</span>
+                    </a>
+
+                    <div class="sidebar-section">Account</div>
+                    <a class="sidebar-link active" href="profile.html">
+                        <i class="fas fa-user"></i> <span>My Profile</span>
+                    </a>
+                    <a class="sidebar-link" href="../index.html">
+                        <i class="fas fa-globe"></i> <span>Public Site</span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <button class="sidebar-logout" id="sidebarLogout">
+                        <i class="fas fa-arrow-right-from-bracket"></i> <span>Logout</span>
+                    </button>
+                </div>
+            </aside>
+
+            <div class="main">
+
+                <div class="mobile-hero">
+                    <div class="mobile-hero-top">
+                        <div class="mobile-hero-greet">
+                            <div class="mobile-hero-avatar" id="mHeroAvatar">AV</div>
+                            <div>
+                                <div class="hi">Welcome back,</div>
+                                <div class="name" id="mHeroName">Student</div>
+                            </div>
+                        </div>
+                        <div class="mobile-hero-actions">
+                            <button class="mobile-hero-icon-btn" id="mThemeBtn" aria-label="Toggle dark mode">
+                                <i class="fas fa-moon" id="mThemeIcon"></i>
+                            </button>
+                            <button class="mobile-hero-icon-btn" id="mHeroLogout" aria-label="Logout">
+                                <i class="fas fa-arrow-right-from-bracket"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mobile-hero-title">My Profile</div>
+                    <div class="mobile-hero-sub">Your student information</div>
+                </div>
+
+                <header class="topbar">
+                    <div class="topbar-title">
+                        <h2>My Profile</h2>
+                        <p>Your student information</p>
+                    </div>
+                    <div class="topbar-actions">
+                        <button class="theme-btn" id="themeBtn" aria-label="Toggle dark mode">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </div>
+                    <div class="topbar-user">
+                        <div class="topbar-user-info">
+                            <div class="n" id="topbarName">Student</div>
+                            <div class="r" id="topbarReg">—</div>
+                        </div>
+                        <div class="topbar-avatar" id="topbarAvatar">AV</div>
+                    </div>
+                </header>
+
+                <main class="content">
+
+                    <div class="profile-grid">
+                        <div class="profile-card">
+                            <div class="profile-avatar" id="profileAvatar">AV</div>
+                            <div class="profile-name" id="profileName">—</div>
+                            <div class="profile-reg" id="profileReg">—</div>
+                            <div class="profile-status-pill"><i class="fas fa-circle"></i> Active</div>
+                        </div>
+
+                        <div>
+                            <!-- VIEW MODE -->
+                            <div class="view-mode" id="viewMode">
+                                <div class="info-card">
+                                    <div class="info-row">
+                                        <span class="k"><i class="fas fa-layer-group"></i> Level</span>
+                                        <span class="v" id="infoLevel">—</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="k"><i class="fas fa-building-columns"></i> Department</span>
+                                        <span class="v" id="infoDept">—</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="k"><i class="fas fa-map-location-dot"></i> State of Origin</span>
+                                        <span class="v" id="infoState">—</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="k"><i class="fas fa-envelope"></i> Email</span>
+                                        <span class="v" id="infoEmail">—</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="k"><i class="fas fa-phone"></i> Phone</span>
+                                        <span class="v" id="infoPhone">—</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="k"><i class="fas fa-location-dot"></i> Home Address</span>
+                                        <span class="v" id="infoAddress">—</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="k"><i class="fas fa-calendar"></i> Applied</span>
+                                        <span class="v" id="infoApplied">—</span>
+                                    </div>
+                                </div>
+
+                                <div class="section-spacer"></div>
+
+                                <div class="actions-grid">
+                                    <button class="action-btn primary" id="editBtn">
+                                        <i class="fas fa-pen"></i> Edit Profile
+                                    </button>
+                                    <button class="action-btn outline" id="changePwBtn">
+                                        <i class="fas fa-key"></i> Change Password
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- EDIT MODE -->
+                            <div class="edit-form" id="editForm">
+                                <div class="info-card" style="padding: 22px 26px 26px;">
+                                    <div class="form-field">
+                                        <label>Phone Number</label>
+                                        <input type="tel" id="editPhone" placeholder="e.g., 080XXXXXXXX">
+                                    </div>
+                                    <div class="form-field">
+                                        <label>Home Address</label>
+                                        <input type="text" id="editAddress" placeholder="Enter your home address">
+                                    </div>
+                                    <div class="edit-actions">
+                                        <button class="action-btn primary" id="saveBtn">
+                                            <i class="fas fa-check"></i> Save Changes
+                                        </button>
+                                        <button class="action-btn outline" id="cancelBtn">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-spacer"></div>
+
+                    <button class="action-btn danger" id="logoutBtn" style="width: 100%;">
+                        <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                    </button>
+
+                </main>
+
+                <footer class="portal-footer">
+                    &copy; <span id="year"></span> AVMS ABU Zaria · Student Portal
+                </footer>
+
+            </div>
+
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a class="nav-tab" href="dashboard.html">
+            <i class="fas fa-house"></i><span>Home</span>
+        </a>
+        <a class="nav-tab" href="cbt.html">
+            <i class="fas fa-graduation-cap"></i><span>CBT</span>
+        </a>
+        <a class="nav-tab" href="announcements.html">
+            <i class="fas fa-bell"></i><span>Alerts</span>
+        </a>
+        <a class="nav-tab active" href="profile.html">
+            <i class="fas fa-user"></i><span>Profile</span>
+        </a>
+    </nav>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // THEME
+        function applyThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = isDark ? 'fa-sun' : 'fa-moon';
+            document.querySelectorAll('#themeIcon, #mThemeIcon').forEach(el => {
+                el.className = 'fas ' + icon;
+            });
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('avms-theme', isDark ? 'dark' : 'light'); } catch(e){}
+            applyThemeIcons();
+        }
+        document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+        document.getElementById('mThemeBtn').addEventListener('click', toggleTheme);
+        applyThemeIcons();
+
+        // HELPERS
+        function toast(msg, isError) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.toggle('error', !!isError);
+            t.classList.add('show');
+            clearTimeout(window.__toastTimer);
+            window.__toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+        }
+        function initials(name) {
+            if (!name) return 'AV';
+            const parts = name.trim().split(/\s+/);
+            if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        function fmtDate(d) {
+            if (!d) return '';
+            const dt = new Date(d);
+            if (isNaN(dt)) return '';
+            return dt.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+        function showGuard(text) {
+            document.getElementById('guardText').textContent = text;
+            document.getElementById('guardScreen').classList.remove('hidden');
+            document.getElementById('appShell').classList.remove('ready');
+        }
+        function hideGuard() {
+            document.getElementById('guardScreen').classList.add('hidden');
+            document.getElementById('appShell').classList.add('ready');
+        }
+        async function doLogout() {
+            try { await supabase.auth.signOut(); } catch (e) {}
+            localStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('adminSession');
+            window.location.href = 'login.html';
+        }
+
+        let currentStudent = null;
+        let currentUserId = null;
+
+        // GUARD
+        (async function init() {
+            if (typeof supabase === 'undefined' || !supabase) {
+                showGuard('Connection error. Please refresh.');
+                return;
+            }
+            try {
+                const { data: sess } = await supabase.auth.getSession();
+                if (!sess || !sess.session) { window.location.href = 'login.html'; return; }
+                currentUserId = sess.session.user.id;
+
+                const { data: student, error } = await supabase
+                    .from('students').select('*').eq('auth_user_id', currentUserId).maybeSingle();
+
+                if (error) throw error;
+                if (!student) {
+                    showGuard('No student record linked to this account. Contact AVMS.');
+                    setTimeout(() => window.location.href = 'login.html', 2500);
+                    return;
+                }
+                if (student.is_active !== true) {
+                    showGuard('⏳ Your application is pending admin approval.');
+                    setTimeout(() => window.location.href = 'login.html', 2500);
+                    return;
+                }
+
+                currentStudent = student;
+                renderStudent(student);
+                hideGuard();
+            } catch (err) {
+                console.warn('Init error:', err);
+                showGuard('Something went wrong. Redirecting...');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+            }
+        })();
+
+        function renderStudent(s) {
+            const fullName = s.full_name || 'Student';
+            const firstName = fullName.split(/\s+/)[0] || 'Student';
+            const ini = initials(fullName);
+            const reg = s.reg_no || '—';
+            const level = s.class_level ? (s.class_level + ' Level') : '—';
+
+            document.getElementById('topbarName').textContent = fullName;
+            document.getElementById('topbarReg').textContent = reg;
+            document.getElementById('topbarAvatar').textContent = ini;
+            document.getElementById('mHeroName').textContent = firstName;
+            document.getElementById('mHeroAvatar').textContent = ini;
+
+            document.getElementById('profileAvatar').textContent = ini;
+            document.getElementById('profileName').textContent = fullName;
+            document.getElementById('profileReg').textContent = reg;
+
+            document.getElementById('infoLevel').textContent = level;
+            document.getElementById('infoDept').textContent = s.department || 'Veterinary Medicine';
+            document.getElementById('infoState').textContent = s.state_of_origin || '—';
+            document.getElementById('infoEmail').textContent = s.email || '—';
+            document.getElementById('infoPhone').textContent = s.phone || '—';
+            document.getElementById('infoAddress').textContent = s.home_address || '—';
+            document.getElementById('infoApplied').textContent = s.applied_at ? fmtDate(s.applied_at) : '—';
+
+            // Prefill edit inputs
+            document.getElementById('editPhone').value = s.phone || '';
+            document.getElementById('editAddress').value = s.home_address || '';
+        }
+
+        document.getElementById('sidebarLogout').addEventListener('click', doLogout);
+        document.getElementById('mHeroLogout').addEventListener('click', doLogout);
+        document.getElementById('logoutBtn').addEventListener('click', doLogout);
+
+        // EDIT MODE
+        const viewMode = document.getElementById('viewMode');
+        const editForm = document.getElementById('editForm');
+
+        document.getElementById('editBtn').addEventListener('click', () => {
+            viewMode.classList.add('hidden');
+            editForm.classList.add('active');
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            editForm.classList.remove('active');
+            viewMode.classList.remove('hidden');
+            // Reset values to current
+            if (currentStudent) {
+                document.getElementById('editPhone').value = currentStudent.phone || '';
+                document.getElementById('editAddress').value = currentStudent.home_address || '';
+            }
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', async () => {
+            const phone = (document.getElementById('editPhone').value || '').trim();
+            const address = (document.getElementById('editAddress').value || '').trim();
+
+            if (!phone && !address) {
+                toast('Please fill at least one field.', true);
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveBtn');
+            const original = saveBtn.innerHTML;
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const { error } = await supabase
+                    .from('students')
+                    .update({ phone, home_address: address })
+                    .eq('id', currentStudent.id);
+
+                if (error) throw error;
+
+                // Update local state
+                currentStudent.phone = phone;
+                currentStudent.home_address = address;
+                renderStudent(currentStudent);
+
+                editForm.classList.remove('active');
+                viewMode.classList.remove('hidden');
+                toast('✅ Profile updated successfully.');
+
+            } catch (err) {
+                console.warn('Update error:', err);
+                toast('❌ Could not save changes. Try again.', true);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = original;
+            }
+        });
+
+        // CHANGE PASSWORD
+        document.getElementById('changePwBtn').addEventListener('click', async () => {
+            const email = currentStudent?.email || '';
+            if (!email) { toast('No email on file.', true); return; }
+            try {
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin + '/student/login.html'
+                });
+                if (error) throw error;
+                toast('Reset link sent to ' + email);
+            } catch (err) {
+                console.warn('Password reset error:', err);
+                toast('Could not send reset email.', true);
+            }
+        });
+    </script>
+
+</body>
+</html>
