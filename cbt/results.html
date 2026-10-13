@@ -28,6 +28,9 @@
             --border-hair: #f0ede0;
             --icon-bg: #F7F5EC;
             --hover-bg: #F5F0DC;
+            --option-bg: #FBF8EE;
+            --option-letter-bg: #e3e0d2;
+            --option-letter-text: #555;
         }
 
         html.dark {
@@ -41,6 +44,9 @@
             --border-hair: #1e2c26;
             --icon-bg: #1e2c26;
             --hover-bg: #1e2c26;
+            --option-bg: #1e2c26;
+            --option-letter-bg: #24352e;
+            --option-letter-text: #a8b5ac;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -99,14 +105,12 @@
             font-size: 11px;
             color: rgba(255,255,255,0.7);
         }
-
         .topbar-actions {
             display: flex;
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
         }
-
         .theme-toggle {
             width: 40px;
             height: 40px;
@@ -118,13 +122,12 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
             transition: background 0.2s, transform 0.1s;
             flex-shrink: 0;
         }
         .theme-toggle:hover { background: rgba(255,255,255,0.22); }
         .theme-toggle:active { transform: scale(0.94); }
-
         .btn-dashboard {
             background: #C9A961;
             color: #1F4E3D;
@@ -139,7 +142,6 @@
             align-items: center;
             gap: 8px;
             text-decoration: none;
-            white-space: nowrap;
         }
         .btn-dashboard:hover {
             background: #A88943;
@@ -296,10 +298,11 @@
         .stat-card.correct i { color: #28a745; }
         .stat-card.wrong i { color: #dc3545; }
         .stat-card.skipped i { color: #888; }
+        html.dark .stat-card.skipped i { color: #a8b5ac; }
         .stat-card h3 {
             font-family: Georgia, 'Times New Roman', serif;
             font-size: 30px;
-            color: #1F4E3D;
+            color: var(--text);
             font-weight: 800;
             margin-bottom: 4px;
         }
@@ -312,7 +315,7 @@
             font-weight: 600;
         }
 
-        /* ACTIONS */
+        /* ACTION BUTTONS */
         .actions-row {
             display: flex;
             gap: 12px;
@@ -355,7 +358,7 @@
         .btn-ghost {
             background: var(--surface);
             color: var(--text);
-            border: 2px solid var(--border);
+            border: 2px solid #1F4E3D;
         }
         html.dark .btn-ghost {
             color: #C9A961;
@@ -366,7 +369,7 @@
             border-color: #C9A961;
         }
 
-        /* REVIEW */
+        /* REVIEW SECTION */
         .review-header {
             display: flex;
             justify-content: space-between;
@@ -464,30 +467,12 @@
             align-items: center;
             gap: 6px;
         }
-        .review-status-badge.correct {
-            background: #d4edda;
-            color: #155724;
-        }
-        html.dark .review-status-badge.correct {
-            background: rgba(40,167,69,0.2);
-            color: #9ddfa6;
-        }
-        .review-status-badge.wrong {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        html.dark .review-status-badge.wrong {
-            background: rgba(220,53,69,0.2);
-            color: #ff8a8a;
-        }
-        .review-status-badge.skipped {
-            background: #e2e3e5;
-            color: #383d41;
-        }
-        html.dark .review-status-badge.skipped {
-            background: rgba(136,136,136,0.2);
-            color: #a8b5ac;
-        }
+        .review-status-badge.correct { background: #d4edda; color: #155724; }
+        .review-status-badge.wrong { background: #f8d7da; color: #721c24; }
+        .review-status-badge.skipped { background: #e2e3e5; color: #383d41; }
+        html.dark .review-status-badge.correct { background: rgba(40,167,69,0.2); color: #9ddfa6; }
+        html.dark .review-status-badge.wrong { background: rgba(220,53,69,0.2); color: #ff8a8a; }
+        html.dark .review-status-badge.skipped { background: rgba(136,136,136,0.2); color: #a8b5ac; }
 
         .review-question {
             font-family: Georgia, 'Times New Roman', serif;
@@ -512,7 +497,7 @@
             align-items: center;
             gap: 12px;
             font-size: 14px;
-            background: var(--surface-2);
+            background: var(--option-bg);
             border: 2px solid var(--border);
             color: var(--text);
         }
@@ -520,21 +505,24 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: var(--border);
+            background: var(--option-letter-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
             font-size: 13px;
             flex-shrink: 0;
-            color: var(--text-soft);
+            color: var(--option-letter-text);
         }
         .review-option.is-correct {
             background: #d4edda;
             border-color: #28a745;
+            color: #155724;
         }
         html.dark .review-option.is-correct {
             background: rgba(40,167,69,0.15);
+            color: #9ddfa6;
+            border-color: #28a745;
         }
         .review-option.is-correct .option-letter {
             background: #28a745;
@@ -543,9 +531,12 @@
         .review-option.user-chose-wrong {
             background: #f8d7da;
             border-color: #dc3545;
+            color: #721c24;
         }
         html.dark .review-option.user-chose-wrong {
             background: rgba(220,53,69,0.15);
+            color: #ff8a8a;
+            border-color: #dc3545;
         }
         .review-option.user-chose-wrong .option-letter {
             background: #dc3545;
@@ -557,7 +548,8 @@
             box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
         }
         html.dark .review-option.user-chose-correct {
-            background: rgba(40,167,69,0.2);
+            background: rgba(40,167,69,0.15);
+            color: #9ddfa6;
         }
 
         .option-tag {
@@ -569,18 +561,9 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        .option-tag.correct-tag {
-            background: #28a745;
-            color: white;
-        }
-        .option-tag.your-tag {
-            background: #2D6B54;
-            color: white;
-        }
-        .option-tag.wrong-tag {
-            background: #dc3545;
-            color: white;
-        }
+        .option-tag.correct-tag { background: #28a745; color: white; }
+        .option-tag.your-tag { background: #2D6B54; color: white; }
+        .option-tag.wrong-tag { background: #dc3545; color: white; }
 
         .solution-box {
             background: var(--surface-2);
@@ -649,7 +632,7 @@
         }
 
         @media print {
-            body { background: white !important; color: #1a1a1a !important; }
+            body { background: white; color: #1a1a1a; }
             .topbar, .actions-row, .review-filters, .theme-toggle { display: none !important; }
             .score-card {
                 background: #1F4E3D !important;
@@ -659,11 +642,8 @@
             .stat-card, .review-item, .review-option, .solution-box {
                 background: white !important;
                 color: #1a1a1a !important;
+                border-color: #e3e0d2 !important;
             }
-            .stat-card h3, .review-header h2, .review-question, .solution-box p {
-                color: #1F4E3D !important;
-            }
-            .review-question { color: #1a1a1a !important; }
         }
     </style>
 </head>
@@ -671,7 +651,7 @@
 
     <div class="topbar">
         <div class="topbar-inner">
-            <a href="dashboard.html" class="topbar-brand">
+            <a href="#" id="topbarBrandLink" class="topbar-brand">
                 <div class="icon">🎓</div>
                 <div class="text">
                     <h1>AVMS CBT Results</h1>
@@ -682,18 +662,21 @@
                 <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
-                <a href="dashboard.html" class="btn-dashboard">
-                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                <a href="#" id="topbarBackBtn" class="btn-dashboard">
+                    <i class="fas fa-arrow-left"></i> <span id="topbarBackLabel">Back to Dashboard</span>
                 </a>
             </div>
         </div>
     </div>
 
     <div class="main" id="mainContent">
+        <!-- Populated by JS -->
     </div>
 
     <script>
+        // ============================================
         // THEME
+        // ============================================
         function applyThemeIcon() {
             const isDark = document.documentElement.classList.contains('dark');
             const icon = document.getElementById('themeIcon');
@@ -707,9 +690,12 @@
         document.getElementById('themeBtn').addEventListener('click', toggleTheme);
         applyThemeIcon();
 
+        // ============================================
         // SESSION CHECK
+        // ============================================
         const studentJson = sessionStorage.getItem('cbt_student');
         const resultJson = sessionStorage.getItem('cbt_last_result');
+        const modeJson = sessionStorage.getItem('cbt_current_mode');
 
         if (!studentJson) {
             window.location.href = 'login.html';
@@ -724,8 +710,39 @@
         const student = JSON.parse(studentJson);
         const result = JSON.parse(resultJson);
 
+        // ============================================
+        // SMART BACK NAVIGATION
+        // ============================================
+        // Determine where the test was started from
+        let startedFrom = 'dashboard';
+        if (modeJson) {
+            try {
+                const modeConfig = JSON.parse(modeJson);
+                startedFrom = modeConfig.started_from || 'dashboard';
+            } catch (e) {}
+        }
+
+        let backUrl = 'dashboard.html';
+        let backLabel = 'Back to Dashboard';
+
+        if (startedFrom === 'portal') {
+            backUrl = '../student/cbt.html';
+            backLabel = 'Back to CBT Hub';
+        }
+
+        // Apply to topbar link
+        document.getElementById('topbarBackBtn').href = backUrl;
+        document.getElementById('topbarBackLabel').textContent = backLabel;
+        document.getElementById('topbarBrandLink').href = backUrl;
+
+        // ============================================
+        // STATE
+        // ============================================
         let currentFilter = 'all';
 
+        // ============================================
+        // HELPERS
+        // ============================================
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
@@ -742,6 +759,9 @@
                 .replace(/'/g, '&#039;');
         }
 
+        // ============================================
+        // COMPUTE SUMMARY
+        // ============================================
         let correctCount = 0;
         let wrongCount = 0;
         let skippedCount = 0;
@@ -755,6 +775,9 @@
         const percentage = result.percentage;
         const passed = percentage >= 50;
 
+        // ============================================
+        // EMOJI + MESSAGE
+        // ============================================
         let emoji, title, subtitle;
         if (percentage >= 80) {
             emoji = '🏆';
@@ -778,6 +801,9 @@
             subtitle = 'Study the solutions carefully, then retake the test.';
         }
 
+        // ============================================
+        // BUILD MAIN CONTENT
+        // ============================================
         const main = document.getElementById('mainContent');
 
         main.innerHTML = `
@@ -843,8 +869,8 @@
                 <button class="btn-action btn-primary" onclick="retake()">
                     <i class="fas fa-redo"></i> Retake ${result.mode === 'exam' ? 'Exam' : 'Test'}
                 </button>
-                <a href="dashboard.html" class="btn-action btn-secondary">
-                    <i class="fas fa-home"></i> Back to Dashboard
+                <a href="${backUrl}" class="btn-action btn-secondary">
+                    <i class="fas fa-home"></i> ${backLabel}
                 </a>
                 <button class="btn-action btn-ghost" onclick="window.print()">
                     <i class="fas fa-print"></i> Print Results
@@ -864,6 +890,9 @@
             <div class="review-list" id="reviewList"></div>
         `;
 
+        // ============================================
+        // RENDER REVIEW LIST
+        // ============================================
         function renderReview() {
             const list = document.getElementById('reviewList');
             let filtered = result.answers;
@@ -968,11 +997,15 @@
             const storageKey = `cbt_test_${result.course_id}_${result.mode}`;
             localStorage.removeItem(storageKey);
             sessionStorage.removeItem('cbt_last_result');
+            // NOTE: we do NOT clear cbt_current_mode here so retake keeps the same origin.
 
             const goTo = result.mode === 'exam' ? 'exam.html' : 'test.html';
             window.location.href = goTo;
         }
 
+        // ============================================
+        // INIT
+        // ============================================
         renderReview();
     </script>
 </body>
