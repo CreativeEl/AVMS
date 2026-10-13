@@ -8,20 +8,61 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('avms-theme') || 'light';
+                if (t === 'dark') document.documentElement.classList.add('dark');
+            } catch(e){}
+        })();
+    </script>
     <style>
+        :root {
+            --bg: #F5F0DC;
+            --surface: #ffffff;
+            --surface-2: #FBF8EE;
+            --text: #1a1a1a;
+            --text-soft: #666;
+            --text-muted: #888;
+            --border: #e3e0d2;
+            --border-hair: #f0ede0;
+            --icon-bg: #F7F5EC;
+            --hover-bg: #F5F0DC;
+            --option-bg: #FBF8EE;
+            --option-letter-bg: #e3e0d2;
+            --option-letter-text: #555;
+            --nav-btn-bg: #ffffff;
+        }
+
+        html.dark {
+            --bg: #0f1714;
+            --surface: #182420;
+            --surface-2: #1e2c26;
+            --text: #e8f0ea;
+            --text-soft: #a8b5ac;
+            --text-muted: #7a8a80;
+            --border: #24352e;
+            --border-hair: #1e2c26;
+            --icon-bg: #1e2c26;
+            --hover-bg: #1e2c26;
+            --option-bg: #1e2c26;
+            --option-letter-bg: #24352e;
+            --option-letter-text: #a8b5ac;
+            --nav-btn-bg: #1e2c26;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #F5F0DC;
-            color: #1a1a1a;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
         }
 
-        /* ============================================
-           TOP BAR (fixed)
-           ============================================ */
+        /* TOP BAR */
         .test-topbar {
             background: #1F4E3D;
             color: white;
@@ -37,6 +78,7 @@
             box-shadow: 0 2px 10px rgba(31,78,61,0.2);
             border-bottom: 3px solid #C9A961;
         }
+        html.dark .test-topbar { background: #0a120f; }
         .test-topbar .left {
             display: flex;
             align-items: center;
@@ -82,14 +124,31 @@
         .progress-info {
             font-size: 14px;
             color: rgba(255,255,255,0.85);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .progress-info strong {
-            color: white;
-        }
+        .progress-info strong { color: white; }
 
-        /* ============================================
-           WARNING BANNER
-           ============================================ */
+        .theme-toggle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.22); }
+        .theme-toggle:active { transform: scale(0.94); }
+
+        /* WARNING BANNER */
         .warning-banner {
             background: #8B1A1A;
             color: white;
@@ -109,9 +168,7 @@
             to { transform: translateY(0); }
         }
 
-        /* ============================================
-           MAIN LAYOUT
-           ============================================ */
+        /* MAIN LAYOUT */
         .test-main {
             max-width: 1300px;
             margin: 0 auto;
@@ -122,16 +179,15 @@
             align-items: start;
         }
 
-        /* ============================================
-           QUESTION PANEL
-           ============================================ */
+        /* QUESTION PANEL */
         .question-panel {
-            background: white;
+            background: var(--surface);
             border-radius: 15px;
             padding: 35px;
-            border: 1px solid #e3e0d2;
+            border: 1px solid var(--border);
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
             border-top: 4px solid #C9A961;
+            transition: background 0.3s, border-color 0.3s;
         }
 
         .question-header {
@@ -139,7 +195,7 @@
             justify-content: space-between;
             align-items: center;
             padding-bottom: 15px;
-            border-bottom: 2px solid #f0ede0;
+            border-bottom: 2px solid var(--border-hair);
             margin-bottom: 25px;
             flex-wrap: wrap;
             gap: 10px;
@@ -151,6 +207,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+        html.dark .question-number { color: #C9A961; }
         .difficulty-badge {
             padding: 4px 12px;
             border-radius: 20px;
@@ -171,6 +228,7 @@
             line-height: 1.6;
             margin-bottom: 25px;
         }
+        html.dark .question-text { color: var(--text); }
 
         /* Options */
         .options-list {
@@ -183,27 +241,27 @@
             align-items: center;
             gap: 15px;
             padding: 16px 20px;
-            background: #FBF8EE;
-            border: 2px solid #e3e0d2;
+            background: var(--option-bg);
+            border: 2px solid var(--border);
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s;
         }
         .option-item:hover {
             border-color: #C9A961;
-            background: #F5F0DC;
+            background: var(--hover-bg);
         }
         .option-item.selected {
             border-color: #C9A961;
-            background: #F5F0DC;
+            background: var(--hover-bg);
             box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.2);
         }
         .option-letter {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #e3e0d2;
-            color: #555;
+            background: var(--option-letter-bg);
+            color: var(--option-letter-text);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -218,7 +276,7 @@
         }
         .option-text {
             font-size: 15px;
-            color: #1a1a1a;
+            color: var(--text);
             line-height: 1.5;
             flex-grow: 1;
         }
@@ -230,7 +288,7 @@
             gap: 12px;
             margin-top: 30px;
             padding-top: 25px;
-            border-top: 2px solid #f0ede0;
+            border-top: 2px solid var(--border-hair);
         }
         .btn-nav {
             padding: 12px 25px;
@@ -246,14 +304,14 @@
             font-family: inherit;
         }
         .btn-prev {
-            background: #FBF8EE;
-            color: #555;
-            border: 2px solid #e3e0d2;
+            background: var(--option-bg);
+            color: var(--text-soft);
+            border: 2px solid var(--border);
         }
         .btn-prev:hover:not(:disabled) {
-            background: #F5F0DC;
+            background: var(--hover-bg);
             border-color: #C9A961;
-            color: #1F4E3D;
+            color: var(--text);
         }
         .btn-next {
             background: #2D6B54;
@@ -278,9 +336,7 @@
             box-shadow: 0 4px 12px rgba(31,78,61,0.2);
         }
 
-        /* ============================================
-           SIDEBAR — QUESTION NAVIGATOR
-           ============================================ */
+        /* SIDEBAR */
         .sidebar-panel {
             position: sticky;
             top: 90px;
@@ -290,16 +346,17 @@
         }
 
         .navigator-card {
-            background: white;
+            background: var(--surface);
             border-radius: 15px;
             padding: 20px;
-            border: 1px solid #e3e0d2;
+            border: 1px solid var(--border);
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
+            transition: background 0.3s, border-color 0.3s;
         }
         .navigator-card h3 {
             font-size: 12px;
             font-weight: 700;
-            color: #1F4E3D;
+            color: var(--text);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 15px;
@@ -307,6 +364,7 @@
             align-items: center;
             gap: 8px;
         }
+        html.dark .navigator-card h3 { color: #C9A961; }
         .navigator-card h3 i { color: #C9A961; }
 
         .navigator-grid {
@@ -316,14 +374,14 @@
         }
         .nav-btn {
             aspect-ratio: 1;
-            border: 2px solid #e3e0d2;
-            background: white;
+            border: 2px solid var(--border);
+            background: var(--nav-btn-bg);
             border-radius: 8px;
             font-size: 13px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
-            color: #555;
+            color: var(--text-soft);
             font-family: inherit;
             display: flex;
             align-items: center;
@@ -331,7 +389,7 @@
         }
         .nav-btn:hover {
             border-color: #C9A961;
-            color: #1F4E3D;
+            color: var(--text);
         }
         .nav-btn.answered {
             background: #2D6B54;
@@ -352,9 +410,9 @@
             gap: 8px;
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 1px solid #f0ede0;
+            border-top: 1px solid var(--border-hair);
             font-size: 12px;
-            color: #666;
+            color: var(--text-soft);
         }
         .legend-item {
             display: flex;
@@ -365,7 +423,7 @@
             width: 16px;
             height: 16px;
             border-radius: 4px;
-            border: 2px solid #e3e0d2;
+            border: 2px solid var(--border);
         }
         .legend-dot.answered {
             background: #2D6B54;
@@ -376,7 +434,7 @@
             border-color: #C9A961;
         }
         .legend-dot.unanswered {
-            background: white;
+            background: var(--nav-btn-bg);
         }
 
         .stat-row {
@@ -384,15 +442,14 @@
             justify-content: space-between;
             padding: 8px 0;
             font-size: 13px;
-            color: #666;
+            color: var(--text-soft);
         }
         .stat-row strong {
-            color: #1F4E3D;
+            color: var(--text);
         }
+        html.dark .stat-row strong { color: #C9A961; }
 
-        /* ============================================
-           CALCULATOR
-           ============================================ */
+        /* CALCULATOR */
         .calc-btn {
             position: fixed;
             bottom: 25px;
@@ -519,9 +576,7 @@
             grid-column: span 2;
         }
 
-        /* ============================================
-           SUBMIT MODAL
-           ============================================ */
+        /* SUBMIT MODAL */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -539,7 +594,7 @@
         .modal-overlay.show { display: flex; }
 
         .modal-box {
-            background: white;
+            background: var(--surface);
             border-radius: 15px;
             padding: 30px;
             max-width: 420px;
@@ -547,11 +602,12 @@
             text-align: center;
             border-top: 4px solid #C9A961;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            transition: background 0.3s;
         }
         .modal-box .icon {
             width: 70px;
             height: 70px;
-            background: #F5F0DC;
+            background: var(--hover-bg);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -563,12 +619,13 @@
         }
         .modal-box h3 {
             font-family: Georgia, 'Times New Roman', serif;
-            color: #1F4E3D;
+            color: var(--text);
             font-size: 20px;
             margin-bottom: 10px;
         }
+        html.dark .modal-box h3 { color: #C9A961; }
         .modal-box p {
-            color: #666;
+            color: var(--text-soft);
             font-size: 14px;
             line-height: 1.6;
             margin-bottom: 20px;
@@ -590,12 +647,12 @@
         }
         .modal-box .btn-cancel {
             background: transparent;
-            color: #555;
-            border: 2px solid #e3e0d2;
+            color: var(--text-soft);
+            border: 2px solid var(--border);
         }
         .modal-box .btn-cancel:hover {
-            background: #FBF8EE;
-            border-color: #888;
+            background: var(--hover-bg);
+            border-color: var(--text-soft);
         }
         .modal-box .btn-confirm {
             background: #2D6B54;
@@ -604,46 +661,27 @@
         .modal-box .btn-confirm:hover { background: #1F4E3D; }
         .modal-box .btn-confirm:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
+        /* RESPONSIVE */
         @media (max-width: 900px) {
-            .test-main {
-                grid-template-columns: 1fr;
-            }
-            .sidebar-panel {
-                position: static;
-                order: -1;
-            }
-            .navigator-grid {
-                grid-template-columns: repeat(10, 1fr);
-            }
-            .question-panel {
-                padding: 25px 20px;
-            }
-            .question-text {
-                font-size: 17px;
-            }
-            .calculator {
-                width: 280px;
-            }
+            .test-main { grid-template-columns: 1fr; }
+            .sidebar-panel { position: static; order: -1; }
+            .navigator-grid { grid-template-columns: repeat(10, 1fr); }
+            .question-panel { padding: 25px 20px; }
+            .question-text { font-size: 17px; }
+            .calculator { width: 280px; }
         }
         @media (max-width: 500px) {
-            .navigator-grid {
-                grid-template-columns: repeat(8, 1fr);
-            }
+            .navigator-grid { grid-template-columns: repeat(8, 1fr); }
         }
     </style>
 </head>
 <body>
 
-    <!-- WARNING BANNER -->
     <div class="warning-banner" id="warningBanner">
         <i class="fas fa-exclamation-triangle"></i>
         <span id="warningText">Warning: Do not leave this page!</span>
     </div>
 
-    <!-- TOP BAR -->
     <div class="test-topbar">
         <div class="left">
             <div class="test-title">
@@ -656,14 +694,15 @@
             </div>
         </div>
         <div class="progress-info">
-            Question <strong id="currentNum">1</strong> of <strong id="totalNum">40</strong>
+            <span>Question <strong id="currentNum">1</strong> of <strong id="totalNum">40</strong></span>
+            <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
         </div>
     </div>
 
-    <!-- MAIN -->
     <div class="test-main">
 
-        <!-- QUESTION PANEL -->
         <div class="question-panel">
             <div class="question-header">
                 <span class="question-number">Question <span id="qNum">1</span></span>
@@ -684,7 +723,6 @@
             </div>
         </div>
 
-        <!-- SIDEBAR — NAVIGATOR -->
         <div class="sidebar-panel">
             <div class="navigator-card">
                 <h3><i class="fas fa-th"></i> Question Navigator</h3>
@@ -703,7 +741,7 @@
                         <span>Not answered</span>
                     </div>
                 </div>
-                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #f0ede0;">
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-hair);">
                     <div class="stat-row">
                         <span>Answered:</span>
                         <strong id="answeredStat">0</strong>
@@ -720,12 +758,10 @@
         </div>
     </div>
 
-    <!-- CALCULATOR BUTTON -->
     <button class="calc-btn" id="calcBtn" onclick="openCalculator()" title="Open Calculator">
         <i class="fas fa-calculator"></i>
     </button>
 
-    <!-- CALCULATOR -->
     <div class="calculator" id="calculator">
         <div class="calc-header" id="calcHeader">
             <span><i class="fas fa-calculator"></i> Calculator</span>
@@ -759,7 +795,6 @@
         </div>
     </div>
 
-    <!-- SUBMIT MODAL -->
     <div class="modal-overlay" id="submitModal">
         <div class="modal-box">
             <div class="icon"><i class="fas fa-question"></i></div>
@@ -773,6 +808,22 @@
     </div>
 
     <script>
+        // ============================================
+        // THEME
+        // ============================================
+        function applyThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('avms-theme', isDark ? 'dark' : 'light'); } catch(e){}
+            applyThemeIcon();
+        }
+        document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+        applyThemeIcon();
+
         // ============================================
         // SESSION CHECK
         // ============================================
@@ -792,24 +843,19 @@
         // STATE
         // ============================================
         let questions = [];
-        let userAnswers = {};  // { question_index: "A"|"B"|"C"|"D" }
+        let userAnswers = {};
         let currentIndex = 0;
-        let timeLeft = modeConfig.time_minutes * 60;  // seconds
+        let timeLeft = modeConfig.time_minutes * 60;
         let timerInterval = null;
         let tabSwitchCount = 0;
         let isSubmitted = false;
 
         const STORAGE_KEY = `cbt_test_${modeConfig.course_id}_${modeConfig.mode}`;
 
-        // ============================================
-        // UPDATE UI HEADERS
-        // ============================================
         document.getElementById('testTitle').textContent =
             `${modeConfig.mode === 'exam' ? 'Examination' : 'Practice Test'} · ${modeConfig.course_code}`;
 
-        // ============================================
-        // ANTI-CHEAT: refresh / close warning
-        // ============================================
+        // ANTI-CHEAT
         window.addEventListener('beforeunload', function (e) {
             if (isSubmitted) return;
             e.preventDefault();
@@ -817,26 +863,18 @@
             return 'Your progress will be lost. Are you sure?';
         });
 
-        // ============================================
-        // ANTI-CHEAT: tab switch detection
-        // ============================================
         document.addEventListener('visibilitychange', function () {
             if (isSubmitted) return;
-            if (document.hidden) {
-                handleTabSwitch();
-            }
+            if (document.hidden) handleTabSwitch();
         });
 
         function handleTabSwitch() {
             tabSwitchCount++;
-
             if (tabSwitchCount === 1) {
                 showWarning('⚠️ Warning: Leaving this page during a test is not allowed. If you do it again, your test will be submitted automatically.');
             } else if (tabSwitchCount >= 2) {
                 showWarning('❌ You left the page again. Submitting your test now...');
-                setTimeout(() => {
-                    finalSubmit(true);
-                }, 1500);
+                setTimeout(() => finalSubmit(true), 1500);
             }
         }
 
@@ -844,27 +882,18 @@
             const banner = document.getElementById('warningBanner');
             document.getElementById('warningText').textContent = text;
             banner.classList.add('show');
-            setTimeout(() => {
-                banner.classList.remove('show');
-            }, 6000);
+            setTimeout(() => banner.classList.remove('show'), 6000);
         }
 
-        // ============================================
-        // ANTI-CHEAT: disable right-click, copy, paste, cut, text selection
-        // ============================================
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('cut', e => e.preventDefault());
         document.addEventListener('paste', e => e.preventDefault());
         document.addEventListener('selectstart', e => {
-            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-                e.preventDefault();
-            }
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') e.preventDefault();
         });
 
-        // ============================================
         // LOAD QUESTIONS
-        // ============================================
         async function loadQuestions() {
             try {
                 const { data, error } = await supabase
@@ -881,34 +910,24 @@
                     return;
                 }
 
-                // Shuffle and take the required number
                 const shuffled = shuffleArray(data);
                 const selected = shuffled.slice(0, modeConfig.question_count);
 
-                // Shuffle options AND relabel A/B/C/D by position
                 questions = selected.map(q => {
-                    // Build the raw option content (no letters attached yet)
                     const rawOptions = [
                         { text: q.option_a, wasCorrect: q.correct_answer === 'A' },
                         { text: q.option_b, wasCorrect: q.correct_answer === 'B' },
                         { text: q.option_c, wasCorrect: q.correct_answer === 'C' },
                         { text: q.option_d, wasCorrect: q.correct_answer === 'D' }
                     ];
-
-                    // Shuffle the CONTENT (not the labels)
                     const shuffledContent = shuffleArray(rawOptions);
-
-                    // Relabel by new position: index 0 → A, 1 → B, 2 → C, 3 → D
                     const letters = ['A', 'B', 'C', 'D'];
                     const newOptions = shuffledContent.map((opt, i) => ({
                         letter: letters[i],
                         text: opt.text,
                         isCorrect: opt.wasCorrect
                     }));
-
-                    // The correct answer is now whichever letter landed on the correct option
                     const newCorrectLetter = newOptions.find(o => o.isCorrect).letter;
-
                     return {
                         id: q.id,
                         text: q.question_text,
@@ -919,18 +938,12 @@
                     };
                 });
 
-                // Update total display to reflect actual loaded count
                 document.getElementById('totalNum').textContent = questions.length;
-
-                // Try to restore progress
                 restoreProgress();
-
-                // Render everything
                 renderNavigator();
                 renderQuestion();
                 startTimer();
                 updateProgressInfo();
-
             } catch (err) {
                 console.warn('Error loading questions:', err);
                 alert('Failed to load questions. Redirecting to dashboard.');
@@ -938,7 +951,6 @@
             }
         }
 
-        // Fisher-Yates shuffle
         function shuffleArray(arr) {
             const a = [...arr];
             for (let i = a.length - 1; i > 0; i--) {
@@ -948,9 +960,7 @@
             return a;
         }
 
-        // ============================================
-        // RESTORE / SAVE PROGRESS
-        // ============================================
+        // PROGRESS
         function hashQuestionIds() {
             return JSON.stringify(questions.map(q => q.id).sort());
         }
@@ -985,9 +995,7 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
-        // ============================================
-        // RENDER QUESTION
-        // ============================================
+        // RENDER
         function renderQuestion() {
             const q = questions[currentIndex];
             if (!q) return;
@@ -996,7 +1004,6 @@
             document.getElementById('currentNum').textContent = currentIndex + 1;
             document.getElementById('questionText').textContent = q.text;
 
-            // Safe difficulty class — only allow known values
             const badge = document.getElementById('difficultyBadge');
             const allowedDifficulties = ['easy', 'medium', 'hard'];
             const safeDifficulty = allowedDifficulties.includes(q.difficulty) ? q.difficulty : 'medium';
@@ -1012,11 +1019,9 @@
                 </div>
             `).join('');
 
-            // Update nav buttons
             document.getElementById('prevBtn').disabled = currentIndex === 0;
             document.getElementById('nextBtn').disabled = currentIndex === questions.length - 1;
 
-            // Update navigator current state
             updateNavigatorHighlight();
             updateProgressInfo();
         }
@@ -1031,9 +1036,6 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // ============================================
-        // SELECT ANSWER
-        // ============================================
         function selectAnswer(letter) {
             userAnswers[currentIndex] = letter;
             saveProgress();
@@ -1041,21 +1043,12 @@
             renderNavigator();
         }
 
-        // ============================================
-        // NAVIGATION
-        // ============================================
         function goPrev() {
-            if (currentIndex > 0) {
-                currentIndex--;
-                renderQuestion();
-            }
+            if (currentIndex > 0) { currentIndex--; renderQuestion(); }
         }
 
         function goNext() {
-            if (currentIndex < questions.length - 1) {
-                currentIndex++;
-                renderQuestion();
-            }
+            if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); }
         }
 
         function goToQuestion(index) {
@@ -1063,9 +1056,6 @@
             renderQuestion();
         }
 
-        // ============================================
-        // NAVIGATOR GRID
-        // ============================================
         function renderNavigator() {
             const grid = document.getElementById('navigatorGrid');
             grid.innerHTML = questions.map((_, i) => {
@@ -1092,9 +1082,7 @@
             document.getElementById('unansweredStat').textContent = total - answered;
         }
 
-        // ============================================
         // TIMER
-        // ============================================
         function startTimer() {
             updateTimerDisplay();
             timerInterval = setInterval(() => {
@@ -1102,10 +1090,9 @@
                 updateTimerDisplay();
                 saveProgress();
 
-                if (timeLeft <= 300) { // last 5 min warning
+                if (timeLeft <= 300) {
                     document.getElementById('timerBox').classList.add('warning');
                 }
-
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
                     showWarning('⏰ Time is up! Submitting your test...');
@@ -1121,9 +1108,7 @@
                 `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
-        // ============================================
         // SUBMIT
-        // ============================================
         function openSubmitModal() {
             const answered = Object.keys(userAnswers).length;
             const total = questions.length;
@@ -1154,7 +1139,6 @@
                 confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
             }
 
-            // Calculate score
             let score = 0;
             const detailedAnswers = [];
             questions.forEach((q, i) => {
@@ -1175,7 +1159,6 @@
 
             const timeTaken = (modeConfig.time_minutes * 60) - timeLeft;
 
-            // Save to results storage (for results.html to read)
             const resultData = {
                 mode: modeConfig.mode,
                 course_id: modeConfig.course_id,
@@ -1193,7 +1176,6 @@
 
             sessionStorage.setItem('cbt_last_result', JSON.stringify(resultData));
 
-            // Save to database (best-effort)
             try {
                 await supabase.from('cbt_attempts').insert([{
                     reg_no: student.reg_no,
@@ -1208,16 +1190,11 @@
                 console.warn('Could not save attempt to database:', err);
             }
 
-            // Clear localStorage
             localStorage.removeItem(STORAGE_KEY);
-
-            // Redirect
             window.location.href = 'results.html';
         }
 
-        // ============================================
         // CALCULATOR
-        // ============================================
         let calcExpr = '';
 
         function openCalculator() {
@@ -1247,15 +1224,8 @@
 
         function calcEquals() {
             try {
-                const jsExpr = calcExpr
-                    .replace(/÷/g, '/')
-                    .replace(/×/g, '*')
-                    .replace(/−/g, '-');
-
-                if (!/^[0-9+\-*/().% ]+$/.test(jsExpr)) {
-                    throw new Error('Invalid expression');
-                }
-
+                const jsExpr = calcExpr.replace(/÷/g, '/').replace(/×/g, '*').replace(/−/g, '-');
+                if (!/^[0-9+\-*/().% ]+$/.test(jsExpr)) throw new Error('Invalid expression');
                 const result = Function('"use strict"; return (' + jsExpr + ')')();
                 const rounded = Math.round(result * 1000000) / 1000000;
                 calcExpr = String(rounded);
@@ -1266,7 +1236,6 @@
             }
         }
 
-        // Make calculator draggable
         (function makeDraggable() {
             const header = document.getElementById('calcHeader');
             const calc = document.getElementById('calculator');
@@ -1292,9 +1261,7 @@
             document.addEventListener('mouseup', () => isDragging = false);
         })();
 
-        // ============================================
         // INIT
-        // ============================================
         loadQuestions();
     </script>
 </body>
