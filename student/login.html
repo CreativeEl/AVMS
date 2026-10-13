@@ -55,7 +55,6 @@
             min-height: 100dvh;
         }
 
-        /* Soft background blobs */
         body::before {
             content: '';
             position: fixed;
@@ -95,7 +94,6 @@
             width: 100%;
         }
 
-        /* TOP BAR */
         .top-bar {
             display: flex;
             align-items: center;
@@ -116,7 +114,6 @@
         body.dark .top-bar a { color: var(--gold); }
         .top-bar a i { font-size: 14px; }
 
-        /* LOGO */
         .logo-wrap {
             display: flex;
             flex-direction: column;
@@ -165,7 +162,6 @@
             color: var(--text-soft);
         }
 
-        /* LOGIN CARD */
         .login-card {
             background: var(--card-bg);
             border-radius: 24px;
@@ -229,7 +225,6 @@
         }
         .field-input input::placeholder { color: #a8a8a8; }
 
-        /* ===== FIX: Browser autofill white background (Chrome/Safari) ===== */
         .field-input input:-webkit-autofill,
         .field-input input:-webkit-autofill:hover,
         .field-input input:-webkit-autofill:focus,
@@ -250,7 +245,6 @@
             caret-color: #E8E8E8;
         }
 
-        /* iOS Safari autofill fix */
         @supports (-webkit-touch-callout: none) {
             .field-input input:-webkit-autofill {
                 -webkit-text-fill-color: var(--text) !important;
@@ -272,7 +266,6 @@
             font-size: 15px;
         }
 
-        /* PRIMARY BUTTON */
         .btn-primary {
             width: 100%;
             height: 54px;
@@ -297,7 +290,6 @@
         .btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
         .btn-primary:hover:not(:disabled) { background: var(--green-mid); }
 
-        /* OUTLINED BUTTON */
         .btn-outline {
             width: 100%;
             height: 54px;
@@ -335,7 +327,6 @@
         .forgot-link:hover { color: var(--green-deep); text-decoration: underline; }
         body.dark .forgot-link:hover { color: var(--gold); }
 
-        /* MESSAGES */
         .alert {
             padding: 14px 16px;
             border-radius: 12px;
@@ -352,7 +343,6 @@
         body.dark .alert-warn { background: #3A2E14; color: #F0D080; }
         body.dark .alert-success { background: #1A3A24; color: #A0E0A0; }
 
-        /* FOOTER */
         .app-footer {
             text-align: center;
             padding: 24px 0 0;
@@ -363,7 +353,6 @@
         .app-footer a { color: var(--green-deep); text-decoration: none; font-weight: 600; }
         body.dark .app-footer a { color: var(--gold); }
 
-        /* SPINNER */
         .spinner {
             display: inline-block;
             width: 16px; height: 16px;
@@ -374,7 +363,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* THEME TOGGLE (bottom-right) */
         .theme-toggle {
             position: fixed;
             bottom: 24px;
@@ -401,7 +389,6 @@
             .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; }
         }
 
-        /* DESKTOP NICE-TO-HAVE */
         @media (min-width: 640px) {
             .app-screen { padding-top: 48px; padding-bottom: 48px; }
         }
@@ -415,19 +402,16 @@
 
     <div class="app-screen">
 
-        <!-- TOP BAR -->
         <div class="top-bar">
             <a href="../index.html"><i class="fas fa-chevron-left"></i> Back to Site</a>
         </div>
 
-        <!-- LOGO -->
         <div class="logo-wrap">
             <div class="logo-circle"><span>AV</span></div>
             <h1>Student Portal</h1>
             <p>AVMS · ABU Zaria</p>
         </div>
 
-        <!-- LOGIN CARD -->
         <div class="login-card">
 
             <div id="loginAlert" class="alert"></div>
@@ -465,7 +449,6 @@
 
         </div>
 
-        <!-- FOOTER -->
         <div class="app-footer">
             &copy; <span id="year"></span> AVMS ABU Zaria<br>
             <a href="../index.html">Return to main site</a>
@@ -475,7 +458,7 @@
 
     <script>
         // ============================================
-        // THEME TOGGLE (dark mode)
+        // THEME TOGGLE
         // ============================================
         (function initTheme() {
             const saved = localStorage.getItem('avms-theme');
@@ -528,6 +511,42 @@
                 loginBtnText.textContent = 'Sign In';
             }
         }
+        async function killSession() {
+            try { await supabase.auth.signOut(); } catch (e) {}
+        }
+
+        // ============================================
+        // SESSION HYGIENE — if an old session exists, re-verify against the roster.
+        // If the student's roster row is gone or deactivated, force sign-out.
+        // ============================================
+        (async function cleanStaleSession() {
+            if (typeof supabase === 'undefined' || !supabase) return;
+            try {
+                const { data: sess } = await supabase.auth.getSession();
+                if (!sess || !sess.session) return;
+
+                const userId = sess.session.user.id;
+
+                // Check 1: by auth_user_id
+                const { data: byAuth } = await supabase
+                    .from('students')
+                    .select('id, is_active')
+                    .eq('auth_user_id', userId)
+                    .maybeSingle();
+
+                if (!byAuth || byAuth.is_active !== true) {
+                    await killSession();
+                    try {
+                        localStorage.removeItem('adminLoggedIn');
+                        sessionStorage.removeItem('adminLoggedIn');
+                        sessionStorage.removeItem('adminSession');
+                    } catch (e) {}
+                }
+            } catch (err) {
+                // If we can't verify, be safe and sign out
+                await killSession();
+            }
+        })();
 
         // ============================================
         // TOGGLE PASSWORD VISIBILITY
@@ -595,7 +614,6 @@
                 });
 
                 if (authErr) {
-                    // Friendly messages
                     const msg = (authErr.message || '').toLowerCase();
                     if (msg.includes('invalid') || msg.includes('credentials')) {
                         showAlert('❌ Incorrect email or password. Please try again.', 'error');
@@ -615,8 +633,8 @@
                     return;
                 }
 
-                // 2) Check student record
-                const { data: student, error: stuErr } = await supabase
+                // 2) Check student record — by auth_user_id
+                const { data: studentByAuth, error: stuErr } = await supabase
                     .from('students')
                     .select('id, is_active, full_name, reg_no, class_level')
                     .eq('auth_user_id', userId)
@@ -624,23 +642,36 @@
 
                 if (stuErr) throw stuErr;
 
-                if (!student) {
+                if (!studentByAuth) {
                     // No roster record linked — sign them out
-                    await supabase.auth.signOut();
+                    await killSession();
                     showAlert('⚠️ No student record is linked to this account. Please contact AVMS.', 'error');
                     setLoading(false);
                     return;
                 }
 
-                if (student.is_active !== true) {
-                    // Account exists but not approved
-                    await supabase.auth.signOut();
+                if (studentByAuth.is_active !== true) {
+                    await killSession();
                     showAlert('⏳ <strong>Application pending.</strong><br>Your account is awaiting admin approval. You\'ll receive an email once approved.', 'warn');
                     setLoading(false);
                     return;
                 }
 
-                // 3) Approved — redirect to dashboard
+                // 3) Double-check by reg_no (belt + suspenders — in case auth_user_id drifts)
+                const { data: studentByReg } = await supabase
+                    .from('students')
+                    .select('id, is_active')
+                    .eq('reg_no', studentByAuth.reg_no)
+                    .maybeSingle();
+
+                if (!studentByReg || studentByReg.is_active !== true) {
+                    await killSession();
+                    showAlert('⚠️ Your student record was removed or deactivated. Please contact AVMS.', 'error');
+                    setLoading(false);
+                    return;
+                }
+
+                // 4) Approved — redirect to dashboard
                 showAlert('✅ Login successful. Redirecting...', 'success');
                 window.location.href = 'dashboard.html';
 
