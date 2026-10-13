@@ -66,7 +66,6 @@
             transition: background 0.25s, color 0.25s;
         }
 
-        /* GUARD */
         .guard-screen {
             position: fixed; inset: 0;
             background: var(--surface-2);
@@ -304,7 +303,6 @@
             width: 100%;
         }
 
-        /* HERO BLOCK */
         .cbt-hero {
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
             border-radius: 20px;
@@ -375,7 +373,6 @@
         }
         .section-head .count { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 
-        /* COURSE GRID */
         .courses-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -515,7 +512,6 @@
         }
         .btn-mode i { font-size: 15px; margin-bottom: 1px; }
 
-        /* Level gate */
         .gate-card {
             background: var(--surface);
             border-radius: 20px;
@@ -605,7 +601,6 @@
             border-top-color: var(--gold);
         }
 
-        /* BOTTOM NAV */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -671,7 +666,6 @@
 </head>
 <body>
 
-    <!-- GUARD -->
     <div class="guard-screen" id="guardScreen">
         <div class="guard-spinner"></div>
         <div class="guard-text" id="guardText">Verifying session...</div>
@@ -849,8 +843,10 @@
             window.location.href = 'login.html';
         }
 
+        // STATE
         let currentStudent = null;
         let questionCounts = {};
+        let loadedCourses = [];
 
         // GUARD
         (async function init() {
@@ -910,7 +906,6 @@
             const container = document.getElementById('cbtContent');
             const level = currentStudent.class_level;
 
-            // Level gate — CBT only for 100–300
             if (!level || level < 100 || level > 300) {
                 container.innerHTML = `
                     <div class="gate-card">
@@ -926,7 +921,6 @@
                 return;
             }
 
-            // Fetch courses for this level
             try {
                 const { data: courses, error } = await supabase
                     .from('cbt_courses')
@@ -937,7 +931,7 @@
 
                 if (error) throw error;
 
-                // Fetch question counts
+                loadedCourses = courses || [];
                 await loadQuestionCounts();
 
                 container.innerHTML = `
@@ -959,7 +953,7 @@
                     <div class="courses-grid" id="coursesGrid"></div>
                 `;
 
-                renderCourseList(courses || []);
+                renderCourseList(loadedCourses);
             } catch (err) {
                 console.warn('CBT load error:', err);
                 container.innerHTML = `
@@ -1051,55 +1045,53 @@
             }).join('');
         }
 
-        // START TEST / EXAM — reuse existing CBT files
-        async function startMode(mode, courseId, courseCode) {
-            const requiredQs = mode === 'test' ? 40 : 60;
-            const qCount = questionCounts[courseId] || 0;
+        // START TEST / EXAM — synchronous, reuses existing CBT files
+        function startMode(mode, courseId, courseCode) {
+            try {
+                const requiredQs = mode === 'test' ? 40 : 60;
+                const qCount = questionCounts[courseId] || 0;
 
-            if (qCount < requiredQs) {
-                alert(
-                    `Not enough questions for this ${mode}.\n\n` +
-                    `This course has ${qCount} question${qCount === 1 ? '' : 's'}.\n` +
-                    `A ${mode} needs ${requiredQs} questions.`
-                );
-                return;
+                if (qCount < requiredQs) {
+                    alert(
+                        `Not enough questions for this ${mode}.\n\n` +
+                        `This course has ${qCount} question${qCount === 1 ? '' : 's'}.\n` +
+                        `A ${mode} needs ${requiredQs} questions.`
+                    );
+                    return;
+                }
+
+                const cachedCourse = loadedCourses.find(c => c.id === courseId);
+
+                // Populate CBT session so existing CBT portal works without login
+                const cbtStudent = {
+                    id: currentStudent.id,
+                    reg_no: currentStudent.reg_no,
+                    full_name: currentStudent.full_name,
+                    state_of_origin: currentStudent.state_of_origin,
+                    department: currentStudent.department,
+                    level: currentStudent.class_level,
+                    logged_in_at: new Date().toISOString()
+                };
+                sessionStorage.setItem('cbt_student', JSON.stringify(cbtStudent));
+
+                const modeConfig = {
+                    mode: mode,
+                    course_id: courseId,
+                    course_code: courseCode,
+                    course_name: cachedCourse ? cachedCourse.name : '',
+                    question_count: mode === 'test' ? 40 : 60,
+                    time_minutes: mode === 'test' ? 40 : 60,
+                    started_from: 'portal'
+                };
+                sessionStorage.setItem('cbt_current_mode', JSON.stringify(modeConfig));
+
+                // Redirect to existing CBT test/exam page
+                const target = mode === 'test' ? '../cbt/test.html' : '../cbt/exam.html';
+                window.location.href = target;
+            } catch (err) {
+                console.error('[CBT startMode] error:', err);
+                alert('Could not start ' + mode + ': ' + err.message);
             }
-
-            // Fetch course for name
-            const { data: courses } = await supabase
-                .from('cbt_courses')
-                .select('*')
-                .eq('id', courseId)
-                .limit(1);
-
-            const course = courses && courses[0];
-
-            // Populate CBT session so the existing CBT portal works without login
-            const cbtStudent = {
-                id: currentStudent.id,
-                reg_no: currentStudent.reg_no,
-                full_name: currentStudent.full_name,
-                state_of_origin: currentStudent.state_of_origin,
-                department: currentStudent.department,
-                level: currentStudent.class_level,
-                logged_in_at: new Date().toISOString()
-            };
-            sessionStorage.setItem('cbt_student', JSON.stringify(cbtStudent));
-
-            // Mode config — matches what the existing CBT files expect
-            const modeConfig = {
-                mode: mode,
-                course_id: courseId,
-                course_code: courseCode,
-                course_name: course ? course.name : '',
-                question_count: mode === 'test' ? 40 : 60,
-                time_minutes: mode === 'test' ? 40 : 60,
-                started_from: 'portal'
-            };
-            sessionStorage.setItem('cbt_current_mode', JSON.stringify(modeConfig));
-
-            // Redirect to existing CBT test/exam page
-            window.location.href = mode === 'test' ? '../cbt/test.html' : '../cbt/exam.html';
         }
     </script>
 
