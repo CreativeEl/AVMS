@@ -48,15 +48,12 @@ function prettySize(bytes) {
 
 // ============================================
 // IMAGE COMPRESSOR
-// Resizes + recompresses until under MAX_UPLOAD_BYTES.
-// Returns a File object. Throws if it can't get under limit.
 // ============================================
 async function compressImage(file, fieldLabel) {
     if (!file.type.startsWith('image/')) return file;
 
-    const targetBytes = MAX_UPLOAD_BYTES - 8 * 1024; // leave 8 KB headroom
+    const targetBytes = MAX_UPLOAD_BYTES - 8 * 1024;
 
-    // If already small enough, return as-is
     if (file.size <= targetBytes) return file;
 
     const bitmap = await loadImage(file);
@@ -81,7 +78,6 @@ async function compressImage(file, fieldLabel) {
         }
     }
 
-    // Last resort: strip to jpeg at low quality
     const lastBlob = await drawToBlob(bitmap, Math.min(500, origW), Math.min(500, origH), 0.3, 'image/jpeg');
     if (lastBlob && lastBlob.size <= targetBytes) {
         const baseName = (file.name || 'photo').replace(/\.[^.]+$/, '');
@@ -103,7 +99,6 @@ function loadImage(file) {
         };
         img.onerror = () => {
             URL.revokeObjectURL(url);
-            // Fallback: createImageBitmap (works on HEIC in some browsers)
             if (typeof createImageBitmap === 'function') {
                 createImageBitmap(file).then(resolve).catch(reject);
             } else {
@@ -624,9 +619,11 @@ function initForm() {
 
         // ============================================
         // STEP 1: COMPRESS + UPLOAD FILES
+        // Saves the STORAGE PATH (not public URL) so admins can
+        // generate signed URLs on demand.
         // ============================================
         const fileFields = ['passportPhoto', 'admissionLetter', 'studentId', 'paymentReceipt'];
-        const fileUrls = {
+        const filePaths = {
             passportPhoto: '',
             admissionLetter: '',
             studentId: '',
@@ -643,13 +640,11 @@ function initForm() {
             if (!file) continue;
 
             try {
-                // Compress if image
                 if (file.type.startsWith('image/')) {
                     showFormMessage(`⏳ Compressing ${fieldLabel}...`, 'warn');
                     file = await compressImage(file, fieldLabel);
                 }
 
-                // PDF or other — check size
                 if (file.size > MAX_UPLOAD_BYTES) {
                     throw new Error(
                         `${fieldLabel} is ${prettySize(file.size)}. Maximum allowed is ${formatKB(MAX_UPLOAD_BYTES)}. Please upload a smaller file.`
@@ -675,11 +670,8 @@ function initForm() {
                     throw new Error(`${fieldLabel} upload failed: ${ok.error || 'network error'}. Please try again.`);
                 }
 
-                const { data: urlData } = supabase.storage
-                    .from('membership-documents')
-                    .getPublicUrl(filePath);
-
-                fileUrls[field] = urlData?.publicUrl || '';
+                // SAVE THE PATH (not the public URL)
+                filePaths[field] = filePath;
 
             } catch (error) {
                 console.warn('Upload error:', error);
@@ -776,10 +768,10 @@ function initForm() {
             phone: document.getElementById('phone')?.value || '',
             email: email,
             home_address: document.getElementById('homeAddress')?.value || '',
-            passport_photo_url: fileUrls.passportPhoto || '',
-            admission_letter_url: fileUrls.admissionLetter || '',
-            student_id_url: fileUrls.studentId || '',
-            payment_receipt_url: fileUrls.paymentReceipt || '',
+            passport_photo_url: filePaths.passportPhoto || '',
+            admission_letter_url: filePaths.admissionLetter || '',
+            student_id_url: filePaths.studentId || '',
+            payment_receipt_url: filePaths.paymentReceipt || '',
             auth_user_id: authUserId,
             is_active: false,
             status: 'pending',
@@ -805,7 +797,6 @@ function initForm() {
         }
     }
 
-    // Upload with retry on network errors
     async function uploadWithRetry(bucket, path, file, attemptsLeft) {
         try {
             const { error } = await supabase.storage
