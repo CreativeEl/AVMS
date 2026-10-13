@@ -21,6 +21,20 @@
             --cream: #F5F0DC;
             --cream-light: #FBF8EE;
             --border: #e3e0d2;
+            --bg: #FBF8EE;
+            --text: #1a1a1a;
+            --text-soft: #6b6b6b;
+            --field-bg: #F7F5EC;
+            --card-bg: #ffffff;
+        }
+
+        body.dark {
+            --bg: #0F1F19;
+            --text: #E8E8E8;
+            --text-soft: #A8A8A8;
+            --field-bg: #1A2E24;
+            --card-bg: #15271F;
+            --border: #1F4E3D;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -28,9 +42,10 @@
         html, body {
             height: 100%;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #FBF8EE;
-            color: #1a1a1a;
+            background: var(--bg);
+            color: var(--text);
             overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
         }
 
         body {
@@ -61,6 +76,12 @@
             pointer-events: none;
             z-index: 0;
         }
+        body.dark::before {
+            background: radial-gradient(circle, rgba(201,169,97,0.08) 0%, transparent 70%);
+        }
+        body.dark::after {
+            background: radial-gradient(circle, rgba(45,107,84,0.18) 0%, transparent 70%);
+        }
 
         .app-screen {
             position: relative;
@@ -78,6 +99,7 @@
         .top-bar {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             margin-bottom: 28px;
             min-height: 32px;
         }
@@ -91,6 +113,7 @@
             font-weight: 600;
             padding: 6px 10px 6px 0;
         }
+        body.dark .top-bar a { color: var(--gold); }
         .top-bar a i { font-size: 14px; }
 
         /* LOGO */
@@ -136,17 +159,23 @@
             letter-spacing: -0.3px;
             margin-bottom: 4px;
         }
+        body.dark .logo-wrap h1 { color: var(--gold); }
         .logo-wrap p {
             font-size: 13px;
-            color: #6b6b6b;
+            color: var(--text-soft);
         }
 
         /* LOGIN CARD */
         .login-card {
-            background: #ffffff;
+            background: var(--card-bg);
             border-radius: 24px;
             padding: 28px 22px 24px;
             box-shadow: 0 12px 40px rgba(31,78,61,0.08), 0 2px 8px rgba(31,78,61,0.04);
+            transition: background 0.3s;
+        }
+        body.dark .login-card {
+            border: 1px solid var(--border);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
         }
 
         .field {
@@ -161,11 +190,12 @@
             letter-spacing: 0.3px;
             text-transform: uppercase;
         }
+        body.dark .field-label { color: var(--gold); }
         .field-input {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: #F7F5EC;
+            background: var(--field-bg);
             border: 1.5px solid transparent;
             border-radius: 14px;
             padding: 0 16px;
@@ -174,8 +204,12 @@
         }
         .field-input:focus-within {
             border-color: var(--green-mid);
-            background: #ffffff;
+            background: var(--card-bg);
             box-shadow: 0 0 0 4px rgba(45,107,84,0.08);
+        }
+        body.dark .field-input:focus-within {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(201,169,97,0.15);
         }
         .field-input i {
             color: #8a8a8a;
@@ -190,7 +224,7 @@
             outline: none;
             font-family: 'Inter', sans-serif;
             font-size: 15px;
-            color: #1a1a1a;
+            color: var(--text);
             height: 100%;
         }
         .field-input input::placeholder { color: #a8a8a8; }
@@ -250,19 +284,22 @@
             gap: 8px;
             text-decoration: none;
         }
+        body.dark .btn-outline { color: var(--gold); border-color: var(--gold); }
         .btn-outline:active { transform: scale(0.98); }
         .btn-outline:hover { background: rgba(31,78,61,0.05); }
+        body.dark .btn-outline:hover { background: rgba(201,169,97,0.1); }
 
         .forgot-link {
             display: block;
             text-align: center;
             margin-top: 18px;
             font-size: 13px;
-            color: #6b6b6b;
+            color: var(--text-soft);
             text-decoration: none;
             font-weight: 500;
         }
         .forgot-link:hover { color: var(--green-deep); text-decoration: underline; }
+        body.dark .forgot-link:hover { color: var(--gold); }
 
         /* MESSAGES */
         .alert {
@@ -277,6 +314,9 @@
         .alert-error { background: #FBE9E9; color: var(--red-deep); border-left: 4px solid var(--red-deep); }
         .alert-warn { background: #FBF3DD; color: #6b4a05; border-left: 4px solid var(--gold); }
         .alert-success { background: #E8F3EC; color: var(--green-deep); border-left: 4px solid var(--green-mid); }
+        body.dark .alert-error { background: #3A1A1A; color: #F0A0A0; }
+        body.dark .alert-warn { background: #3A2E14; color: #F0D080; }
+        body.dark .alert-success { background: #1A3A24; color: #A0E0A0; }
 
         /* FOOTER */
         .app-footer {
@@ -287,6 +327,7 @@
             line-height: 1.6;
         }
         .app-footer a { color: var(--green-deep); text-decoration: none; font-weight: 600; }
+        body.dark .app-footer a { color: var(--gold); }
 
         /* SPINNER */
         .spinner {
@@ -299,6 +340,33 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* THEME TOGGLE (bottom-right) */
+        .theme-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1200;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            background: var(--green-deep);
+            color: var(--gold);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 6px 18px rgba(31,78,61,0.35);
+            transition: transform 0.18s, background 0.18s, color 0.18s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .theme-toggle:hover { background: var(--green-mid); transform: scale(1.06); }
+        .theme-toggle:active { transform: scale(0.94); }
+        @media (max-width: 768px) {
+            .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; }
+        }
+
         /* DESKTOP NICE-TO-HAVE */
         @media (min-width: 640px) {
             .app-screen { padding-top: 48px; padding-bottom: 48px; }
@@ -306,6 +374,10 @@
     </style>
 </head>
 <body>
+
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </button>
 
     <div class="app-screen">
 
@@ -368,6 +440,26 @@
     </div>
 
     <script>
+        // ============================================
+        // THEME TOGGLE (dark mode)
+        // ============================================
+        (function initTheme() {
+            const saved = localStorage.getItem('avms-theme');
+            if (saved === 'dark') {
+                document.body.classList.add('dark');
+                const icon = document.querySelector('#themeToggle i');
+                if (icon) icon.className = 'fas fa-sun';
+            }
+        })();
+
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('avms-theme', isDark ? 'dark' : 'light');
+            const icon = this.querySelector('i');
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        });
+
         document.getElementById('year').textContent = new Date().getFullYear();
 
         // ============================================
