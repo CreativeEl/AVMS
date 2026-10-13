@@ -8,14 +8,55 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('avms-theme') || 'light';
+                if (t === 'dark') document.documentElement.classList.add('dark');
+            } catch(e){}
+        })();
+    </script>
     <style>
+        :root {
+            --green-deep: #1F4E3D;
+            --green-mid: #2D6B54;
+            --gold: #C9A961;
+            --gold-deep: #A88943;
+            --red-deep: #8B1A1A;
+
+            --bg: #F5F0DC;
+            --surface: #ffffff;
+            --surface-2: #FBF8EE;
+            --text: #1a1a1a;
+            --text-soft: #666;
+            --text-muted: #888;
+            --border: #e3e0d2;
+            --border-hair: #f0ede0;
+            --icon-bg: #F7F5EC;
+            --hover-bg: #F5F0DC;
+        }
+
+        html.dark {
+            --bg: #0f1714;
+            --surface: #182420;
+            --surface-2: #1e2c26;
+            --text: #e8f0ea;
+            --text-soft: #a8b5ac;
+            --text-muted: #7a8a80;
+            --border: #24352e;
+            --border-hair: #1e2c26;
+            --icon-bg: #1e2c26;
+            --hover-bg: #1e2c26;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #F5F0DC;
-            color: #1a1a1a;
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
         }
 
         /* ============================================
@@ -30,6 +71,9 @@
             z-index: 100;
             box-shadow: 0 2px 10px rgba(31,78,61,0.2);
             border-bottom: 3px solid #C9A961;
+        }
+        html.dark .topbar {
+            background: #0a120f;
         }
         .topbar-inner {
             max-width: 1200px;
@@ -90,6 +134,23 @@
         .user-pill i {
             color: #C9A961;
         }
+        .theme-toggle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.22); }
+        .theme-toggle:active { transform: scale(0.94); }
         .btn-logout {
             background: #8B1A1A;
             color: white;
@@ -119,7 +180,6 @@
             padding: 30px 20px 60px;
         }
 
-        /* Welcome card */
         .welcome-card {
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
             color: white;
@@ -129,6 +189,9 @@
             position: relative;
             overflow: hidden;
             border-top: 4px solid #C9A961;
+        }
+        html.dark .welcome-card {
+            background: linear-gradient(135deg, #0a120f 0%, #122620 100%);
         }
         .welcome-card::before {
             content: '';
@@ -172,19 +235,19 @@
             color: #C9A961;
         }
 
-        /* Semester selector */
         .semester-section {
-            background: white;
+            background: var(--surface);
             padding: 25px;
             border-radius: 15px;
-            border: 1px solid #e3e0d2;
+            border: 1px solid var(--border);
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
             margin-bottom: 25px;
+            transition: background 0.3s, border-color 0.3s;
         }
         .semester-label {
             font-size: 14px;
             font-weight: 700;
-            color: #1F4E3D;
+            color: var(--green-deep);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 15px;
@@ -192,6 +255,7 @@
             align-items: center;
             gap: 8px;
         }
+        html.dark .semester-label { color: var(--gold); }
         .semester-label i {
             color: #C9A961;
         }
@@ -201,8 +265,8 @@
             gap: 15px;
         }
         .semester-tab {
-            background: #FBF8EE;
-            border: 2px solid #e3e0d2;
+            background: var(--surface-2);
+            border: 2px solid var(--border);
             border-radius: 12px;
             padding: 20px;
             cursor: pointer;
@@ -211,7 +275,7 @@
             font-family: inherit;
             font-size: 15px;
             font-weight: 600;
-            color: #666;
+            color: var(--text-soft);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -221,21 +285,23 @@
             font-size: 24px;
             color: #2D6B54;
         }
+        html.dark .semester-tab i { color: var(--gold); }
         .semester-tab:hover {
             border-color: #C9A961;
-            background: #F5F0DC;
-            color: #1F4E3D;
+            background: var(--hover-bg);
+            color: var(--green-deep);
         }
+        html.dark .semester-tab:hover { color: var(--gold); }
         .semester-tab.active {
             border-color: #C9A961;
-            background: #F5F0DC;
-            color: #1F4E3D;
+            background: var(--hover-bg);
+            color: var(--green-deep);
         }
+        html.dark .semester-tab.active { color: var(--gold); }
         .semester-tab.active i {
             color: #C9A961;
         }
 
-        /* Courses section */
         .courses-section-header {
             display: flex;
             justify-content: space-between;
@@ -246,25 +312,27 @@
         }
         .courses-section-header h3 {
             font-family: Georgia, 'Times New Roman', serif;
-            color: #1F4E3D;
+            color: var(--green-deep);
             font-size: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
             font-weight: 700;
         }
+        html.dark .courses-section-header h3 { color: var(--gold); }
         .courses-section-header h3 i {
             color: #C9A961;
         }
         .course-count {
-            background: #FBF8EE;
-            color: #1F4E3D;
+            background: var(--surface-2);
+            color: var(--green-deep);
             border: 1px solid #C9A961;
             padding: 6px 14px;
             border-radius: 20px;
             font-size: 13px;
             font-weight: 600;
         }
+        html.dark .course-count { color: var(--gold); }
 
         .courses-grid {
             display: grid;
@@ -273,11 +341,11 @@
         }
 
         .course-card {
-            background: white;
+            background: var(--surface);
             border-radius: 15px;
             padding: 25px;
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
-            border: 1px solid #e3e0d2;
+            border: 1px solid var(--border);
             border-top: 4px solid #C9A961;
             transition: all 0.3s;
             display: flex;
@@ -296,7 +364,7 @@
             gap: 10px;
         }
         .course-code {
-            background: #1F4E3D;
+            background: var(--green-deep);
             color: #C9A961;
             padding: 5px 12px;
             border-radius: 6px;
@@ -304,6 +372,10 @@
             font-size: 13px;
             font-family: monospace;
             letter-spacing: 0.5px;
+        }
+        html.dark .course-code {
+            background: var(--gold);
+            color: #1a1a1a;
         }
         .course-semester-badge {
             padding: 5px 12px;
@@ -314,25 +386,28 @@
             letter-spacing: 0.5px;
         }
         .course-semester-badge.sem1 {
-            background: #FBF8EE;
-            color: #1F4E3D;
+            background: var(--surface-2);
+            color: var(--green-deep);
             border: 1px solid #C9A961;
         }
+        html.dark .course-semester-badge.sem1 { color: var(--gold); }
         .course-semester-badge.sem2 {
-            background: #F5F0DC;
+            background: var(--hover-bg);
             color: #8B1A1A;
             border: 1px solid #C9A961;
         }
+        html.dark .course-semester-badge.sem2 { color: #ff8a8a; }
 
         .course-name {
             font-family: Georgia, 'Times New Roman', serif;
-            color: #1F4E3D;
+            color: var(--green-deep);
             font-size: 18px;
             font-weight: 700;
             line-height: 1.3;
         }
+        html.dark .course-name { color: var(--text); }
         .course-description {
-            color: #666;
+            color: var(--text-soft);
             font-size: 13px;
             line-height: 1.6;
             flex-grow: 1;
@@ -342,22 +417,24 @@
             display: flex;
             gap: 15px;
             padding: 12px 0;
-            border-top: 1px solid #f0ede0;
-            border-bottom: 1px solid #f0ede0;
+            border-top: 1px solid var(--border-hair);
+            border-bottom: 1px solid var(--border-hair);
         }
         .course-stat {
             display: flex;
             align-items: center;
             gap: 6px;
             font-size: 13px;
-            color: #666;
+            color: var(--text-soft);
         }
         .course-stat i {
             color: #2D6B54;
         }
+        html.dark .course-stat i { color: var(--gold); }
         .course-stat strong {
-            color: #1F4E3D;
+            color: var(--green-deep);
         }
+        html.dark .course-stat strong { color: var(--text); }
 
         .course-actions {
             display: grid;
@@ -402,7 +479,8 @@
             box-shadow: 0 6px 15px rgba(139,26,26,0.25);
         }
         .btn-mode:disabled {
-            background: #ccc;
+            background: var(--icon-bg);
+            color: var(--text-muted);
             cursor: not-allowed;
             opacity: 0.6;
         }
@@ -410,15 +488,14 @@
             font-size: 16px;
         }
 
-        /* Empty / loading states */
         .empty-state {
-            background: white;
+            background: var(--surface);
             padding: 60px 20px;
             border-radius: 15px;
             text-align: center;
-            color: #888;
+            color: var(--text-muted);
             grid-column: 1 / -1;
-            border: 1px solid #e3e0d2;
+            border: 1px solid var(--border);
             box-shadow: 0 1px 3px rgba(31,78,61,0.05);
         }
         .empty-state i {
@@ -430,16 +507,16 @@
         }
         .empty-state h4 {
             font-family: Georgia, 'Times New Roman', serif;
-            color: #1F4E3D;
+            color: var(--green-deep);
             font-size: 18px;
             margin-bottom: 8px;
         }
+        html.dark .empty-state h4 { color: var(--gold); }
         .empty-state p {
             font-size: 14px;
             line-height: 1.6;
         }
 
-        /* Loading spinner */
         .spinner {
             display: inline-block;
             width: 14px;
@@ -453,19 +530,15 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Footer */
         .page-footer {
             text-align: center;
             margin-top: 50px;
             padding: 20px;
-            color: #888;
+            color: var(--text-muted);
             font-size: 13px;
-            border-top: 1px solid #e3e0d2;
+            border-top: 1px solid var(--border);
         }
 
-        /* ============================================
-           RESPONSIVE
-           ============================================ */
         @media (max-width: 640px) {
             .topbar-inner {
                 flex-direction: column;
@@ -509,6 +582,9 @@
                     <i class="fas fa-user-graduate"></i>
                     <span id="topbarName">Student</span>
                 </div>
+                <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
                 <button class="btn-logout" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
@@ -577,6 +653,22 @@
 
     <script>
         // ============================================
+        // THEME
+        // ============================================
+        function applyThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('avms-theme', isDark ? 'dark' : 'light'); } catch(e){}
+            applyThemeIcon();
+        }
+        document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+        applyThemeIcon();
+
+        // ============================================
         // HELPERS
         // ============================================
         function escapeHtml(text) {
@@ -627,7 +719,7 @@
         // ============================================
         let currentSemester = 1;
         let allCourses = [];
-        let questionCounts = {}; // { course_id: count }
+        let questionCounts = {};
 
         // ============================================
         // LOGOUT
@@ -635,6 +727,7 @@
         function logout() {
             if (!confirm('Are you sure you want to log out?')) return;
             sessionStorage.removeItem('cbt_student');
+            sessionStorage.removeItem('cbt_current_mode');
             window.location.href = 'login.html';
         }
 
@@ -663,10 +756,7 @@
                 if (error) throw error;
 
                 allCourses = data || [];
-
-                // Load question counts for all courses
                 await loadQuestionCounts();
-
                 displayCourses();
             } catch (err) {
                 console.warn('Error loading courses:', err);
@@ -692,7 +782,6 @@
 
                 if (error) throw error;
 
-                // Count per course
                 questionCounts = {};
                 (data || []).forEach(q => {
                     questionCounts[q.course_id] = (questionCounts[q.course_id] || 0) + 1;
@@ -704,7 +793,7 @@
         }
 
         // ============================================
-        // DISPLAY COURSES FOR CURRENT SEMESTER
+        // DISPLAY COURSES
         // ============================================
         function displayCourses() {
             const grid = document.getElementById('coursesGrid');
@@ -726,7 +815,6 @@
 
             grid.innerHTML = filtered.map(course => {
                 const qCount = questionCounts[course.id] || 0;
-                // Align with the actual startMode requirements below
                 const canTakeTest = qCount >= 40;
                 const canTakeExam = qCount >= 60;
                 // FIXED: single-quoted safe string for onclick attribute
@@ -787,7 +875,6 @@
                 return;
             }
 
-            // Save mode + course for the test page to pick up
             const modeConfig = {
                 mode: mode,
                 course_id: courseId,
