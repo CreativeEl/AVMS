@@ -8,20 +8,69 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('avms-theme') || 'light';
+                if (t === 'dark') document.documentElement.classList.add('dark');
+            } catch(e){}
+        })();
+    </script>
     <style>
+        :root {
+            --green-deep: #1F4E3D;
+            --green-mid: #2D6B54;
+            --gold: #C9A961;
+            --red-deep: #8B1A1A;
+
+            --bg-a: radial-gradient(circle at 20% 20%, rgba(201,169,97,0.15) 0%, transparent 45%);
+            --bg-b: radial-gradient(circle at 80% 80%, rgba(45,107,84,0.35) 0%, transparent 50%);
+            --bg-c: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+
+            --card-bg: #FBF8EE;
+            --card-border-top: #C9A961;
+            --text-strong: #1F4E3D;
+            --text-soft: #666;
+            --text-muted: #888;
+            --input-bg: #ffffff;
+            --input-border: #e3e0d2;
+            --input-text: #1a1a1a;
+            --note-bg: #F5F0DC;
+            --note-border: #C9A961;
+            --note-text: #1F4E3D;
+            --divider: #e3e0d2;
+        }
+
+        html.dark {
+            --bg-a: radial-gradient(circle at 20% 20%, rgba(201,169,97,0.08) 0%, transparent 45%);
+            --bg-b: radial-gradient(circle at 80% 80%, rgba(45,107,84,0.18) 0%, transparent 50%);
+            --bg-c: linear-gradient(135deg, #0a120f 0%, #122620 100%);
+
+            --card-bg: #182420;
+            --card-border-top: #C9A961;
+            --text-strong: #C9A961;
+            --text-soft: #a8b5ac;
+            --text-muted: #7a8a80;
+            --input-bg: #1e2c26;
+            --input-border: #24352e;
+            --input-text: #e8f0ea;
+            --note-bg: #1e2c26;
+            --note-border: #C9A961;
+            --note-text: #e8f0ea;
+            --divider: #24352e;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background:
-                radial-gradient(circle at 20% 20%, rgba(201,169,97,0.15) 0%, transparent 45%),
-                radial-gradient(circle at 80% 80%, rgba(45,107,84,0.35) 0%, transparent 50%),
-                linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
+            background: var(--bg-a), var(--bg-b), var(--bg-c);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            transition: background 0.3s;
         }
 
         .login-wrapper {
@@ -29,7 +78,15 @@
             max-width: 480px;
         }
 
-        /* Back link */
+        /* Back row */
+        .back-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -38,7 +95,6 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            margin-bottom: 20px;
             padding: 8px 16px;
             border-radius: 20px;
             transition: all 0.3s;
@@ -48,13 +104,32 @@
             color: #C9A961;
         }
 
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.2s, transform 0.1s;
+            flex-shrink: 0;
+        }
+        .theme-toggle:hover { background: rgba(255,255,255,0.2); }
+        .theme-toggle:active { transform: scale(0.94); }
+
         /* Main login card */
         .login-card {
-            background: #FBF8EE;
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 40px 35px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            border-top: 4px solid #C9A961;
+            border-top: 4px solid var(--card-border-top);
+            transition: background 0.3s;
         }
 
         .login-header {
@@ -79,29 +154,32 @@
 
         .login-header h1 {
             font-family: Georgia, 'Times New Roman', serif;
-            color: #1F4E3D;
+            color: var(--text-strong);
             font-size: 26px;
             margin-bottom: 8px;
             font-weight: 700;
             letter-spacing: -0.2px;
+            transition: color 0.3s;
         }
 
         .login-header p {
-            color: #666;
+            color: var(--text-soft);
             font-size: 14px;
             line-height: 1.5;
+            transition: color 0.3s;
         }
 
         /* Welcome note */
         .welcome-note {
-            background: #F5F0DC;
-            border-left: 4px solid #C9A961;
+            background: var(--note-bg);
+            border-left: 4px solid var(--note-border);
             padding: 15px 18px;
             border-radius: 8px;
             margin-bottom: 25px;
             font-size: 13px;
-            color: #1F4E3D;
+            color: var(--note-text);
             line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
         }
         .welcome-note i {
             color: #C9A961;
@@ -116,15 +194,19 @@
         .form-group label {
             display: block;
             font-weight: 600;
-            color: #1F4E3D;
+            color: var(--text-strong);
             margin-bottom: 8px;
             font-size: 14px;
+            transition: color 0.3s;
         }
 
         .form-group label i {
             color: #2D6B54;
             margin-right: 6px;
             width: 16px;
+        }
+        html.dark .form-group label i {
+            color: #C9A961;
         }
 
         .input-wrapper {
@@ -134,20 +216,24 @@
         .form-group input {
             width: 100%;
             padding: 14px 45px 14px 15px;
-            border: 1.5px solid #e3e0d2;
+            border: 1.5px solid var(--input-border);
             border-radius: 10px;
             font-size: 15px;
             font-family: inherit;
             transition: all 0.3s;
-            background: white;
-            color: #1a1a1a;
+            background: var(--input-bg);
+            color: var(--input-text);
         }
 
         .form-group input:focus {
             outline: none;
             border-color: #C9A961;
-            background: white;
+            background: var(--input-bg);
             box-shadow: 0 0 0 3px rgba(201,169,97,0.18);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
         }
 
         .input-wrapper .toggle-visibility {
@@ -157,7 +243,7 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #888;
+            color: var(--text-muted);
             cursor: pointer;
             font-size: 16px;
             padding: 5px;
@@ -165,19 +251,22 @@
         }
 
         .input-wrapper .toggle-visibility:hover {
-            color: #2D6B54;
+            color: var(--text-strong);
         }
 
         .form-hint {
             display: block;
-            color: #888;
+            color: var(--text-muted);
             font-size: 12px;
             margin-top: 6px;
         }
 
         .form-hint.warning {
-            color: #8B1A1A;
+            color: #c04545;
             font-weight: 600;
+        }
+        html.dark .form-hint.warning {
+            color: #ff8a8a;
         }
 
         /* Error message */
@@ -190,6 +279,10 @@
             margin-bottom: 18px;
             font-size: 14px;
             display: none;
+        }
+        html.dark .error-msg {
+            background: rgba(220,53,69,0.15);
+            color: #ff8a8a;
         }
         .error-msg.show {
             display: block;
@@ -251,10 +344,11 @@
             text-align: center;
             margin-top: 25px;
             padding-top: 20px;
-            border-top: 1px solid #e3e0d2;
+            border-top: 1px solid var(--divider);
             font-size: 13px;
-            color: #888;
+            color: var(--text-muted);
             line-height: 1.6;
+            transition: color 0.3s, border-color 0.3s;
         }
         .login-footer i {
             color: #C9A961;
@@ -264,6 +358,9 @@
             color: #2D6B54;
             text-decoration: none;
             font-weight: 600;
+        }
+        html.dark .login-footer a {
+            color: #C9A961;
         }
         .login-footer a:hover {
             text-decoration: underline;
@@ -281,6 +378,10 @@
             display: none;
             align-items: center;
             gap: 10px;
+        }
+        html.dark .success-msg {
+            background: rgba(40,167,69,0.15);
+            color: #9ddfa6;
         }
         .success-msg.show {
             display: flex;
@@ -309,10 +410,14 @@
 </head>
 <body>
     <div class="login-wrapper">
-        <!-- Back to homepage -->
-        <a href="../index.html" class="back-link">
-            <i class="fas fa-arrow-left"></i> Back to AVMS Homepage
-        </a>
+        <div class="back-row">
+            <a href="../index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to AVMS Homepage
+            </a>
+            <button class="theme-toggle" id="themeBtn" aria-label="Toggle dark mode">
+                <i class="fas fa-moon" id="themeIcon"></i>
+            </button>
+        </div>
 
         <div class="login-card">
             <div class="login-header">
@@ -368,6 +473,22 @@
     </div>
 
     <script>
+        // ============================================
+        // THEME
+        // ============================================
+        function applyThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('avms-theme', isDark ? 'dark' : 'light'); } catch(e){}
+            applyThemeIcon();
+        }
+        document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+        applyThemeIcon();
+
         // ============================================
         // LOGIN PAGE LOGIC
         // ============================================
@@ -535,7 +656,7 @@
         // ============================================
         // CLEAR OLD SESSION ON LOGIN PAGE
         // ============================================
-        // (So the student is forced to log in again)
+        (So the student is forced to log in again)
         sessionStorage.removeItem('cbt_student');
     </script>
 </body>
