@@ -220,7 +220,7 @@
         .field-input input {
             flex: 1;
             border: none;
-            background: transparent;
+            background: transparent !important;
             outline: none;
             font-family: 'Inter', sans-serif;
             font-size: 15px;
@@ -228,6 +228,40 @@
             height: 100%;
         }
         .field-input input::placeholder { color: #a8a8a8; }
+
+        /* ===== FIX: Browser autofill white background (Chrome/Safari) ===== */
+        .field-input input:-webkit-autofill,
+        .field-input input:-webkit-autofill:hover,
+        .field-input input:-webkit-autofill:focus,
+        .field-input input:-webkit-autofill:active {
+            -webkit-text-fill-color: var(--text) !important;
+            -webkit-box-shadow: 0 0 0 1000px var(--field-bg) inset !important;
+            box-shadow: 0 0 0 1000px var(--field-bg) inset !important;
+            transition: background-color 9999s ease-in-out 0s;
+            caret-color: var(--text);
+        }
+        body.dark .field-input input:-webkit-autofill,
+        body.dark .field-input input:-webkit-autofill:hover,
+        body.dark .field-input input:-webkit-autofill:focus,
+        body.dark .field-input input:-webkit-autofill:active {
+            -webkit-text-fill-color: #E8E8E8 !important;
+            -webkit-box-shadow: 0 0 0 1000px #1A2E24 inset !important;
+            box-shadow: 0 0 0 1000px #1A2E24 inset !important;
+            caret-color: #E8E8E8;
+        }
+
+        /* iOS Safari autofill fix */
+        @supports (-webkit-touch-callout: none) {
+            .field-input input:-webkit-autofill {
+                -webkit-text-fill-color: var(--text) !important;
+                transition: background-color 9999s ease-in-out 0s;
+            }
+            body.dark .field-input input:-webkit-autofill {
+                -webkit-text-fill-color: #E8E8E8 !important;
+                background-color: #1A2E24 !important;
+                transition: background-color 9999s ease-in-out 0s;
+            }
+        }
 
         .toggle-pw {
             background: none;
