@@ -12,7 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
     <script>
-        // Apply saved theme immediately (avoid flash)
         (function(){
             try {
                 var t = localStorage.getItem('avms-theme') || 'light';
@@ -72,7 +71,6 @@
             transition: background 0.25s, color 0.25s;
         }
 
-        /* GUARD */
         .guard-screen {
             position: fixed; inset: 0;
             background: var(--surface-2);
@@ -96,10 +94,8 @@
         .guard-text { font-size: 14px; color: var(--green-deep); font-weight: 600; max-width: 320px; line-height: 1.5; }
         html.dark .guard-text { color: var(--gold); }
 
-        /* PORTAL */
         .portal { display: flex; min-height: 100vh; }
 
-        /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-w);
             background: linear-gradient(180deg, #1F4E3D 0%, #17392c 100%);
@@ -196,7 +192,6 @@
         .sidebar-logout:hover { color: #ffb3b3; }
         .sidebar-logout i { color: #ffb3b3; font-size: 14px; width: 18px; text-align: center; }
 
-        /* MOBILE HERO */
         .mobile-hero {
             display: none;
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
@@ -245,7 +240,9 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 14px;
             flex-shrink: 0;
+            overflow: hidden;
         }
+        .mobile-hero-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .mobile-hero-greet .hi {
             font-size: 11.5px;
             color: rgba(255,255,255,0.65);
@@ -286,7 +283,6 @@
             margin-top: 3px;
         }
 
-        /* MAIN */
         .main {
             flex: 1;
             margin-left: var(--sidebar-w);
@@ -354,7 +350,9 @@
             font-weight: 700; font-size: 14px;
             flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(31,78,61,0.2);
+            overflow: hidden;
         }
+        .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .content {
             padding: 24px 28px 40px;
@@ -478,7 +476,6 @@
             border-top-color: var(--gold);
         }
 
-        /* MOBILE BOTTOM NAV */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -531,7 +528,6 @@
         .app-shell { visibility: hidden; }
         .app-shell.ready { visibility: visible; }
 
-        /* MOBILE */
         @media (max-width: 900px) {
             .sidebar { display: none; }
             .main { margin-left: 0; }
@@ -548,17 +544,14 @@
 </head>
 <body>
 
-    <!-- GUARD -->
     <div class="guard-screen" id="guardScreen">
         <div class="guard-spinner"></div>
         <div class="guard-text" id="guardText">Verifying session...</div>
     </div>
 
-    <!-- PORTAL -->
     <div class="app-shell" id="appShell">
         <div class="portal">
 
-            <!-- SIDEBAR -->
             <aside class="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-logo">AV</div>
@@ -607,10 +600,8 @@
                 </div>
             </aside>
 
-            <!-- MAIN -->
             <div class="main">
 
-                <!-- MOBILE HERO -->
                 <div class="mobile-hero">
                     <div class="mobile-hero-top">
                         <div class="mobile-hero-greet">
@@ -633,7 +624,6 @@
                     <div class="mobile-hero-sub" id="mHeroSub">Study materials for your level</div>
                 </div>
 
-                <!-- TOPBAR -->
                 <header class="topbar">
                     <div class="topbar-title">
                         <h2>Downloads</h2>
@@ -653,7 +643,6 @@
                     </div>
                 </header>
 
-                <!-- CONTENT -->
                 <main class="content">
 
                     <div class="section-head">
@@ -684,7 +673,6 @@
         </div>
     </div>
 
-    <!-- MOBILE BOTTOM NAV -->
     <nav class="bottom-nav">
         <a class="nav-tab" href="dashboard.html">
             <i class="fas fa-house"></i><span>Home</span>
@@ -703,9 +691,6 @@
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // ============================================
-        // THEME
-        // ============================================
         function applyThemeIcons() {
             const isDark = document.documentElement.classList.contains('dark');
             const icon = isDark ? 'fa-sun' : 'fa-moon';
@@ -722,9 +707,6 @@
         document.getElementById('mThemeBtn').addEventListener('click', toggleTheme);
         applyThemeIcons();
 
-        // ============================================
-        // HELPERS
-        // ============================================
         function initials(name) {
             if (!name) return 'AV';
             const parts = name.trim().split(/\s+/);
@@ -746,17 +728,77 @@
         }
         async function doLogout() {
             try { await supabase.auth.signOut(); } catch (e) {}
+            try {
+                sessionStorage.removeItem('avms_avatar_url');
+                sessionStorage.removeItem('avms_avatar_expires');
+            } catch(e){}
             localStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminSession');
             window.location.href = 'login.html';
         }
 
+        // AVATAR helpers
+        function extractStoragePath(input) {
+            if (!input) return null;
+            const str = String(input).trim();
+            if (!str) return null;
+            const marker = '/membership-documents/';
+            const idx = str.indexOf(marker);
+            if (idx !== -1) return str.substring(idx + marker.length);
+            return str;
+        }
+
+        async function ensureAvatar(userId) {
+            const url = sessionStorage.getItem('avms_avatar_url');
+            const exp = parseInt(sessionStorage.getItem('avms_avatar_expires') || '0', 10);
+            if (url && Date.now() < exp) return;
+            try {
+                const { data: app } = await supabase
+                    .from('membership_applications')
+                    .select('passport_photo_url')
+                    .eq('auth_user_id', userId)
+                    .order('applied_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                if (!app || !app.passport_photo_url) {
+                    sessionStorage.removeItem('avms_avatar_url');
+                    sessionStorage.removeItem('avms_avatar_expires');
+                    return;
+                }
+                const path = extractStoragePath(app.passport_photo_url);
+                if (!path) return;
+                const { data: signed } = await supabase.storage
+                    .from('membership-documents')
+                    .createSignedUrl(path, 3600);
+                if (signed && signed.signedUrl) {
+                    sessionStorage.setItem('avms_avatar_url', signed.signedUrl);
+                    sessionStorage.setItem('avms_avatar_expires', String(Date.now() + 45 * 60 * 1000));
+                }
+            } catch (e) {
+                console.warn('Avatar refresh failed (non-fatal):', e);
+            }
+        }
+
+        function applyAvatar(ini) {
+            const url = sessionStorage.getItem('avms_avatar_url');
+            const exp = parseInt(sessionStorage.getItem('avms_avatar_expires') || '0', 10);
+            const hasFresh = url && Date.now() < exp;
+            const targets = [
+                document.getElementById('topbarAvatar'),
+                document.getElementById('mHeroAvatar')
+            ].filter(Boolean);
+            targets.forEach(el => {
+                if (hasFresh) {
+                    el.innerHTML = `<img src="${url}" alt="" onerror="this.parentElement.textContent='${ini}';">`;
+                } else {
+                    el.textContent = ini;
+                }
+            });
+        }
+
         let currentStudent = null;
 
-        // ============================================
-        // GUARD + INIT
-        // ============================================
         (async function init() {
             if (typeof supabase === 'undefined' || !supabase) {
                 showGuard('Connection error. Please refresh.');
@@ -783,7 +825,9 @@
                 }
 
                 currentStudent = student;
+                await ensureAvatar(userId);
                 renderStudent(student);
+                applyAvatar(initials(student.full_name));
                 hideGuard();
                 loadMaterialsAndDownloads();
             } catch (err) {
@@ -796,32 +840,23 @@
         function renderStudent(s) {
             const fullName = s.full_name || 'Student';
             const firstName = fullName.split(/\s+/)[0] || 'Student';
-            const ini = initials(fullName);
             const reg = s.reg_no || '—';
             const level = s.class_level ? (s.class_level + ' Level') : '—';
 
             document.getElementById('topbarName').textContent = fullName;
             document.getElementById('topbarReg').textContent = reg;
-            document.getElementById('topbarAvatar').textContent = ini;
-
             document.getElementById('mHeroName').textContent = firstName;
-            document.getElementById('mHeroAvatar').textContent = ini;
-
             document.getElementById('materialsLevel').textContent = level;
         }
 
         document.getElementById('sidebarLogout').addEventListener('click', doLogout);
         document.getElementById('mHeroLogout').addEventListener('click', doLogout);
 
-        // ============================================
-        // LOAD: materials + general downloads
-        // ============================================
         async function loadMaterialsAndDownloads() {
             const mBox = document.getElementById('materialsList');
             const dBox = document.getElementById('downloadsList');
             const countEl = document.getElementById('materialsCount');
 
-            // Materials filtered by level
             if (currentStudent && currentStudent.class_level) {
                 try {
                     const { data, error } = await supabase
@@ -853,7 +888,6 @@
                 mBox.innerHTML = `<div class="empty-card"><i class="fas fa-book-open"></i>No materials — your level isn't set.</div>`;
             }
 
-            // General downloads
             try {
                 const { data, error } = await supabase
                     .from('documents').select('*')
