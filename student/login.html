@@ -516,6 +516,62 @@
         }
 
         // ============================================
+        // AVATAR — sign + cache (45 min)
+        // ============================================
+        function extractStoragePath(input) {
+            if (!input) return null;
+            const str = String(input).trim();
+            if (!str) return null;
+            const marker = '/membership-documents/';
+            const idx = str.indexOf(marker);
+            if (idx !== -1) return str.substring(idx + marker.length);
+            return str;
+        }
+
+        async function signAndCacheAvatar(userId) {
+            try {
+                const { data: app, error } = await supabase
+                    .from('membership_applications')
+                    .select('passport_photo_url')
+                    .eq('auth_user_id', userId)
+                    .order('applied_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (error || !app || !app.passport_photo_url) {
+                    // No passport — clear any stale cache
+                    sessionStorage.removeItem('avms_avatar_url');
+                    sessionStorage.removeItem('avms_avatar_expires');
+                    return;
+                }
+
+                const path = extractStoragePath(app.passport_photo_url);
+                if (!path) {
+                    sessionStorage.removeItem('avms_avatar_url');
+                    sessionStorage.removeItem('avms_avatar_expires');
+                    return;
+                }
+
+                const { data: signed, error: signErr } = await supabase.storage
+                    .from('membership-documents')
+                    .createSignedUrl(path, 3600);
+
+                if (signErr || !signed || !signed.signedUrl) {
+                    sessionStorage.removeItem('avms_avatar_url');
+                    sessionStorage.removeItem('avms_avatar_expires');
+                    return;
+                }
+
+                sessionStorage.setItem('avms_avatar_url', signed.signedUrl);
+                sessionStorage.setItem('avms_avatar_expires', String(Date.now() + 45 * 60 * 1000));
+            } catch (e) {
+                console.warn('Avatar signing failed (non-fatal):', e);
+                sessionStorage.removeItem('avms_avatar_url');
+                sessionStorage.removeItem('avms_avatar_expires');
+            }
+        }
+
+        // ============================================
         // SESSION HYGIENE — if an old session exists, re-verify against the roster.
         // If the student's roster row is gone or deactivated, force sign-out.
         // ============================================
@@ -527,7 +583,6 @@
 
                 const userId = sess.session.user.id;
 
-                // Check 1: by auth_user_id
                 const { data: byAuth } = await supabase
                     .from('students')
                     .select('id, is_active')
@@ -537,13 +592,14 @@
                 if (!byAuth || byAuth.is_active !== true) {
                     await killSession();
                     try {
+                        sessionStorage.removeItem('avms_avatar_url');
+                        sessionStorage.removeItem('avms_avatar_expires');
                         localStorage.removeItem('adminLoggedIn');
                         sessionStorage.removeItem('adminLoggedIn');
                         sessionStorage.removeItem('adminSession');
                     } catch (e) {}
                 }
             } catch (err) {
-                // If we can't verify, be safe and sign out
                 await killSession();
             }
         })();
@@ -607,7 +663,6 @@
             setLoading(true);
 
             try {
-                // 1) Sign in
                 const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
                     email: email,
                     password: password
@@ -633,7 +688,6 @@
                     return;
                 }
 
-                // 2) Check student record — by auth_user_id
                 const { data: studentByAuth, error: stuErr } = await supabase
                     .from('students')
                     .select('id, is_active, full_name, reg_no, class_level')
@@ -643,7 +697,6 @@
                 if (stuErr) throw stuErr;
 
                 if (!studentByAuth) {
-                    // No roster record linked — sign them out
                     await killSession();
                     showAlert('⚠️ No student record is linked to this account. Please contact AVMS.', 'error');
                     setLoading(false);
@@ -657,7 +710,6 @@
                     return;
                 }
 
-                // 3) Double-check by reg_no (belt + suspenders — in case auth_user_id drifts)
                 const { data: studentByReg } = await supabase
                     .from('students')
                     .select('id, is_active')
@@ -671,7 +723,9 @@
                     return;
                 }
 
-                // 4) Approved — redirect to dashboard
+                // Sign & cache the passport avatar (non-blocking — failure doesn't stop login)
+                await signAndCacheAvatar(userId);
+
                 showAlert('✅ Login successful. Redirecting...', 'success');
                 window.location.href = 'dashboard.html';
 
