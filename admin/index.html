@@ -10,6 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/config.js"></script>
+    <script>
+        (function(){
+            try {
+                var t = localStorage.getItem('avms-theme') || 'light';
+                if (t === 'dark') document.body && document.body.classList.add('dark');
+            } catch(e){}
+        })();
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -28,6 +36,11 @@
             padding: 20px;
             position: relative;
             overflow: hidden;
+            transition: background 0.3s;
+        }
+
+        body.dark .admin-login {
+            background: linear-gradient(135deg, #0a120f 0%, #0f1f19 45%, #122620 100%);
         }
 
         .admin-login::before {
@@ -64,6 +77,15 @@
             position: relative;
             z-index: 1;
             border-top: 4px solid #C9A961;
+            transition: background 0.3s;
+        }
+
+        body.dark .login-box {
+            background: #15271F;
+            color: #E8E8E8;
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(201, 169, 97, 0.35);
         }
 
         .login-box .logo-text {
@@ -82,7 +104,9 @@
             text-align: center;
             margin-bottom: 8px;
             letter-spacing: -0.3px;
+            transition: color 0.3s;
         }
+        body.dark .login-box h1 { color: #C9A961; }
 
         .login-box > p {
             color: #888;
@@ -92,6 +116,7 @@
             font-weight: 500;
             letter-spacing: 0.3px;
         }
+        body.dark .login-box > p { color: #A8A8A8; }
 
         .login-box .form-group {
             margin-bottom: 18px;
@@ -103,7 +128,9 @@
             color: #1F4E3D;
             margin-bottom: 7px;
             font-size: 13.5px;
+            transition: color 0.3s;
         }
+        body.dark .login-box .form-group label { color: #C9A961; }
 
         .login-box .form-group input {
             width: 100%;
@@ -117,15 +144,26 @@
             color: #1a1a1a;
         }
 
+        body.dark .login-box .form-group input {
+            background: #1A2E24;
+            border-color: #1F4E3D;
+            color: #E8E8E8;
+        }
+
         .login-box .form-group input::placeholder {
             color: #a8a89a;
         }
+        body.dark .login-box .form-group input::placeholder { color: #8A8A8A; }
 
         .login-box .form-group input:focus {
             border-color: #C9A961;
             outline: none;
             background: white;
             box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+        }
+        body.dark .login-box .form-group input:focus {
+            background: #15271F;
+            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.25);
         }
 
         .login-box .btn {
@@ -172,6 +210,10 @@
             display: none;
             border-left: 4px solid #dc3545;
         }
+        body.dark .login-box .error-msg {
+            background: #3A1A1A;
+            color: #F0A0A0;
+        }
 
         .login-box .error-msg.show {
             display: block;
@@ -191,6 +233,11 @@
             border-top: 1px solid #f0ede0;
             font-size: 12.5px;
             color: #888;
+            transition: color 0.3s, border-color 0.3s;
+        }
+        body.dark .login-footer {
+            border-top-color: #1F4E3D;
+            color: #A8A8A8;
         }
 
         .login-footer a {
@@ -199,9 +246,37 @@
             font-weight: 600;
             transition: color 0.2s;
         }
+        body.dark .login-footer a { color: #C9A961; }
 
         .login-footer a:hover {
             color: #C9A961;
+        }
+
+        /* THEME TOGGLE */
+        .theme-toggle {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1200;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #C9A961;
+            background: #1F4E3D;
+            color: #C9A961;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 6px 18px rgba(31,78,61,0.35);
+            transition: transform 0.18s, background 0.18s, color 0.18s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .theme-toggle:hover { background: #2D6B54; transform: scale(1.06); }
+        .theme-toggle:active { transform: scale(0.94); }
+        @media (max-width: 768px) {
+            .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; }
         }
 
         @media (max-width: 480px) {
@@ -219,6 +294,10 @@
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
     <div class="admin-login">
         <div class="login-box">
             <span class="logo-text">🔐</span>
@@ -246,6 +325,29 @@
     </div>
 
     <script>
+        // ============================================
+        // THEME TOGGLE
+        // ============================================
+        (function initTheme() {
+            const saved = localStorage.getItem('avms-theme');
+            if (saved === 'dark') {
+                document.body.classList.add('dark');
+                const icon = document.querySelector('#themeToggle i');
+                if (icon) icon.className = 'fas fa-sun';
+            }
+        })();
+
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('avms-theme', isDark ? 'dark' : 'light');
+            const icon = this.querySelector('i');
+            icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        });
+
+        // ============================================
+        // LOGIN
+        // ============================================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔐 Login page loaded');
 
@@ -253,12 +355,10 @@
             const errorDiv = document.getElementById('loginError');
             const submitBtn = document.getElementById('loginBtn');
 
-            // If already logged in via Supabase, check role then redirect
             supabase.auth.getSession().then(async ({ data }) => {
                 if (data && data.session) {
                     console.log('✅ Existing Supabase session found');
 
-                    // ROLE CHECK
                     const role = data.session.user.user_metadata?.role;
                     if (role !== 'admin') {
                         console.warn('🚫 Non-admin session detected — signing out');
@@ -280,7 +380,6 @@
                     window.location.href = 'dashboard.html';
                     return;
                 }
-                // Pre-fill from previous session if "remember" flag exists
                 const rememberedEmail = localStorage.getItem('adminEmail');
                 if (rememberedEmail) {
                     document.getElementById('adminEmail').value = rememberedEmail;
@@ -297,7 +396,6 @@
                 const email = document.getElementById('adminEmail').value.trim();
                 const password = document.getElementById('adminPassword').value;
 
-                // Show loading state
                 const originalText = submitBtn.innerHTML;
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = 'Signing in...';
@@ -319,7 +417,6 @@
 
                     console.log('✅ Login successful for:', data.user.email);
 
-                    // ROLE CHECK — only admins allowed past this point
                     const role = data.user.user_metadata?.role;
                     if (role !== 'admin') {
                         console.warn('🚫 Access denied — user is not admin');
@@ -333,10 +430,7 @@
 
                     console.log('✅ Admin role confirmed');
 
-                    // Store email for pre-fill on next visit
                     localStorage.setItem('adminEmail', email);
-
-                    // Bridge: set old flags so unupdated pages still work
                     localStorage.setItem('adminLoggedIn', 'true');
                     sessionStorage.setItem('adminLoggedIn', 'true');
                     sessionStorage.setItem('adminSession', JSON.stringify({
@@ -345,7 +439,6 @@
                         timestamp: Date.now()
                     }));
 
-                    // Redirect to dashboard
                     window.location.href = 'dashboard.html';
 
                 } catch (err) {
