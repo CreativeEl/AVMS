@@ -66,7 +66,6 @@
             transition: background 0.25s, color 0.25s;
         }
 
-        /* GUARD */
         .guard-screen {
             position: fixed; inset: 0;
             background: var(--surface-2);
@@ -92,7 +91,6 @@
 
         .portal { display: flex; min-height: 100vh; }
 
-        /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-w);
             background: linear-gradient(180deg, #1F4E3D 0%, #17392c 100%);
@@ -167,7 +165,6 @@
         .sidebar-logout:hover { color: #ffb3b3; }
         .sidebar-logout i { color: #ffb3b3; font-size: 14px; width: 18px; text-align: center; }
 
-        /* MOBILE HERO */
         .mobile-hero {
             display: none;
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
@@ -208,6 +205,10 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 14px;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        .mobile-hero-avatar img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
         }
         .mobile-hero-greet .hi {
             font-size: 11.5px; color: rgba(255,255,255,0.65);
@@ -268,6 +269,10 @@
             color: var(--gold);
             font-weight: 700; font-size: 15px;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+        .mobile-id-card .id-logo img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
         }
         .mobile-id-card .id-body { flex: 1; min-width: 0; }
         .mobile-id-card .id-label {
@@ -332,7 +337,6 @@
         html.dark .nav-tab.active i { color: var(--gold); }
         .nav-tab:active { transform: scale(0.94); }
 
-        /* MAIN */
         .main {
             flex: 1;
             margin-left: var(--sidebar-w);
@@ -393,6 +397,10 @@
             font-weight: 700; font-size: 14px;
             flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(31,78,61,0.2);
+            overflow: hidden;
+        }
+        .topbar-avatar img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
         }
 
         .content {
@@ -677,17 +685,14 @@
 </head>
 <body>
 
-    <!-- GUARD -->
     <div class="guard-screen" id="guardScreen">
         <div class="guard-spinner"></div>
         <div class="guard-text" id="guardText">Verifying session...</div>
     </div>
 
-    <!-- PORTAL -->
     <div class="app-shell" id="appShell">
         <div class="portal">
 
-            <!-- SIDEBAR -->
             <aside class="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-logo">AV</div>
@@ -736,10 +741,8 @@
                 </div>
             </aside>
 
-            <!-- MAIN -->
             <div class="main">
 
-                <!-- MOBILE HERO -->
                 <div class="mobile-hero">
                     <div class="mobile-hero-top">
                         <div class="mobile-hero-greet">
@@ -762,7 +765,6 @@
                     <div class="mobile-hero-sub">AVMS · ABU Zaria</div>
                 </div>
 
-                <!-- MOBILE ID CARD -->
                 <div class="mobile-id-card-wrap">
                     <div class="mobile-id-card">
                         <div class="id-logo">AV</div>
@@ -775,7 +777,6 @@
                     </div>
                 </div>
 
-                <!-- TOPBAR -->
                 <header class="topbar">
                     <div class="topbar-title">
                         <h2>Dashboard</h2>
@@ -795,7 +796,6 @@
                     </div>
                 </header>
 
-                <!-- CONTENT -->
                 <main class="content">
 
                     <div class="welcome-banner">
@@ -880,7 +880,6 @@
         </div>
     </div>
 
-    <!-- MOBILE BOTTOM NAV -->
     <nav class="bottom-nav">
         <a class="nav-tab active" href="dashboard.html">
             <i class="fas fa-house"></i><span>Home</span>
@@ -944,15 +943,87 @@
         }
         async function doLogout() {
             try { await supabase.auth.signOut(); } catch (e) {}
+            try {
+                sessionStorage.removeItem('avms_avatar_url');
+                sessionStorage.removeItem('avms_avatar_expires');
+            } catch(e){}
             localStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminSession');
             window.location.href = 'login.html';
         }
 
+        // ============================================
+        // AVATAR — read cached URL, refresh if stale
+        // ============================================
+        function extractStoragePath(input) {
+            if (!input) return null;
+            const str = String(input).trim();
+            if (!str) return null;
+            const marker = '/membership-documents/';
+            const idx = str.indexOf(marker);
+            if (idx !== -1) return str.substring(idx + marker.length);
+            return str;
+        }
+
+        async function ensureAvatar(userId) {
+            const url = sessionStorage.getItem('avms_avatar_url');
+            const exp = parseInt(sessionStorage.getItem('avms_avatar_expires') || '0', 10);
+            if (url && Date.now() < exp) return; // still fresh
+
+            try {
+                const { data: app } = await supabase
+                    .from('membership_applications')
+                    .select('passport_photo_url')
+                    .eq('auth_user_id', userId)
+                    .order('applied_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (!app || !app.passport_photo_url) {
+                    sessionStorage.removeItem('avms_avatar_url');
+                    sessionStorage.removeItem('avms_avatar_expires');
+                    return;
+                }
+
+                const path = extractStoragePath(app.passport_photo_url);
+                if (!path) return;
+
+                const { data: signed } = await supabase.storage
+                    .from('membership-documents')
+                    .createSignedUrl(path, 3600);
+
+                if (signed && signed.signedUrl) {
+                    sessionStorage.setItem('avms_avatar_url', signed.signedUrl);
+                    sessionStorage.setItem('avms_avatar_expires', String(Date.now() + 45 * 60 * 1000));
+                }
+            } catch (e) {
+                console.warn('Avatar refresh failed (non-fatal):', e);
+            }
+        }
+
+        function applyAvatar(ini) {
+            const url = sessionStorage.getItem('avms_avatar_url');
+            const exp = parseInt(sessionStorage.getItem('avms_avatar_expires') || '0', 10);
+            const hasFresh = url && Date.now() < exp;
+
+            const targets = [
+                document.getElementById('topbarAvatar'),
+                document.getElementById('mHeroAvatar'),
+                document.querySelector('.mobile-id-card .id-logo')
+            ].filter(Boolean);
+
+            targets.forEach(el => {
+                if (hasFresh) {
+                    el.innerHTML = `<img src="${url}" alt="" onerror="this.parentElement.textContent='${ini}';">`;
+                } else {
+                    el.textContent = ini;
+                }
+            });
+        }
+
         let currentStudent = null;
 
-        // GUARD
         (async function init() {
             if (typeof supabase === 'undefined' || !supabase) {
                 showGuard('Connection error. Please refresh.');
@@ -979,7 +1050,12 @@
                 }
 
                 currentStudent = student;
+
+                // Ensure avatar URL is fresh (re-sign if expired)
+                await ensureAvatar(userId);
+
                 renderStudent(student);
+                applyAvatar(initials(student.full_name));
                 hideGuard();
                 loadHomeAnnouncements();
                 loadHomeEvents();
@@ -999,9 +1075,7 @@
 
             document.getElementById('topbarName').textContent = fullName;
             document.getElementById('topbarReg').textContent = reg;
-            document.getElementById('topbarAvatar').textContent = ini;
             document.getElementById('mHeroName').textContent = firstName;
-            document.getElementById('mHeroAvatar').textContent = ini;
             document.getElementById('mIdName').textContent = fullName;
             document.getElementById('mIdReg').textContent = reg;
             document.getElementById('mIdLevel').textContent = level;
@@ -1015,7 +1089,6 @@
         document.getElementById('sidebarLogout').addEventListener('click', doLogout);
         document.getElementById('mHeroLogout').addEventListener('click', doLogout);
 
-        // LOADERS
         async function loadHomeAnnouncements() {
             const grid = document.getElementById('homeAnnGrid');
             try {
