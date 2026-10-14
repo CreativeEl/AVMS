@@ -670,7 +670,6 @@ function initForm() {
                     throw new Error(`${fieldLabel} upload failed: ${ok.error || 'network error'}. Please try again.`);
                 }
 
-                // SAVE THE PATH (not the public URL)
                 filePaths[field] = filePath;
 
             } catch (error) {
@@ -685,11 +684,45 @@ function initForm() {
         }
 
         // ============================================
-        // STEP 2: CREATE AUTH ACCOUNT
+        // STEP 2: CONFLICT PRE-CHECK — email already used?
         // ============================================
         const email = (document.getElementById('email')?.value || '').trim();
         const password = document.getElementById('password')?.value || '';
 
+        try {
+            const { data: existingByEmail } = await supabase
+                .from('students')
+                .select('id, is_registered')
+                .ilike('email', email)
+                .maybeSingle();
+
+            if (existingByEmail && existingByEmail.id !== verifiedStudent.id) {
+                // Email belongs to a DIFFERENT roster row
+                if (existingByEmail.is_registered === true) {
+                    showFormMessage(
+                        '⚠️ This email is already linked to another student record. Please use a different email or <a href="student/login.html" style="color: #8B1A1A; font-weight: 700;">log in instead</a>.',
+                        'error'
+                    );
+                    if (submitBtn) {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                    return;
+                } else {
+                    // Stale link — clear it so we can proceed
+                    await supabase
+                        .from('students')
+                        .update({ email: null, auth_user_id: null })
+                        .eq('id', existingByEmail.id);
+                }
+            }
+        } catch (e) {
+            console.warn('Email pre-check error (continuing):', e);
+        }
+
+        // ============================================
+        // STEP 3: CREATE AUTH ACCOUNT
+        // ============================================
         let authUserId = null;
         try {
             const { data: authData, error: authErr } = await supabase.auth.signUp({
@@ -703,8 +736,9 @@ function initForm() {
         } catch (error) {
             console.warn('SignUp error:', error);
             let friendly = '⚠️ Could not create your account. ';
-            if (error.message && error.message.toLowerCase().includes('already')) {
-                friendly += 'This email is already registered. If you already applied, please log in instead.';
+            const lower = (error.message || '').toLowerCase();
+            if (lower.includes('already') || lower.includes('registered') || lower.includes('exists')) {
+                friendly += 'This email is already registered. <a href="student/login.html" style="color: #8B1A1A; font-weight: 700;">Log in instead</a>, or use a different email.';
             } else {
                 friendly += 'Please try again, or contact AVMS if the problem persists.';
             }
@@ -717,7 +751,31 @@ function initForm() {
         }
 
         // ============================================
-        // STEP 3: UPDATE students ROW
+        // STEP 4: CLEAN STALE auth_user_id ON OTHER ROWS
+        // (safety net — if an old attempt left this auth_user_id
+        //  on a different roster row, null it out first)
+        // ============================================
+        if (authUserId) {
+            try {
+                const { data: orphan } = await supabase
+                    .from('students')
+                    .select('id')
+                    .eq('auth_user_id', authUserId)
+                    .maybeSingle();
+
+                if (orphan && orphan.id !== verifiedStudent.id) {
+                    await supabase
+                        .from('students')
+                        .update({ auth_user_id: null })
+                        .eq('id', orphan.id);
+                }
+            } catch (e) {
+                console.warn('auth_user_id pre-clean error (continuing):', e);
+            }
+        }
+
+        // ============================================
+        // STEP 5: UPDATE students ROW
         // ============================================
         try {
             const { error: stuErr } = await supabase
@@ -730,7 +788,20 @@ function initForm() {
                 })
                 .eq('id', verifiedStudent.id);
 
-            if (stuErr) throw stuErr;
+            if (stuErr) {
+                const code = stuErr.code || '';
+                const msg = (stuErr.message || '').toLowerCase();
+                if (code === '23505' || msg.includes('duplicate') || msg.includes('conflict')) {
+                    showFormMessage('⚠️ This email or account is already linked to another student record. Please contact AVMS with your Registration Number.', 'error');
+                } else {
+                    throw stuErr;
+                }
+                if (submitBtn) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+                return;
+            }
 
         } catch (error) {
             console.warn('students update error:', error);
@@ -743,7 +814,7 @@ function initForm() {
         }
 
         // ============================================
-        // STEP 4: INSERT membership_applications
+        // STEP 6: INSERT membership_applications
         // ============================================
         const formData = {
             title: document.getElementById('title')?.value || '',
