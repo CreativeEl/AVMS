@@ -31,8 +31,10 @@
         .btn-view:hover { background: #1F4E3D; }
         .btn-approve { background: #28a745; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; }
         .btn-approve:hover { background: #218838; }
-        .btn-reject { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-reject { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; margin-right: 5px; }
         .btn-reject:hover { background: #c82333; }
+        .btn-delete-row { background: #6c757d; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-delete-row:hover { background: #495057; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20,47,37,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal.show { display: flex; }
@@ -59,7 +61,6 @@
         .search-box { padding: 10px 15px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; width: 250px; transition: all 0.2s; }
         .search-box:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
 
-        /* ===== THEME TOGGLE (bottom-right) ===== */
         .theme-toggle {
             position: fixed;
             bottom: 24px;
@@ -86,7 +87,6 @@
             .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; }
         }
 
-        /* ===== DARK MODE ===== */
         body.dark { background: #0F1F19; color: #E8E8E8; }
         body.dark .admin-main { background: #0F1F19; }
         body.dark .admin-header { border-bottom-color: #1F4E3D; }
@@ -121,7 +121,6 @@
 
         body.dark .empty-state { color: #8A8A8A; }
 
-        /* ===== AUTH GUARD ===== */
         body:not(.authed) .admin-wrapper { display: none; }
         body.authed .auth-checking { display: none; }
         .auth-checking {
@@ -136,7 +135,6 @@
         }
         body.dark .auth-checking { background: #0F1F19; color: #C9A961; }
 
-        /* ===== MOBILE SIDEBAR ===== */
         .admin-hamburger,
         .admin-overlay { display: none; }
 
@@ -339,8 +337,6 @@
 
         // ============================================
         // STORAGE PATH EXTRACTOR
-        // Accepts either a full public URL or a raw path,
-        // returns the storage-relative path (e.g. passports/xxx.jpg)
         // ============================================
         function extractStoragePath(input) {
             if (!input) return null;
@@ -351,7 +347,6 @@
             if (idx !== -1) {
                 return str.substring(idx + marker.length);
             }
-            // Already a relative path
             return str;
         }
 
@@ -429,6 +424,9 @@
                             <button class="btn-approve" onclick="updateStatus(${app.id}, 'approved')"><i class="fas fa-check"></i></button>
                             <button class="btn-reject" onclick="updateStatus(${app.id}, 'rejected')"><i class="fas fa-times"></i></button>
                         ` : ''}
+                        <button class="btn-delete-row" onclick="deleteApplication(${app.id})" title="Delete application + files">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </td>
                 </tr>
             `).join('');
@@ -450,7 +448,7 @@
         }
 
         // ============================================
-        // DOCUMENT LINK HANDLER
+        // DOCUMENT LINK HANDLER (signed URLs)
         // ============================================
         async function openDocument(btnEl, storedValue, docName) {
             if (!storedValue) return;
@@ -464,7 +462,7 @@
 
                 const { data, error } = await supabase.storage
                     .from('membership-documents')
-                    .createSignedUrl(path, 3600); // 1 hour
+                    .createSignedUrl(path, 3600);
 
                 if (error) throw error;
                 if (!data || !data.signedUrl) throw new Error('Could not sign URL');
@@ -585,6 +583,67 @@
                 alert(`✅ Application ${status} successfully!${status === 'approved' ? ' The student can now log in to the Student Portal.' : ''}`);
             } catch (error) {
                 alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // ============================================
+        // DELETE APPLICATION (row + storage files)
+        // Does NOT touch the student row or the auth user.
+        // ============================================
+        async function deleteApplication(id) {
+            const app = allApplications.find(a => a.id === id);
+            if (!app) return;
+
+            const name = ((app.first_name || '') + ' ' + (app.surname || '')).trim() || 'this applicant';
+            const confirmMsg =
+                'Delete this application permanently?\n\n' +
+                'Applicant: ' + name + '\n' +
+                'Reg No: ' + (app.reg_no || app.reg_number || '—') + '\n\n' +
+                'This will also delete the uploaded documents.\n' +
+                'The student roster entry and login account are NOT affected.\n\n' +
+                'Continue?';
+            if (!confirm(confirmMsg)) return;
+
+            try {
+                // ---- 1) Collect storage paths from the 4 doc fields ----
+                const paths = [];
+                ['passport_photo_url', 'admission_letter_url', 'student_id_url', 'payment_receipt_url'].forEach(field => {
+                    const raw = app[field];
+                    const path = extractStoragePath(raw);
+                    if (path) paths.push(path);
+                });
+
+                // ---- 2) Delete files from storage (best-effort) ----
+                let deletedFiles = 0;
+                if (paths.length > 0) {
+                    try {
+                        const { data: rmData, error: rmErr } = await supabase.storage
+                            .from('membership-documents')
+                            .remove(paths);
+                        if (!rmErr) {
+                            deletedFiles = (rmData && rmData.length) || paths.length;
+                        } else {
+                            console.warn('Storage remove error (continuing):', rmErr);
+                        }
+                    } catch (e) {
+                        console.warn('Storage remove threw (continuing):', e);
+                    }
+                }
+
+                // ---- 3) Delete the application row ----
+                const { error: delErr } = await supabase
+                    .from('membership_applications')
+                    .delete()
+                    .eq('id', id);
+
+                if (delErr) throw delErr;
+
+                // ---- 4) Refresh ----
+                loadApplications();
+                alert('✅ Application deleted.\n\nUploaded files removed: ' + deletedFiles);
+            } catch (error) {
+                console.error('Delete application error:', error);
+                alert('❌ Could not delete:\n\n' + error.message);
             }
         }
 
