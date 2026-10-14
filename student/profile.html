@@ -91,7 +91,6 @@
 
         .portal { display: flex; min-height: 100vh; }
 
-        /* SIDEBAR */
         .sidebar {
             width: var(--sidebar-w);
             background: linear-gradient(180deg, #1F4E3D 0%, #17392c 100%);
@@ -166,7 +165,6 @@
         .sidebar-logout:hover { color: #ffb3b3; }
         .sidebar-logout i { color: #ffb3b3; font-size: 14px; width: 18px; text-align: center; }
 
-        /* MOBILE HERO */
         .mobile-hero {
             display: none;
             background: linear-gradient(135deg, #1F4E3D 0%, #2D6B54 100%);
@@ -200,7 +198,9 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 14px;
             flex-shrink: 0;
+            overflow: hidden;
         }
+        .mobile-hero-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .mobile-hero-greet .hi {
             font-size: 11.5px; color: rgba(255,255,255,0.65);
             font-weight: 600; letter-spacing: 0.4px; margin-bottom: 2px;
@@ -234,7 +234,6 @@
             position: relative; z-index: 1; margin-top: 3px;
         }
 
-        /* MAIN */
         .main {
             flex: 1;
             margin-left: var(--sidebar-w);
@@ -295,7 +294,9 @@
             font-weight: 700; font-size: 14px;
             flex-shrink: 0;
             box-shadow: 0 4px 12px rgba(31,78,61,0.2);
+            overflow: hidden;
         }
+        .topbar-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .content {
             padding: 24px 28px 40px;
@@ -319,7 +320,6 @@
             border-radius: 2px; background: var(--gold);
         }
 
-        /* PROFILE GRID */
         .profile-grid {
             display: grid;
             grid-template-columns: 320px 1fr;
@@ -366,7 +366,9 @@
             z-index: 1;
             border: 4px solid var(--surface);
             box-shadow: 0 10px 24px rgba(31,78,61,0.25);
+            overflow: hidden;
         }
+        .profile-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .profile-name {
             font-family: Georgia, serif;
             font-size: 21px; font-weight: 700;
@@ -397,7 +399,6 @@
         }
         .profile-status-pill i { font-size: 6px; }
 
-        /* INFO CARD */
         .info-card {
             background: var(--surface);
             border-radius: 20px;
@@ -438,7 +439,6 @@
             word-break: break-word;
         }
 
-        /* ACTION BUTTONS */
         .actions-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -480,38 +480,23 @@
             border-color: var(--border);
         }
         html.dark .action-btn.outline { color: var(--gold); border-color: var(--border-soft); }
-        .action-btn.outline:hover {
-            background: var(--icon-bg);
-        }
+        .action-btn.outline:hover { background: var(--icon-bg); }
         .action-btn.danger {
             background: var(--surface);
             color: var(--red-deep);
             border-color: #f0c8c8;
         }
-        html.dark .action-btn.danger {
-            color: #ff8a8a;
-            border-color: rgba(200,60,60,0.35);
-        }
-        .action-btn.danger:hover {
-            background: #FBEAEA;
-        }
-        html.dark .action-btn.danger:hover {
-            background: rgba(200,60,60,0.12);
-        }
+        html.dark .action-btn.danger { color: #ff8a8a; border-color: rgba(200,60,60,0.35); }
+        .action-btn.danger:hover { background: #FBEAEA; }
+        html.dark .action-btn.danger:hover { background: rgba(200,60,60,0.12); }
 
-        /* SECTION SPACER */
         .section-spacer { height: 32px; }
 
-        /* EDIT MODE */
-        .edit-form {
-            display: none;
-        }
+        .edit-form { display: none; }
         .edit-form.active { display: block; }
         .view-mode.hidden { display: none; }
 
-        .form-field {
-            margin-bottom: 16px;
-        }
+        .form-field { margin-bottom: 16px; }
         .form-field label {
             display: block;
             font-size: 11.5px;
@@ -545,10 +530,7 @@
             border-color: var(--gold);
             box-shadow: 0 0 0 4px rgba(201,169,97,0.12);
         }
-        .form-field input:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
+        .form-field input:disabled { opacity: 0.65; cursor: not-allowed; }
 
         .edit-actions {
             display: flex;
@@ -557,7 +539,6 @@
             flex-wrap: wrap;
         }
 
-        /* TOAST */
         .toast {
             position: fixed;
             top: 24px;
@@ -578,7 +559,6 @@
         .toast.show { transform: translateX(-50%) translateY(0); }
         .toast.error { background: var(--red-deep); }
 
-        /* BOTTOM NAV */
         .bottom-nav {
             display: none;
             position: fixed;
@@ -750,7 +730,6 @@
                         </div>
 
                         <div>
-                            <!-- VIEW MODE -->
                             <div class="view-mode" id="viewMode">
                                 <div class="info-card">
                                     <div class="info-row">
@@ -795,7 +774,6 @@
                                 </div>
                             </div>
 
-                            <!-- EDIT MODE -->
                             <div class="edit-form" id="editForm">
                                 <div class="info-card" style="padding: 22px 26px 26px;">
                                     <div class="form-field">
@@ -856,7 +834,6 @@
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // THEME
         function applyThemeIcons() {
             const isDark = document.documentElement.classList.contains('dark');
             const icon = isDark ? 'fa-sun' : 'fa-moon';
@@ -873,7 +850,6 @@
         document.getElementById('mThemeBtn').addEventListener('click', toggleTheme);
         applyThemeIcons();
 
-        // HELPERS
         function toast(msg, isError) {
             const t = document.getElementById('toast');
             t.textContent = msg;
@@ -905,16 +881,86 @@
         }
         async function doLogout() {
             try { await supabase.auth.signOut(); } catch (e) {}
+            try {
+                sessionStorage.removeItem('avms_avatar_url');
+                sessionStorage.removeItem('avms_avatar_expires');
+            } catch(e){}
             localStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminLoggedIn');
             sessionStorage.removeItem('adminSession');
             window.location.href = 'login.html';
         }
 
+        // AVATAR
+        function extractStoragePath(input) {
+            if (!input) return null;
+            const str = String(input).trim();
+            if (!str) return null;
+            const marker = '/membership-documents/';
+            const idx = str.indexOf(marker);
+            if (idx !== -1) return str.substring(idx + marker.length);
+            return str;
+        }
+
+        async function ensureAvatar(userId) {
+            const url = sessionStorage.getItem('avms_avatar_url');
+            const exp = parseInt(sessionStorage.getItem('avms_avatar_expires') || '0', 10);
+            if (url && Date.now() < exp) return;
+
+            try {
+                const { data: app } = await supabase
+                    .from('membership_applications')
+                    .select('passport_photo_url')
+                    .eq('auth_user_id', userId)
+                    .order('applied_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (!app || !app.passport_photo_url) {
+                    sessionStorage.removeItem('avms_avatar_url');
+                    sessionStorage.removeItem('avms_avatar_expires');
+                    return;
+                }
+
+                const path = extractStoragePath(app.passport_photo_url);
+                if (!path) return;
+
+                const { data: signed } = await supabase.storage
+                    .from('membership-documents')
+                    .createSignedUrl(path, 3600);
+
+                if (signed && signed.signedUrl) {
+                    sessionStorage.setItem('avms_avatar_url', signed.signedUrl);
+                    sessionStorage.setItem('avms_avatar_expires', String(Date.now() + 45 * 60 * 1000));
+                }
+            } catch (e) {
+                console.warn('Avatar refresh failed (non-fatal):', e);
+            }
+        }
+
+        function applyAvatar(ini) {
+            const url = sessionStorage.getItem('avms_avatar_url');
+            const exp = parseInt(sessionStorage.getItem('avms_avatar_expires') || '0', 10);
+            const hasFresh = url && Date.now() < exp;
+
+            const targets = [
+                document.getElementById('profileAvatar'),
+                document.getElementById('topbarAvatar'),
+                document.getElementById('mHeroAvatar')
+            ].filter(Boolean);
+
+            targets.forEach(el => {
+                if (hasFresh) {
+                    el.innerHTML = `<img src="${url}" alt="" onerror="this.parentElement.textContent='${ini}';">`;
+                } else {
+                    el.textContent = ini;
+                }
+            });
+        }
+
         let currentStudent = null;
         let currentUserId = null;
 
-        // GUARD
         (async function init() {
             if (typeof supabase === 'undefined' || !supabase) {
                 showGuard('Connection error. Please refresh.');
@@ -941,7 +987,9 @@
                 }
 
                 currentStudent = student;
+                await ensureAvatar(currentUserId);
                 renderStudent(student);
+                applyAvatar(initials(student.full_name));
                 hideGuard();
             } catch (err) {
                 console.warn('Init error:', err);
@@ -959,11 +1007,8 @@
 
             document.getElementById('topbarName').textContent = fullName;
             document.getElementById('topbarReg').textContent = reg;
-            document.getElementById('topbarAvatar').textContent = ini;
             document.getElementById('mHeroName').textContent = firstName;
-            document.getElementById('mHeroAvatar').textContent = ini;
 
-            document.getElementById('profileAvatar').textContent = ini;
             document.getElementById('profileName').textContent = fullName;
             document.getElementById('profileReg').textContent = reg;
 
@@ -975,7 +1020,6 @@
             document.getElementById('infoAddress').textContent = s.home_address || '—';
             document.getElementById('infoApplied').textContent = s.applied_at ? fmtDate(s.applied_at) : '—';
 
-            // Prefill edit inputs
             document.getElementById('editPhone').value = s.phone || '';
             document.getElementById('editAddress').value = s.home_address || '';
         }
@@ -984,7 +1028,6 @@
         document.getElementById('mHeroLogout').addEventListener('click', doLogout);
         document.getElementById('logoutBtn').addEventListener('click', doLogout);
 
-        // EDIT MODE
         const viewMode = document.getElementById('viewMode');
         const editForm = document.getElementById('editForm');
 
@@ -996,7 +1039,6 @@
         document.getElementById('cancelBtn').addEventListener('click', () => {
             editForm.classList.remove('active');
             viewMode.classList.remove('hidden');
-            // Reset values to current
             if (currentStudent) {
                 document.getElementById('editPhone').value = currentStudent.phone || '';
                 document.getElementById('editAddress').value = currentStudent.home_address || '';
@@ -1025,7 +1067,6 @@
 
                 if (error) throw error;
 
-                // Update local state
                 currentStudent.phone = phone;
                 currentStudent.home_address = address;
                 renderStudent(currentStudent);
@@ -1043,7 +1084,6 @@
             }
         });
 
-        // CHANGE PASSWORD
         document.getElementById('changePwBtn').addEventListener('click', async () => {
             const email = currentStudent?.email || '';
             if (!email) { toast('No email on file.', true); return; }
