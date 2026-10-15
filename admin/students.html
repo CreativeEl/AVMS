@@ -68,7 +68,6 @@
         tr:hover { background: #FBF8EE; }
         tr:last-child td { border-bottom: none; }
 
-        /* Passport thumbnail cell */
         .passport-thumb {
             width: 40px; height: 40px;
             border-radius: 50%;
@@ -118,7 +117,6 @@
         .modal-content textarea { resize: vertical; min-height: 100px; font-family: monospace; }
         .modal-content small { display: block; color: #888; font-size: 12px; margin-top: 4px; }
 
-        /* Passport editor inside modal */
         .passport-editor {
             display: flex;
             align-items: center;
@@ -219,7 +217,6 @@
             white-space: pre;
         }
 
-        /* ===== AUTH GUARD — hide content until verified ===== */
         body:not(.authed) .admin-wrapper { display: none; }
         body.authed .auth-checking { display: none; }
         .auth-checking {
@@ -233,7 +230,6 @@
             background: #FBF8EE;
         }
 
-        /* ===== MOBILE SIDEBAR (HAMBURGER DRAWER) ===== */
         .admin-hamburger,
         .admin-overlay { display: none; }
 
@@ -414,7 +410,6 @@
         <div class="modal-content">
             <h2 id="modalTitle">Add Student</h2>
 
-            <!-- Passport editor (only shows in edit mode) -->
             <div class="passport-editor" id="passportEditor" style="display: none;">
                 <div class="preview" id="passportPreview">
                     <i class="fas fa-user"></i>
@@ -513,31 +508,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
         const STORAGE_BUCKET = 'membership-documents';
 
         // ============================================
-        // AUTH GUARD
-        // ============================================
-        (async function initAuth() {
-            const nameEl = document.getElementById('adminName');
-            try {
-                const { data } = await supabase.auth.getSession();
-                if (data && data.session) {
-                    document.body.classList.add('authed');
-                    if (nameEl) nameEl.textContent = (data.session.user?.email || 'Admin').split('@')[0];
-                    return;
-                }
-            } catch (e) { /* fall through */ }
-
-            const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
-            if (legacy) {
-                document.body.classList.add('authed');
-                const email = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-                if (nameEl) nameEl.textContent = email ? email.split('@')[0] : 'Admin';
-                return;
-            }
-
-            window.location.href = 'index.html';
-        })();
-
-        // ============================================
         // LOGOUT
         // ============================================
         document.getElementById('logoutBtn').addEventListener('click', async function(e) {
@@ -578,11 +548,9 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
         let allStudents = [];
         let currentFilter = 'all';
         let currentSearch = '';
-        // passport cache: student_id -> { path, signedUrl, applicationId }
         const passportCache = {};
-        // current student being edited in modal
         let editingStudentId = null;
-        let editingApplication = null; // { id, passport_photo_url }
+        let editingApplication = null;
 
         // ============================================
         // LOAD STUDENTS
@@ -600,7 +568,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                 allStudents = data || [];
                 updateStats();
                 displayStudents();
-                // Prefetch passports in background
                 prefetchPassports();
             } catch (error) {
                 console.error('Error loading students:', error);
@@ -621,15 +588,13 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
 
         // ============================================
         // PREFETCH PASSPORTS
-        // For each registered student, query the latest application,
-        // sign the passport URL, and cache it.
         // ============================================
         async function prefetchPassports() {
             const students = allStudents.filter(s => s.auth_user_id || s.email);
             if (students.length === 0) return;
 
             for (const s of students) {
-                if (passportCache[s.id]) continue; // already cached
+                if (passportCache[s.id]) continue;
 
                 try {
                     const { data: app } = await supabase
@@ -660,7 +625,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                     passportCache[s.id] = { path, signedUrl, applicationId: app.id };
                     updatePassportCell(s.id);
                 } catch (err) {
-                    // Silent — will fall back to placeholder
                     passportCache[s.id] = { path: null, signedUrl: null, applicationId: null };
                     updatePassportCell(s.id);
                 }
@@ -775,7 +739,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             document.getElementById('studentForm').reset();
             document.getElementById('department').value = 'Veterinary Medicine';
             document.getElementById('classLevel').value = '100';
-            // Hide passport editor in add mode
             document.getElementById('passportEditor').style.display = 'none';
             editingStudentId = null;
             editingApplication = null;
@@ -795,7 +758,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
 
             editingStudentId = id;
 
-            // Show passport editor and load current passport
             document.getElementById('passportEditor').style.display = 'flex';
             await loadPassportForEdit(id);
 
@@ -884,7 +846,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             btn.disabled = true;
             removeBtn.disabled = true;
 
-            const origLabel = btn.innerHTML;
             btn.innerHTML = '<span class="spinner"></span> Uploading...';
             hint.textContent = 'Uploading passport...';
 
@@ -897,7 +858,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                 const fileName = `${Date.now()}_${safeName}`;
                 const filePath = `passports/${regSafe}_${fileName}`;
 
-                // 1) Upload new file
                 const { error: upErr } = await supabase.storage
                     .from(STORAGE_BUCKET)
                     .upload(filePath, file, {
@@ -906,7 +866,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                     });
                 if (upErr) throw upErr;
 
-                // 2) Update or create membership_applications row
                 if (editingApplication && editingApplication.id) {
                     const { error: updErr } = await supabase
                         .from('membership_applications')
@@ -915,7 +874,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                     if (updErr) throw updErr;
                     editingApplication.passport_photo_url = filePath;
                 } else {
-                    // No existing app — create a stub row keyed on student info
                     const { data: newApp, error: insErr } = await supabase
                         .from('membership_applications')
                         .insert([{
@@ -938,15 +896,13 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                     editingApplication = { id: newApp.id, passport_photo_url: filePath };
                 }
 
-                // 3) Delete old file (best-effort)
-                if (editingApplication && passportCache[editingStudentId] && passportCache[editingStudentId].path &&
+                if (passportCache[editingStudentId] && passportCache[editingStudentId].path &&
                     passportCache[editingStudentId].path !== filePath) {
                     try {
                         await supabase.storage.from(STORAGE_BUCKET).remove([passportCache[editingStudentId].path]);
                     } catch (e) { /* ignore */ }
                 }
 
-                // 4) Get signed URL and update preview
                 const { data: signed } = await supabase.storage
                     .from(STORAGE_BUCKET)
                     .createSignedUrl(filePath, 3600);
@@ -966,7 +922,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                 btn.innerHTML = '<i class="fas fa-upload"></i> <span id="btnReplaceLabel">Replace passport</span>';
                 btn.disabled = false;
 
-                // Refresh the thumbnail in the table
                 updatePassportCell(editingStudentId);
             } catch (err) {
                 console.error('Passport upload error:', err);
@@ -1001,21 +956,18 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             try {
                 const path = passportCache[editingStudentId]?.path || extractStoragePath(editingApplication.passport_photo_url);
 
-                // 1) Clear DB field
                 const { error: updErr } = await supabase
                     .from('membership_applications')
                     .update({ passport_photo_url: null })
                     .eq('id', editingApplication.id);
                 if (updErr) throw updErr;
 
-                // 2) Delete file from storage (best-effort)
                 if (path) {
                     try {
                         await supabase.storage.from(STORAGE_BUCKET).remove([path]);
                     } catch (e) { /* ignore */ }
                 }
 
-                // 3) Update local state
                 passportCache[editingStudentId] = { path: null, signedUrl: null, applicationId: editingApplication.id };
                 editingApplication.passport_photo_url = null;
 
@@ -1117,7 +1069,6 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                 }
 
                 const d = (data.summary && data.summary.deleted) || {};
-                // Clear cached passport
                 delete passportCache[id];
                 loadStudents();
                 alert(
