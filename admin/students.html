@@ -571,11 +571,11 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
     <script src="js/admin-guard.js"></script>
     <script>
         // ============================================
-        // ENDPOINTS
+        // ENDPOINTS (renamed to avoid collision with config.js)
         // ============================================
-        const SUPABASE_URL = 'https://tlkqzhudnpdnbxaltwbs.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsa3F6aHVkbnBkbmJ4YWx0d2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjgxMjEsImV4cCI6MjEwNDQ0NDEyMX0.wfFQX9TmXx4a0VqRrEK97BUsUncf_5vf61B3gdc5DH0';
-        const DELETE_STUDENT_URL = SUPABASE_URL + '/functions/v1/delete-student';
+        const AVMS_URL = 'https://tlkqzhudnpdnbxaltwbs.supabase.co';
+        const AVMS_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsa3F6aHVkbnBkbmJ4YWx0d2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjgxMjEsImV4cCI6MjEwNDQ0NDEyMX0.wfFQX9TmXx4a0VqRrEK97BUsUncf_5vf61B3gdc5DH0';
+        const DELETE_STUDENT_URL = AVMS_URL + '/functions/v1/delete-student';
         const STORAGE_BUCKET = 'membership-documents';
 
         // ============================================
@@ -1128,7 +1128,7 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': 'Bearer ' + token,
-                        'apikey': SUPABASE_ANON_KEY
+                        'apikey': AVMS_ANON_KEY
                     },
                     body: JSON.stringify({ student_id: id })
                 });
@@ -1245,9 +1245,27 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
         });
 
         // ============================================
-        // INIT
+        // INIT — wait for admin-guard to finish first
         // ============================================
-        loadStudents();
+        function waitForAuthThenLoad() {
+            if (document.body.classList.contains('authed')) {
+                loadStudents();
+                return;
+            }
+            let waited = 0;
+            const timer = setInterval(function () {
+                waited += 100;
+                if (document.body.classList.contains('authed')) {
+                    clearInterval(timer);
+                    loadStudents();
+                } else if (waited >= 5000) {
+                    clearInterval(timer);
+                    console.warn('[students] Auth guard never added .authed — loading anyway');
+                    loadStudents();
+                }
+            }, 100);
+        }
+        waitForAuthThenLoad();
 
         document.getElementById('studentModal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
