@@ -697,7 +697,6 @@ function initForm() {
                 .maybeSingle();
 
             if (existingByEmail && existingByEmail.id !== verifiedStudent.id) {
-                // Email belongs to a DIFFERENT roster row
                 if (existingByEmail.is_registered === true) {
                     showFormMessage(
                         '⚠️ This email is already linked to another student record. Please use a different email or <a href="student/login.html" style="color: #8B1A1A; font-weight: 700;">log in instead</a>.',
@@ -709,7 +708,6 @@ function initForm() {
                     }
                     return;
                 } else {
-                    // Stale link — clear it so we can proceed
                     await supabase
                         .from('students')
                         .update({ email: null, auth_user_id: null })
@@ -722,12 +720,17 @@ function initForm() {
 
         // ============================================
         // STEP 3: CREATE AUTH ACCOUNT
+        // emailRedirectTo sends the confirmation link to /student/login.html
+        // so it doesn't fall back to Supabase's default Site URL (localhost).
         // ============================================
         let authUserId = null;
         try {
             const { data: authData, error: authErr } = await supabase.auth.signUp({
                 email: email,
-                password: password
+                password: password,
+                options: {
+                    emailRedirectTo: window.location.origin + '/student/login.html'
+                }
             });
 
             if (authErr) throw authErr;
@@ -752,8 +755,6 @@ function initForm() {
 
         // ============================================
         // STEP 4: CLEAN STALE auth_user_id ON OTHER ROWS
-        // (safety net — if an old attempt left this auth_user_id
-        //  on a different roster row, null it out first)
         // ============================================
         if (authUserId) {
             try {
