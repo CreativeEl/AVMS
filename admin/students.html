@@ -62,11 +62,37 @@
         }
 
         .table-container { background: white; border-radius: 12px; overflow-x: auto; border: 1px solid #f0ede0; box-shadow: 0 1px 3px rgba(31,78,61,0.04); }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: #FBF8EE; padding: 14px 15px; text-align: left; font-weight: 700; color: #1F4E3D; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #C9A961; }
-        td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; }
+        td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; vertical-align: middle; }
         tr:hover { background: #FBF8EE; }
         tr:last-child td { border-bottom: none; }
+
+        /* Passport thumbnail cell */
+        .passport-thumb {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: #F7F5EC;
+            border: 2px solid #e3e0d2;
+            display: flex; align-items: center; justify-content: center;
+            color: #8a8a8a;
+            font-size: 16px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .passport-thumb img {
+            width: 100%; height: 100%;
+            object-fit: cover; display: block;
+        }
+        .passport-thumb.pulse {
+            background: linear-gradient(90deg, #F7F5EC 25%, #efece1 50%, #F7F5EC 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
 
         .badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-registered { background: #d4edda; color: #155724; }
@@ -83,7 +109,7 @@
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20,47,37,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
         .modal-content h2 { font-family: Georgia, serif; margin-bottom: 20px; color: #1F4E3D; padding-bottom: 10px; border-bottom: 2px solid #C9A961; font-weight: 700; }
         .modal-content .form-group { margin-bottom: 15px; }
         .modal-content label { display: block; font-weight: 600; margin-bottom: 6px; color: #1F4E3D; font-size: 13.5px; }
@@ -91,6 +117,62 @@
         .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
         .modal-content textarea { resize: vertical; min-height: 100px; font-family: monospace; }
         .modal-content small { display: block; color: #888; font-size: 12px; margin-top: 4px; }
+
+        /* Passport editor inside modal */
+        .passport-editor {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 16px;
+            background: #FBF8EE;
+            border: 1px solid #e3e0d2;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+        .passport-editor .preview {
+            width: 96px; height: 96px;
+            border-radius: 50%;
+            background: #F7F5EC;
+            border: 3px solid #e3e0d2;
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: #8a8a8a;
+            font-size: 30px;
+        }
+        .passport-editor .preview img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .passport-editor .actions { flex: 1; min-width: 0; }
+        .passport-editor .actions .hint {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .passport-editor .btn-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-passport {
+            background: #2D6B54;
+            color: white;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12.5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-passport:hover { background: #1F4E3D; }
+        .btn-passport.danger { background: #dc3545; }
+        .btn-passport.danger:hover { background: #c82333; }
+        .btn-passport:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .checkbox-group { display: flex; align-items: center; gap: 8px; }
@@ -198,6 +280,7 @@
 
             .form-row { grid-template-columns: 1fr; }
             .search-box { width: 100%; }
+            .passport-editor { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -309,6 +392,7 @@
                 <table>
                     <thead>
                         <tr>
+                            <th style="width: 70px;">Photo</th>
                             <th>Reg No</th>
                             <th>Full Name</th>
                             <th>State of Origin</th>
@@ -319,7 +403,7 @@
                         </tr>
                     </thead>
                     <tbody id="studentsTableBody">
-                        <tr><td colspan="7" class="empty-state">Loading roster...</td></tr>
+                        <tr><td colspan="8" class="empty-state">Loading roster...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -329,6 +413,26 @@
     <div class="modal" id="studentModal">
         <div class="modal-content">
             <h2 id="modalTitle">Add Student</h2>
+
+            <!-- Passport editor (only shows in edit mode) -->
+            <div class="passport-editor" id="passportEditor" style="display: none;">
+                <div class="preview" id="passportPreview">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="actions">
+                    <div class="hint" id="passportHint">No passport photo on file. Upload one to show it as the student's avatar across the portal.</div>
+                    <input type="file" id="passportFileInput" accept="image/*" style="display: none;">
+                    <div class="btn-row">
+                        <button type="button" class="btn-passport" id="btnReplacePassport" onclick="document.getElementById('passportFileInput').click()">
+                            <i class="fas fa-upload"></i> <span id="btnReplaceLabel">Upload passport</span>
+                        </button>
+                        <button type="button" class="btn-passport danger" id="btnRemovePassport" style="display: none;" onclick="removePassport()">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <form id="studentForm">
                 <input type="hidden" id="editId" value="">
                 <div class="form-group">
@@ -401,11 +505,12 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
     <script src="js/admin-guard.js"></script>
     <script>
         // ============================================
-        // EDGE FUNCTION ENDPOINT
+        // ENDPOINTS
         // ============================================
         const SUPABASE_URL = 'https://tlkqzhudnpdnbxaltwbs.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsa3F6aHVkbnBkbmJ4YWx0d2JzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4NjgxMjEsImV4cCI6MjEwNDQ0NDEyMX0.wfFQX9TmXx4a0VqRrEK97BUsUncf_5vf61B3gdc5DH0';
         const DELETE_STUDENT_URL = SUPABASE_URL + '/functions/v1/delete-student';
+        const STORAGE_BUCKET = 'membership-documents';
 
         // ============================================
         // AUTH GUARD
@@ -447,11 +552,37 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
         });
 
         // ============================================
+        // HELPERS
+        // ============================================
+        function escapeHtml(t) {
+            if (t === null || t === undefined) return '';
+            return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        }
+        function extractStoragePath(input) {
+            if (!input) return null;
+            const str = String(input).trim();
+            if (!str) return null;
+            const marker = '/' + STORAGE_BUCKET + '/';
+            const idx = str.indexOf(marker);
+            if (idx !== -1) return str.substring(idx + marker.length);
+            return str;
+        }
+        function sanitizeFileName(name) {
+            if (!name) return 'photo';
+            return String(name).replace(/[^a-zA-Z0-9._-]/g, '_').slice(-120);
+        }
+
+        // ============================================
         // STATE
         // ============================================
         let allStudents = [];
         let currentFilter = 'all';
         let currentSearch = '';
+        // passport cache: student_id -> { path, signedUrl, applicationId }
+        const passportCache = {};
+        // current student being edited in modal
+        let editingStudentId = null;
+        let editingApplication = null; // { id, passport_photo_url }
 
         // ============================================
         // LOAD STUDENTS
@@ -469,9 +600,11 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                 allStudents = data || [];
                 updateStats();
                 displayStudents();
+                // Prefetch passports in background
+                prefetchPassports();
             } catch (error) {
                 console.error('Error loading students:', error);
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error loading roster: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-state">Error loading roster: ${error.message}</td></tr>`;
             }
         }
 
@@ -486,6 +619,70 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             document.getElementById('statActive').textContent = active;
         }
 
+        // ============================================
+        // PREFETCH PASSPORTS
+        // For each registered student, query the latest application,
+        // sign the passport URL, and cache it.
+        // ============================================
+        async function prefetchPassports() {
+            const students = allStudents.filter(s => s.auth_user_id || s.email);
+            if (students.length === 0) return;
+
+            for (const s of students) {
+                if (passportCache[s.id]) continue; // already cached
+
+                try {
+                    const { data: app } = await supabase
+                        .from('membership_applications')
+                        .select('id, passport_photo_url')
+                        .eq('auth_user_id', s.auth_user_id || '___')
+                        .order('applied_at', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (!app || !app.passport_photo_url) {
+                        passportCache[s.id] = { path: null, signedUrl: null, applicationId: null };
+                        updatePassportCell(s.id);
+                        continue;
+                    }
+
+                    const path = extractStoragePath(app.passport_photo_url);
+                    let signedUrl = null;
+                    if (path) {
+                        try {
+                            const { data: signed } = await supabase.storage
+                                .from(STORAGE_BUCKET)
+                                .createSignedUrl(path, 3600);
+                            signedUrl = signed?.signedUrl || null;
+                        } catch (e) { /* ignore */ }
+                    }
+
+                    passportCache[s.id] = { path, signedUrl, applicationId: app.id };
+                    updatePassportCell(s.id);
+                } catch (err) {
+                    // Silent — will fall back to placeholder
+                    passportCache[s.id] = { path: null, signedUrl: null, applicationId: null };
+                    updatePassportCell(s.id);
+                }
+            }
+        }
+
+        function updatePassportCell(studentId) {
+            const cell = document.querySelector(`.passport-thumb[data-student-id="${studentId}"]`);
+            if (!cell) return;
+            const cache = passportCache[studentId] || {};
+            if (cache.signedUrl) {
+                cell.classList.remove('pulse');
+                cell.innerHTML = `<img src="${cache.signedUrl}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`;
+            } else {
+                cell.classList.remove('pulse');
+                cell.innerHTML = '<i class="fas fa-user"></i>';
+            }
+        }
+
+        // ============================================
+        // DISPLAY STUDENTS
+        // ============================================
         function displayStudents() {
             const tbody = document.getElementById('studentsTableBody');
             let filtered = allStudents;
@@ -509,7 +706,7 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No students found. Click "Add Student" or "Bulk Upload" to get started.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="empty-state">No students found. Click "Add Student" or "Bulk Upload" to get started.</td></tr>`;
                 return;
             }
 
@@ -523,13 +720,30 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                     statusBadge = '<span class="badge badge-registered">Registered (pending approval)</span>';
                 }
 
+                const cached = passportCache[s.id];
+                let passportHtml = '';
+                if (cached && cached.signedUrl) {
+                    passportHtml = `<img src="${cached.signedUrl}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`;
+                } else if (cached) {
+                    passportHtml = '<i class="fas fa-user"></i>';
+                } else {
+                    passportHtml = '<i class="fas fa-user"></i>';
+                }
+
+                const thumbClass = cached ? 'passport-thumb' : 'passport-thumb pulse';
+
                 return `
                     <tr>
-                        <td><strong>${s.reg_no}</strong></td>
-                        <td>${s.full_name || '-'}</td>
-                        <td><code style="background: #FBF8EE; padding: 3px 8px; border-radius: 4px; color: #2D6B54; font-size: 13px; border: 1px solid #f0ede0;">${s.state_of_origin}</code></td>
+                        <td>
+                            <div class="${thumbClass}" data-student-id="${s.id}">
+                                ${passportHtml}
+                            </div>
+                        </td>
+                        <td><strong>${escapeHtml(s.reg_no)}</strong></td>
+                        <td>${escapeHtml(s.full_name || '-')}</td>
+                        <td><code style="background: #FBF8EE; padding: 3px 8px; border-radius: 4px; color: #2D6B54; font-size: 13px; border: 1px solid #f0ede0;">${escapeHtml(s.state_of_origin)}</code></td>
                         <td>${s.class_level ? s.class_level + ' Level' : '-'}</td>
-                        <td>${s.email || '-'}</td>
+                        <td>${escapeHtml(s.email || '-')}</td>
                         <td>${statusBadge}</td>
                         <td>
                             <button class="btn-edit" onclick="editStudent(${s.id})"><i class="fas fa-edit"></i> Edit</button>
@@ -561,10 +775,14 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             document.getElementById('studentForm').reset();
             document.getElementById('department').value = 'Veterinary Medicine';
             document.getElementById('classLevel').value = '100';
+            // Hide passport editor in add mode
+            document.getElementById('passportEditor').style.display = 'none';
+            editingStudentId = null;
+            editingApplication = null;
             document.getElementById('studentModal').classList.add('show');
         }
 
-        function editStudent(id) {
+        async function editStudent(id) {
             const s = allStudents.find(s => s.id === id);
             if (!s) return;
             document.getElementById('modalTitle').textContent = 'Edit Student';
@@ -574,13 +792,251 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
             document.getElementById('stateOfOrigin').value = s.state_of_origin || '';
             document.getElementById('classLevel').value = s.class_level || '100';
             document.getElementById('department').value = s.department || 'Veterinary Medicine';
+
+            editingStudentId = id;
+
+            // Show passport editor and load current passport
+            document.getElementById('passportEditor').style.display = 'flex';
+            await loadPassportForEdit(id);
+
             document.getElementById('studentModal').classList.add('show');
+        }
+
+        async function loadPassportForEdit(studentId) {
+            const preview = document.getElementById('passportPreview');
+            const hint = document.getElementById('passportHint');
+            const removeBtn = document.getElementById('btnRemovePassport');
+            const replaceLabel = document.getElementById('btnReplaceLabel');
+
+            preview.innerHTML = '<i class="fas fa-user"></i>';
+            hint.textContent = 'Loading...';
+            removeBtn.style.display = 'none';
+            replaceLabel.textContent = 'Upload passport';
+
+            editingApplication = null;
+
+            const s = allStudents.find(x => x.id === studentId);
+            if (!s) return;
+
+            try {
+                const { data: app } = await supabase
+                    .from('membership_applications')
+                    .select('id, passport_photo_url')
+                    .eq('auth_user_id', s.auth_user_id || '___')
+                    .order('applied_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (!app || !app.passport_photo_url) {
+                    hint.textContent = 'No passport photo on file. Upload one to show it as the student\'s avatar across the portal.';
+                    replaceLabel.textContent = 'Upload passport';
+                    return;
+                }
+
+                editingApplication = { id: app.id, passport_photo_url: app.passport_photo_url };
+
+                const path = extractStoragePath(app.passport_photo_url);
+                if (!path) {
+                    hint.textContent = 'Passport record exists but no file path stored.';
+                    return;
+                }
+
+                const { data: signed } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .createSignedUrl(path, 3600);
+
+                if (signed && signed.signedUrl) {
+                    preview.innerHTML = `<img src="${signed.signedUrl}" alt="" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-user\\'></i>';">`;
+                    hint.textContent = 'Passport on file. You can replace or remove it.';
+                    removeBtn.style.display = 'inline-flex';
+                    replaceLabel.textContent = 'Replace passport';
+                } else {
+                    hint.textContent = 'Could not load passport file. You can upload a new one.';
+                    replaceLabel.textContent = 'Upload passport';
+                }
+            } catch (e) {
+                console.warn('Passport load error:', e);
+                hint.textContent = 'Could not load passport. You can upload a new one.';
+                replaceLabel.textContent = 'Upload passport';
+            }
         }
 
         function closeModal() {
             document.getElementById('studentModal').classList.remove('show');
+            document.getElementById('passportFileInput').value = '';
+            editingStudentId = null;
+            editingApplication = null;
         }
 
+        // ============================================
+        // PASSPORT — file input change
+        // ============================================
+        document.getElementById('passportFileInput').addEventListener('change', async function() {
+            const file = this.files[0];
+            if (!file) return;
+            if (!editingStudentId) return;
+
+            const preview = document.getElementById('passportPreview');
+            const hint = document.getElementById('passportHint');
+            const btn = document.getElementById('btnReplacePassport');
+            const removeBtn = document.getElementById('btnRemovePassport');
+
+            btn.disabled = true;
+            removeBtn.disabled = true;
+
+            const origLabel = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> Uploading...';
+            hint.textContent = 'Uploading passport...';
+
+            try {
+                const s = allStudents.find(x => x.id === editingStudentId);
+                if (!s) throw new Error('Student not found');
+
+                const regSafe = (s.reg_no || 'unknown').replace(/[^a-zA-Z0-9._-]/g, '_');
+                const safeName = sanitizeFileName(file.name);
+                const fileName = `${Date.now()}_${safeName}`;
+                const filePath = `passports/${regSafe}_${fileName}`;
+
+                // 1) Upload new file
+                const { error: upErr } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .upload(filePath, file, {
+                        contentType: file.type || 'image/jpeg',
+                        upsert: false
+                    });
+                if (upErr) throw upErr;
+
+                // 2) Update or create membership_applications row
+                if (editingApplication && editingApplication.id) {
+                    const { error: updErr } = await supabase
+                        .from('membership_applications')
+                        .update({ passport_photo_url: filePath })
+                        .eq('id', editingApplication.id);
+                    if (updErr) throw updErr;
+                    editingApplication.passport_photo_url = filePath;
+                } else {
+                    // No existing app — create a stub row keyed on student info
+                    const { data: newApp, error: insErr } = await supabase
+                        .from('membership_applications')
+                        .insert([{
+                            reg_no: s.reg_no,
+                            reg_number: s.reg_no,
+                            first_name: (s.full_name || '').split(/\s+/)[0] || '',
+                            surname: (s.full_name || '').split(/\s+/).pop() || '',
+                            email: s.email || '',
+                            auth_user_id: s.auth_user_id || null,
+                            level: s.class_level || null,
+                            state_of_origin: s.state_of_origin || '',
+                            passport_photo_url: filePath,
+                            status: 'approved',
+                            is_active: s.is_active === true,
+                            applied_at: new Date().toISOString()
+                        }])
+                        .select('id, passport_photo_url')
+                        .single();
+                    if (insErr) throw insErr;
+                    editingApplication = { id: newApp.id, passport_photo_url: filePath };
+                }
+
+                // 3) Delete old file (best-effort)
+                if (editingApplication && passportCache[editingStudentId] && passportCache[editingStudentId].path &&
+                    passportCache[editingStudentId].path !== filePath) {
+                    try {
+                        await supabase.storage.from(STORAGE_BUCKET).remove([passportCache[editingStudentId].path]);
+                    } catch (e) { /* ignore */ }
+                }
+
+                // 4) Get signed URL and update preview
+                const { data: signed } = await supabase.storage
+                    .from(STORAGE_BUCKET)
+                    .createSignedUrl(filePath, 3600);
+
+                if (signed && signed.signedUrl) {
+                    preview.innerHTML = `<img src="${signed.signedUrl}" alt="">`;
+                    passportCache[editingStudentId] = {
+                        path: filePath,
+                        signedUrl: signed.signedUrl,
+                        applicationId: editingApplication.id
+                    };
+                }
+
+                hint.textContent = '✅ Passport updated. Changes are live across the portal.';
+                removeBtn.style.display = 'inline-flex';
+                removeBtn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-upload"></i> <span id="btnReplaceLabel">Replace passport</span>';
+                btn.disabled = false;
+
+                // Refresh the thumbnail in the table
+                updatePassportCell(editingStudentId);
+            } catch (err) {
+                console.error('Passport upload error:', err);
+                hint.textContent = '❌ Upload failed: ' + (err.message || 'unknown error');
+                btn.innerHTML = '<i class="fas fa-upload"></i> <span id="btnReplaceLabel">Upload passport</span>';
+                btn.disabled = false;
+                removeBtn.disabled = false;
+            } finally {
+                this.value = '';
+            }
+        });
+
+        // ============================================
+        // PASSPORT — remove
+        // ============================================
+        async function removePassport() {
+            if (!editingStudentId) return;
+            if (!editingApplication || !editingApplication.id) {
+                alert('No passport to remove.');
+                return;
+            }
+            if (!confirm('Remove this student\'s passport photo? They will see the default avatar until a new one is uploaded.')) return;
+
+            const btn = document.getElementById('btnRemovePassport');
+            const hint = document.getElementById('passportHint');
+            const preview = document.getElementById('passportPreview');
+
+            btn.disabled = true;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> Removing...';
+
+            try {
+                const path = passportCache[editingStudentId]?.path || extractStoragePath(editingApplication.passport_photo_url);
+
+                // 1) Clear DB field
+                const { error: updErr } = await supabase
+                    .from('membership_applications')
+                    .update({ passport_photo_url: null })
+                    .eq('id', editingApplication.id);
+                if (updErr) throw updErr;
+
+                // 2) Delete file from storage (best-effort)
+                if (path) {
+                    try {
+                        await supabase.storage.from(STORAGE_BUCKET).remove([path]);
+                    } catch (e) { /* ignore */ }
+                }
+
+                // 3) Update local state
+                passportCache[editingStudentId] = { path: null, signedUrl: null, applicationId: editingApplication.id };
+                editingApplication.passport_photo_url = null;
+
+                preview.innerHTML = '<i class="fas fa-user"></i>';
+                hint.textContent = 'Passport removed. Upload a new one anytime.';
+                btn.style.display = 'none';
+                document.getElementById('btnReplaceLabel').textContent = 'Upload passport';
+
+                updatePassportCell(editingStudentId);
+            } catch (err) {
+                console.error('Passport remove error:', err);
+                alert('❌ Could not remove passport: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = orig;
+            }
+        }
+
+        // ============================================
+        // SAVE STUDENT
+        // ============================================
         document.getElementById('studentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
@@ -661,6 +1117,8 @@ ABU/2021/12346,Fatima Bello,kano,300,Veterinary Medicine" style="min-height: 200
                 }
 
                 const d = (data.summary && data.summary.deleted) || {};
+                // Clear cached passport
+                delete passportCache[id];
                 loadStudents();
                 alert(
                     '✅ Student deleted completely.\n\n' +
