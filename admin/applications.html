@@ -304,31 +304,6 @@
         });
 
         // ============================================
-        // AUTH GUARD
-        // ============================================
-        (async function initAuth() {
-            const nameEl = document.getElementById('adminName');
-            try {
-                const { data } = await supabase.auth.getSession();
-                if (data && data.session) {
-                    document.body.classList.add('authed');
-                    if (nameEl) nameEl.textContent = (data.session.user?.email || 'Admin').split('@')[0];
-                    return;
-                }
-            } catch (e) { /* fall through */ }
-
-            const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
-            if (legacy) {
-                document.body.classList.add('authed');
-                const email = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-                if (nameEl) nameEl.textContent = email ? email.split('@')[0] : 'Admin';
-                return;
-            }
-
-            window.location.href = 'index.html';
-        })();
-
-        // ============================================
         // STATE
         // ============================================
         let allApplications = [];
@@ -519,11 +494,36 @@
         }
 
         // ============================================
+        // SEND APPROVAL EMAIL (MAGIC LINK)
+        // ============================================
+        async function sendApprovalEmail(studentEmail) {
+            if (!studentEmail) return;
+            try {
+                // This tells Supabase to send a Magic Link (OTP) email
+                const { error } = await supabase.auth.signInWithOtp({
+                    email: studentEmail,
+                    options: {
+                        // After they click the link, send them to the student login/dashboard
+                        emailRedirectTo: window.location.origin + '/student/login.html',
+                        shouldCreateUser: false 
+                    }
+                });
+                if (error) {
+                    console.warn('Approval email could not be sent:', error.message);
+                } else {
+                    console.log('✅ Approval email sent to:', studentEmail);
+                }
+            } catch (err) {
+                console.error('Email error:', err);
+            }
+        }
+
+        // ============================================
         // UPDATE STATUS
         // ============================================
         async function updateStatus(id, status) {
             const confirmMsg = status === 'approved'
-                ? 'Approve this application? This will activate the student\'s account so they can log in to the Student Portal.'
+                ? 'Approve this application? This will activate the student\'s account AND send them a login email.'
                 : 'Reject this application?';
             if (!confirm(confirmMsg)) return;
 
@@ -579,8 +579,13 @@
                     if (stuErr) console.warn('students update by reg_no failed:', stuErr);
                 }
 
+                // If approved, trigger the Magic Link email
+                if (status === 'approved' && app.email) {
+                    await sendApprovalEmail(app.email);
+                }
+
                 loadApplications();
-                alert(`✅ Application ${status} successfully!${status === 'approved' ? ' The student can now log in to the Student Portal.' : ''}`);
+                alert(`✅ Application ${status} successfully!${status === 'approved' ? '\n\nAn approval email with a login link has been sent to the student.' : ''}`);
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
