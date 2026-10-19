@@ -343,6 +343,29 @@
         body.dark .alert-warn { background: #3A2E14; color: #F0D080; }
         body.dark .alert-success { background: #1A3A24; color: #A0E0A0; }
 
+        /* Button inside alert for resending */
+        .btn-resend {
+            background: #1F4E3D;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            width: 100%;
+            transition: background 0.2s, opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-resend:hover:not(:disabled) { background: #2D6B54; }
+        .btn-resend:disabled { opacity: 0.6; cursor: not-allowed; }
+        body.dark .btn-resend { background: var(--gold); color: #0F1F19; }
+        body.dark .btn-resend:hover:not(:disabled) { background: var(--gold-deep); }
+
         .app-footer {
             text-align: center;
             padding: 24px 0 0;
@@ -539,7 +562,6 @@
                     .maybeSingle();
 
                 if (error || !app || !app.passport_photo_url) {
-                    // No passport — clear any stale cache
                     sessionStorage.removeItem('avms_avatar_url');
                     sessionStorage.removeItem('avms_avatar_expires');
                     return;
@@ -572,8 +594,7 @@
         }
 
         // ============================================
-        // SESSION HYGIENE — if an old session exists, re-verify against the roster.
-        // If the student's roster row is gone or deactivated, force sign-out.
+        // SESSION HYGIENE
         // ============================================
         (async function cleanStaleSession() {
             if (typeof supabase === 'undefined' || !supabase) return;
@@ -641,6 +662,51 @@
         });
 
         // ============================================
+        // RESEND CONFIRMATION LOGIC
+        // ============================================
+        async function handleResend(btn, email) {
+            btn.disabled = true;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> Sending...';
+
+            try {
+                const { error } = await supabase.auth.resend({
+                    type: 'signup',
+                    email: email,
+                    options: {
+                        emailRedirectTo: window.location.origin + '/student/login.html'
+                    }
+                });
+
+                if (error) throw error;
+
+                showAlert('✅ New confirmation link sent to <strong>' + email + '</strong>. Check your inbox (and spam folder).', 'success');
+
+                // 60-Second Cooldown
+                let timeLeft = 60;
+                const timer = setInterval(() => {
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        btn.disabled = false;
+                        btn.innerHTML = 'Resend confirmation email';
+                    } else {
+                        btn.innerHTML = `Resend in ${timeLeft}s...`;
+                        timeLeft--;
+                    }
+                }, 1000);
+
+            } catch (err) {
+                let msg = err.message || 'Could not resend email.';
+                if (msg.toLowerCase().includes('rate') || msg.toLowerCase().includes('too many')) {
+                    msg = 'Please wait a minute before trying again.';
+                }
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                showAlert('⚠️ ' + msg, 'error');
+            }
+        }
+
+        // ============================================
         // SUBMIT LOGIN
         // ============================================
         form.addEventListener('submit', async function(e) {
@@ -670,10 +736,19 @@
 
                 if (authErr) {
                     const msg = (authErr.message || '').toLowerCase();
-                    if (msg.includes('invalid') || msg.includes('credentials')) {
+                    
+                    // Catch the unconfirmed email error and show the resend button
+                    if (authErr.code === 'email_not_confirmed' || msg.includes('confirm') || msg.includes('verified')) {
+                        alertBox.className = 'alert alert-warn show';
+                        alertBox.innerHTML = `
+                            ⚠️ <strong>Email not confirmed.</strong><br>
+                            Please check your inbox for the confirmation link. It may have expired.<br><br>
+                            <button type="button" class="btn-resend" id="resendBtn" onclick="handleResend(this, '${email}')">
+                                Resend confirmation email
+                            </button>
+                        `;
+                    } else if (msg.includes('invalid') || msg.includes('credentials')) {
                         showAlert('❌ Incorrect email or password. Please try again.', 'error');
-                    } else if (msg.includes('confirm')) {
-                        showAlert('⚠️ Please confirm your email first. Check your inbox.', 'warn');
                     } else {
                         showAlert('⚠️ ' + authErr.message, 'error');
                     }
