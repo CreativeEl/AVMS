@@ -299,10 +299,33 @@ function initForm() {
 
     const pages = document.querySelectorAll('.form-page');
     const steps = document.querySelectorAll('.step-item');
+    const submitBtn = document.getElementById('submitBtn');
+    const declarationCheckbox = document.getElementById('declaration');
+    
     let currentStep = 0;
     const totalSteps = pages.length;
 
     showStep(0);
+
+    // Lock submit button until declaration checkbox is checked
+    if (declarationCheckbox && submitBtn) {
+        declarationCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.5';
+                submitBtn.style.cursor = 'not-allowed';
+            }
+        });
+        
+        // Initial state
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+        submitBtn.style.cursor = 'not-allowed';
+    }
 
     steps.forEach((step, index) => {
         step.addEventListener('click', function() {
@@ -359,13 +382,14 @@ function initForm() {
             uploadedFiles[fileType] = this.files[0];
             
             const isUploaded = this.files && this.files.length > 0;
-            const statusColor = isUploaded ? '#28a745' : '#e8491d';
+            const isRequired = this.hasAttribute('required');
+            const statusColor = isUploaded ? '#28a745' : (isRequired ? '#e8491d' : '#888');
             
             let previewHtml = `
                 <div class="file-item" data-file="${input.id}">
                     <i class="fas fa-file" style="color: ${statusColor};"></i>
                     <span><strong>${escapeHtml(input.id.replace(/([A-Z])/g, ' $1').trim())}:</strong> ${escapeHtml(fileName)} (${fileSizeKB} KB)</span>
-                    <span style="margin-left: auto; color: ${statusColor}; font-weight: bold;">${isUploaded ? '✅ Uploaded' : '❌ Required'}</span>
+                    <span style="margin-left: auto; color: ${statusColor}; font-weight: bold;">${isUploaded ? '✅ Uploaded' : (isRequired ? '❌ Required' : 'Optional')}</span>
             `;
             
             if (this.files[0] && this.files[0].type.startsWith('image/')) {
@@ -400,6 +424,7 @@ function initForm() {
 
     function updateFileStatus() {
         const previewDiv = document.getElementById('filePreview');
+        // Only check inputs that have the 'required' attribute
         const fileInputs = document.querySelectorAll('input[type="file"][required]');
         let uploadedCount = 0;
         const totalFiles = fileInputs.length;
@@ -418,13 +443,13 @@ function initForm() {
         if (uploadedCount === totalFiles) {
             statusMsg.innerHTML = `
                 <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-                    ✅ All ${totalFiles} documents uploaded successfully!
+                    ✅ All required (${totalFiles}) documents uploaded successfully!
                 </div>
             `;
         } else {
             statusMsg.innerHTML = `
                 <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-                    ⚠️ ${uploadedCount} of ${totalFiles} documents uploaded. Please upload all required documents.
+                    ⚠️ ${uploadedCount} of ${totalFiles} required documents uploaded. Please upload the missing ones.
                 </div>
             `;
         }
@@ -454,6 +479,7 @@ function initForm() {
         inputs.forEach(input => {
             if (input.offsetParent === null) return;
             if (input.readOnly) return;
+            if (input.type === 'file') return; // Files handled separately below
             
             if (!input.value.trim()) {
                 valid = false;
@@ -481,12 +507,13 @@ function initForm() {
         }
 
         if (index === 3) {
+            // Only validate files with the 'required' attribute
             const fileInputs = currentPage.querySelectorAll('input[type="file"][required]');
-            let allFilesUploaded = true;
+            let allRequiredUploaded = true;
             
             fileInputs.forEach(input => {
                 if (!input.files || input.files.length === 0) {
-                    allFilesUploaded = false;
+                    allRequiredUploaded = false;
                     input.style.borderColor = '#e8491d';
                     input.style.borderWidth = '3px';
                     setTimeout(() => {
@@ -499,9 +526,9 @@ function initForm() {
                 }
             });
 
-            if (!allFilesUploaded) {
+            if (!allRequiredUploaded) {
                 valid = false;
-                showFormMessage('⚠️ Please upload ALL 4 required documents before proceeding.', 'error');
+                showFormMessage('⚠️ Please upload the required documents (Passport and Payment Receipt) before proceeding.', 'error');
             }
         }
 
@@ -619,8 +646,6 @@ function initForm() {
 
         // ============================================
         // STEP 1: COMPRESS + UPLOAD FILES
-        // Saves the STORAGE PATH (not public URL) so admins can
-        // generate signed URLs on demand.
         // ============================================
         const fileFields = ['passportPhoto', 'admissionLetter', 'studentId', 'paymentReceipt'];
         const filePaths = {
@@ -637,11 +662,11 @@ function initForm() {
             let file = fileInput?.files[0];
             const fieldLabel = field.replace(/([A-Z])/g, ' $1').trim();
 
-            if (!file) continue;
+            if (!file) continue; // Skip if optional file is empty
 
             try {
                 if (file.type.startsWith('image/')) {
-                    showFormMessage(`⏳ Compressing ${fieldLabel}...`, 'warn');
+                    // Silent compression in background (no UI message)
                     file = await compressImage(file, fieldLabel);
                 }
 
@@ -684,7 +709,7 @@ function initForm() {
         }
 
         // ============================================
-        // STEP 2: CONFLICT PRE-CHECK — email already used?
+        // STEP 2: CONFLICT PRE-CHECK
         // ============================================
         const email = (document.getElementById('email')?.value || '').trim();
         const password = document.getElementById('password')?.value || '';
@@ -720,8 +745,6 @@ function initForm() {
 
         // ============================================
         // STEP 3: CREATE AUTH ACCOUNT
-        // emailRedirectTo sends the confirmation link to /student/login.html
-        // so it doesn't fall back to Supabase's default Site URL (localhost).
         // ============================================
         let authUserId = null;
         try {
