@@ -594,10 +594,76 @@
         }
 
         // ============================================
+        // MAGIC LINK HANDLER (Approval Email)
+        // ============================================
+        async function handleMagicLink() {
+            // Check if the URL has an access token (Magic Link)
+            const hash = window.location.hash;
+            if (!hash || !hash.includes('access_token=')) return;
+
+            // Show a loading message to the user
+            showAlert('🔐 Verifying login link...', 'success');
+            form.style.display = 'none'; // Hide password form while verifying
+
+            try {
+                // Let Supabase parse the token from the URL and establish the session
+                const { data: { session }, error: sessErr } = await supabase.auth.getSession();
+                
+                if (sessErr || !session) {
+                    throw new Error('Link expired or invalid.');
+                }
+
+                const userId = session.user.id;
+
+                // Check if student is active in the database
+                const { data: studentByAuth, error: stuErr } = await supabase
+                    .from('students')
+                    .select('id, is_active, reg_no')
+                    .eq('auth_user_id', userId)
+                    .maybeSingle();
+
+                if (stuErr) throw stuErr;
+
+                if (!studentByAuth) {
+                    await killSession();
+                    showAlert('⚠️ No student record linked to this account. Contact AVMS.', 'error');
+                    form.style.display = 'block';
+                    window.history.replaceState(null, '', window.location.pathname);
+                    return;
+                }
+
+                if (studentByAuth.is_active !== true) {
+                    await killSession();
+                    showAlert('⏳ <strong>Application pending.</strong><br>Your account is awaiting admin approval. You\'ll receive an email once approved.', 'warn');
+                    form.style.display = 'block';
+                    window.history.replaceState(null, '', window.location.pathname);
+                    return;
+                }
+
+                // Success! Cache avatar and redirect
+                await signAndCacheAvatar(userId);
+                showAlert('✅ Login successful. Redirecting...', 'success');
+                window.location.href = 'dashboard.html';
+
+            } catch (err) {
+                console.warn('Magic link error:', err);
+                showAlert('⚠️ Login link is invalid or has expired. Please log in manually.', 'error');
+                form.style.display = 'block';
+                window.history.replaceState(null, '', window.location.pathname);
+            }
+        }
+
+        // Run the magic link handler on page load
+        handleMagicLink();
+
+        // ============================================
         // SESSION HYGIENE
         // ============================================
         (async function cleanStaleSession() {
             if (typeof supabase === 'undefined' || !supabase) return;
+            // Don't run session hygiene if we're currently processing a magic link
+            if (window.location.hash.includes('access_token=')) return;
+
             try {
                 const { data: sess } = await supabase.auth.getSession();
                 if (!sess || !sess.session) return;
