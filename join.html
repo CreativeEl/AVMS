@@ -334,7 +334,7 @@
                     <!-- STEP 4: UPLOAD DOCUMENTS -->
                     <div class="form-page" data-step="4">
                         <h3>Upload Documents</h3>
-                        <p class="section-desc">Please upload ALL required documents. All fields are compulsory. <span style="color: #8B1A1A; font-weight: 700;">*</span></p>
+                        <p class="section-desc">Please upload your documents. <strong>Passport Photograph</strong> and <strong>AVMS Payment Receipt</strong> are compulsory. The others are optional.</p>
 
                         <div class="form-row">
                             <div class="form-group">
@@ -343,17 +343,17 @@
                                 <small class="file-hint">Upload a recent passport photo (JPG, PNG) - Required</small>
                             </div>
                             <div class="form-group">
-                                <label for="admissionLetter">Admission Letter *</label>
-                                <input type="file" id="admissionLetter" name="admissionLetter" accept=".pdf,.jpg,.png" required>
-                                <small class="file-hint">Upload your admission letter (PDF, JPG, PNG) - Required</small>
+                                <label for="admissionLetter">Admission Letter (Optional)</label>
+                                <input type="file" id="admissionLetter" name="admissionLetter" accept=".pdf,.jpg,.png">
+                                <small class="file-hint">Upload your admission letter (PDF, JPG, PNG)</small>
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="studentId">Student ID Card *</label>
-                                <input type="file" id="studentId" name="studentId" accept="image/*,.pdf" required>
-                                <small class="file-hint">Upload your student ID card (JPG, PNG, PDF) - Required</small>
+                                <label for="studentId">Student ID Card (Optional)</label>
+                                <input type="file" id="studentId" name="studentId" accept="image/*,.pdf">
+                                <small class="file-hint">Upload your student ID card (JPG, PNG, PDF)</small>
                             </div>
                             <div class="form-group">
                                 <label for="paymentReceipt">AVMS Payment Receipt *</label>
@@ -363,7 +363,7 @@
                         </div>
 
                         <div id="filePreview" class="file-preview-area">
-                            <p><i class="fas fa-info-circle"></i> Please upload all 4 required documents</p>
+                            <p><i class="fas fa-info-circle"></i> Please upload at least the Passport and Payment Receipt.</p>
                         </div>
 
                         <div class="form-navigation">
@@ -397,7 +397,7 @@
 
                         <div class="form-navigation">
                             <button type="button" class="btn-prev">← Back to Edit</button>
-                            <button type="submit" class="btn-submit" id="submitBtn">✅ Submit Application</button>
+                            <button type="submit" class="btn-submit" id="submitBtn" disabled>✅ Submit Application</button>
                         </div>
 
                         <div id="formMessage"></div>
@@ -418,8 +418,8 @@
                             <p><strong>Email:</strong> <span id="confirmEmail"></span></p>
                             <p><strong>Phone:</strong> <span id="confirmPhone"></span></p>
                         </div>
-                        <p class="confirmation-note"><strong>⏳ Wait for admin confirmation.</strong> Your account has been created but is inactive until an admin approves your application. You'll receive an email from AVMS once approved.</p>
-                        <p class="confirmation-note">After approval, log in at the <a href="student/login.html">Student Portal</a>.</p>
+                        <p class="confirmation-note"><strong>📧 Check your email!</strong> We have sent a confirmation link to your email. Please click it to verify your email address.</p>
+                        <p class="confirmation-note"><strong>⏳ Wait for admin approval.</strong> You will not be able to log in until an admin reviews and approves your application. You will receive a separate email once approved.</p>
                         <a href="index.html" class="btn">🏠 Return to Home</a>
                     </div>
                 </div>
