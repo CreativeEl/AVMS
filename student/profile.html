@@ -989,18 +989,25 @@
 
                 currentStudent = student;
                 
-                // Fetch the application to get home_address
+                // Fetch the application to get home_address and phone
                 const { data: appData } = await supabase
                     .from('membership_applications')
-                    .select('id, home_address')
+                    .select('id, home_address, phone')
                     .eq('auth_user_id', currentUserId)
                     .order('applied_at', { ascending: false })
                     .limit(1)
                     .maybeSingle();
                     
                 currentApplication = appData || null;
-                if (currentApplication && currentApplication.home_address) {
-                    currentStudent.home_address = currentApplication.home_address;
+                
+                // Override student properties with the application data
+                if (currentApplication) {
+                    if (currentApplication.home_address) {
+                        currentStudent.home_address = currentApplication.home_address;
+                    }
+                    if (currentApplication.phone) {
+                        currentStudent.phone = currentApplication.phone;
+                    }
                 }
 
                 await ensureAvatar(currentUserId);
@@ -1076,25 +1083,20 @@
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             try {
-                // 1. Update Phone in 'students' table
-                const { error: stuErr } = await supabase
-                    .from('students')
-                    .update({ phone })
-                    .eq('id', currentStudent.id);
-
-                if (stuErr) throw stuErr;
-
-                // 2. Update Home Address in 'membership_applications' table
                 if (currentApplication) {
+                    // Update BOTH phone and address in 'membership_applications'
                     const { error: appErr } = await supabase
                         .from('membership_applications')
-                        .update({ home_address: address })
+                        .update({ phone: phone, home_address: address })
                         .eq('id', currentApplication.id);
 
                     if (appErr) throw appErr;
+                    
+                    currentApplication.phone = phone;
                     currentApplication.home_address = address;
                 }
 
+                // Update local state and UI
                 currentStudent.phone = phone;
                 currentStudent.home_address = address;
                 renderStudent(currentStudent);
