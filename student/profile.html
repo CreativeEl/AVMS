@@ -959,6 +959,7 @@
         }
 
         let currentStudent = null;
+        let currentApplication = null;
         let currentUserId = null;
 
         (async function init() {
@@ -987,8 +988,23 @@
                 }
 
                 currentStudent = student;
+                
+                // Fetch the application to get home_address
+                const { data: appData } = await supabase
+                    .from('membership_applications')
+                    .select('id, home_address')
+                    .eq('auth_user_id', currentUserId)
+                    .order('applied_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                    
+                currentApplication = appData || null;
+                if (currentApplication && currentApplication.home_address) {
+                    currentStudent.home_address = currentApplication.home_address;
+                }
+
                 await ensureAvatar(currentUserId);
-                renderStudent(student);
+                renderStudent(currentStudent);
                 applyAvatar(initials(student.full_name));
                 hideGuard();
             } catch (err) {
@@ -1060,12 +1076,24 @@
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
             try {
-                const { error } = await supabase
+                // 1. Update Phone in 'students' table
+                const { error: stuErr } = await supabase
                     .from('students')
-                    .update({ phone, home_address: address })
+                    .update({ phone })
                     .eq('id', currentStudent.id);
 
-                if (error) throw error;
+                if (stuErr) throw stuErr;
+
+                // 2. Update Home Address in 'membership_applications' table
+                if (currentApplication) {
+                    const { error: appErr } = await supabase
+                        .from('membership_applications')
+                        .update({ home_address: address })
+                        .eq('id', currentApplication.id);
+
+                    if (appErr) throw appErr;
+                    currentApplication.home_address = address;
+                }
 
                 currentStudent.phone = phone;
                 currentStudent.home_address = address;
