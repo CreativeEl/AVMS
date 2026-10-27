@@ -122,19 +122,31 @@
             margin-bottom: 36px;
         }
         .logo-circle {
-            width: 90px;
-            height: 90px;
-            margin-bottom: 18px;
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background: var(--green-deep);
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 12px 28px rgba(31,78,61,0.22);
+            position: relative;
+            margin-bottom: 18px;
         }
-        .logo-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 8px 16px rgba(31,78,61,0.2));
+        .logo-circle::after {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            opacity: 0.85;
+        }
+        .logo-circle span {
+            font-family: Georgia, serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 0.5px;
         }
         .logo-wrap h1 {
             font-family: Georgia, serif;
@@ -331,6 +343,7 @@
         body.dark .alert-warn { background: #3A2E14; color: #F0D080; }
         body.dark .alert-success { background: #1A3A24; color: #A0E0A0; }
 
+        /* Button inside alert for resending */
         .btn-resend {
             background: #1F4E3D;
             color: #fff;
@@ -417,9 +430,7 @@
         </div>
 
         <div class="logo-wrap">
-            <div class="logo-circle">
-                <img src="https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png" alt="AVMS Logo">
-            </div>
+            <div class="logo-circle"><span>AV</span></div>
             <h1>Student Portal</h1>
             <p>AVMS · ABU Zaria</p>
         </div>
@@ -586,13 +597,16 @@
         // MAGIC LINK HANDLER (Approval Email)
         // ============================================
         async function handleMagicLink() {
+            // Check if the URL has an access token (Magic Link)
             const hash = window.location.hash;
             if (!hash || !hash.includes('access_token=')) return;
 
+            // Show a loading message to the user
             showAlert('🔐 Verifying login link...', 'success');
-            form.style.display = 'none'; 
+            form.style.display = 'none'; // Hide password form while verifying
 
             try {
+                // Let Supabase parse the token from the URL and establish the session
                 const { data: { session }, error: sessErr } = await supabase.auth.getSession();
                 
                 if (sessErr || !session) {
@@ -601,6 +615,7 @@
 
                 const userId = session.user.id;
 
+                // Check if student is active in the database
                 const { data: studentByAuth, error: stuErr } = await supabase
                     .from('students')
                     .select('id, is_active, reg_no')
@@ -625,6 +640,7 @@
                     return;
                 }
 
+                // Success! Cache avatar and redirect
                 await signAndCacheAvatar(userId);
                 showAlert('✅ Login successful. Redirecting...', 'success');
                 window.location.href = 'dashboard.html';
@@ -637,6 +653,7 @@
             }
         }
 
+        // Run the magic link handler on page load
         handleMagicLink();
 
         // ============================================
@@ -644,6 +661,7 @@
         // ============================================
         (async function cleanStaleSession() {
             if (typeof supabase === 'undefined' || !supabase) return;
+            // Don't run session hygiene if we're currently processing a magic link
             if (window.location.hash.includes('access_token=')) return;
 
             try {
@@ -730,6 +748,7 @@
 
                 showAlert('✅ New confirmation link sent to <strong>' + email + '</strong>. Check your inbox (and spam folder).', 'success');
 
+                // 60-Second Cooldown
                 let timeLeft = 60;
                 const timer = setInterval(() => {
                     if (timeLeft <= 0) {
@@ -784,6 +803,7 @@
                 if (authErr) {
                     const msg = (authErr.message || '').toLowerCase();
                     
+                    // Catch the unconfirmed email error and show the resend button
                     if (authErr.code === 'email_not_confirmed' || msg.includes('confirm') || msg.includes('verified')) {
                         alertBox.className = 'alert alert-warn show';
                         alertBox.innerHTML = `
@@ -844,6 +864,7 @@
                     return;
                 }
 
+                // Sign & cache the passport avatar (non-blocking — failure doesn't stop login)
                 await signAndCacheAvatar(userId);
 
                 showAlert('✅ Login successful. Redirecting...', 'success');
