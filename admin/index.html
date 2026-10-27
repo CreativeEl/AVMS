@@ -88,12 +88,17 @@
                 0 0 0 1px rgba(201, 169, 97, 0.35);
         }
 
-        .login-box .logo-text {
-            text-align: center;
-            font-size: 52px;
-            display: block;
-            margin-bottom: 14px;
-            line-height: 1;
+        /* UPDATED LOGO SECTION */
+        .login-box .logo-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .login-box .logo-wrap img {
+            width: 76px;
+            height: 76px;
+            object-fit: contain;
+            filter: drop-shadow(0 6px 12px rgba(31,78,61,0.2));
         }
 
         .login-box h1 {
@@ -287,8 +292,9 @@
             .login-box h1 {
                 font-size: 26px;
             }
-            .login-box .logo-text {
-                font-size: 44px;
+            .login-box .logo-wrap img {
+                width: 64px;
+                height: 64px;
             }
         }
     </style>
@@ -300,7 +306,12 @@
 
     <div class="admin-login">
         <div class="login-box">
-            <span class="logo-text">🔐</span>
+            
+            <!-- UPDATED LOGO -->
+            <div class="logo-wrap">
+                <img src="https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png" alt="AVMS Logo">
+            </div>
+
             <h1>Admin Login</h1>
             <p>AVMS ABU ZARIA · DASHBOARD</p>
 
