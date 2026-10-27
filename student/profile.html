@@ -556,6 +556,59 @@
         }
         .form-field input:disabled { opacity: 0.65; cursor: not-allowed; }
 
+        /* Passport Editor Styles */
+        .passport-editor {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 16px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+        .passport-editor .preview {
+            width: 84px; height: 84px;
+            border-radius: 50%;
+            background: var(--icon-bg);
+            border: 2px solid var(--border);
+            overflow: hidden;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 28px;
+        }
+        .passport-editor .preview img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+        }
+        .passport-editor .actions {
+            flex: 1;
+            min-width: 0;
+        }
+        .passport-editor .hint {
+            font-size: 12.5px;
+            color: var(--text-soft);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .btn-upload {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--surface);
+            color: var(--green-deep);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        html.dark .btn-upload { color: var(--gold); border-color: var(--border-soft); background: var(--icon-bg); }
+        .btn-upload:hover { background: var(--icon-bg); border-color: var(--green-mid); }
+        .btn-upload:disabled { opacity: 0.6; cursor: not-allowed; }
+
         .edit-actions {
             display: flex;
             gap: 12px;
@@ -803,6 +856,21 @@
 
                             <div class="edit-form" id="editForm">
                                 <div class="info-card" style="padding: 22px 26px 26px;">
+                                    
+                                    <!-- NEW PASSPORT EDITOR -->
+                                    <div class="passport-editor">
+                                        <div class="preview" id="editPassportPreview">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="actions">
+                                            <div class="hint">Update your profile picture. It will instantly replace your old one across the portal.</div>
+                                            <input type="file" id="passportInput" accept="image/*" style="display: none;">
+                                            <button type="button" class="btn-upload" id="btnUploadPassport">
+                                                <i class="fas fa-camera"></i> Choose New Photo
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <div class="form-field">
                                         <label>Phone Number</label>
                                         <input type="tel" id="editPhone" placeholder="e.g., 080XXXXXXXX">
@@ -918,7 +986,7 @@
             window.location.href = 'login.html';
         }
 
-        // AVATAR
+        // AVATAR helpers
         function extractStoragePath(input) {
             if (!input) return null;
             const str = String(input).trim();
@@ -973,7 +1041,8 @@
             const targets = [
                 document.getElementById('profileAvatar'),
                 document.getElementById('topbarAvatar'),
-                document.getElementById('mHeroAvatar')
+                document.getElementById('mHeroAvatar'),
+                document.getElementById('editPassportPreview')
             ].filter(Boolean);
 
             targets.forEach(el => {
@@ -1016,10 +1085,10 @@
 
                 currentStudent = student;
                 
-                // Fetch the application to get home_address and phone
+                // Fetch the application to get home_address, phone, and passport
                 const { data: appData } = await supabase
                     .from('membership_applications')
-                    .select('id, home_address, phone')
+                    .select('id, home_address, phone, passport_photo_url')
                     .eq('auth_user_id', currentUserId)
                     .order('applied_at', { ascending: false })
                     .limit(1)
@@ -1095,6 +1164,70 @@
             }
         });
 
+        // ============================================
+        // PASSPORT UPLOAD LOGIC
+        // ============================================
+        document.getElementById('btnUploadPassport').addEventListener('click', () => {
+            document.getElementById('passportInput').click();
+        });
+
+        document.getElementById('passportInput').addEventListener('change', async function() {
+            const file = this.files[0];
+            if (!file) return;
+            
+            const btn = document.getElementById('btnUploadPassport');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+            try {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${Date.now()}_${currentStudent.reg_no || 'student'}.${fileExt}`;
+                const filePath = `passports/${fileName}`;
+                
+                // 1. Upload the new image
+                const { error: uploadErr } = await supabase.storage
+                    .from('membership-documents')
+                    .upload(filePath, file, { upsert: false });
+                    
+                if (uploadErr) throw uploadErr;
+
+                // 2. Delete the old image if it exists
+                if (currentApplication && currentApplication.passport_photo_url) {
+                    const oldPath = extractStoragePath(currentApplication.passport_photo_url);
+                    if (oldPath) {
+                        await supabase.storage.from('membership-documents').remove([oldPath]);
+                    }
+                }
+
+                // 3. Update the database record
+                const { error: dbErr } = await supabase
+                    .from('membership_applications')
+                    .update({ passport_photo_url: filePath })
+                    .eq('id', currentApplication.id);
+                    
+                if (dbErr) throw dbErr;
+
+                // 4. Update local state and force refresh
+                currentApplication.passport_photo_url = filePath;
+                
+                sessionStorage.removeItem('avms_avatar_url');
+                sessionStorage.removeItem('avms_avatar_expires');
+                await ensureAvatar(currentUserId);
+                applyAvatar(initials(currentStudent.full_name));
+                
+                toast('✅ Passport updated successfully!');
+
+            } catch (err) {
+                console.error('Passport Upload Error:', err);
+                toast('❌ Upload failed. ' + err.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                this.value = ''; // Reset input
+            }
+        });
+
         document.getElementById('saveBtn').addEventListener('click', async () => {
             const phone = (document.getElementById('editPhone').value || '').trim();
             const address = (document.getElementById('editAddress').value || '').trim();
@@ -1111,7 +1244,6 @@
 
             try {
                 if (currentApplication) {
-                    // Update BOTH phone and address in 'membership_applications'
                     const { error: appErr } = await supabase
                         .from('membership_applications')
                         .update({ phone: phone, home_address: address })
@@ -1123,7 +1255,6 @@
                     currentApplication.home_address = address;
                 }
 
-                // Update local state and UI
                 currentStudent.phone = phone;
                 currentStudent.home_address = address;
                 renderStudent(currentStudent);
