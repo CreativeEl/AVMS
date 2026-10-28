@@ -1038,6 +1038,7 @@
         });
 
         let currentAdminEmail = '';
+        let currentSettings = {}; // Store current URLs to delete old files
 
         async function initAuth() {
             const nameEl = document.getElementById('adminName');
@@ -1122,33 +1123,53 @@
             btn.innerHTML = original;
         }
 
-        async function uploadImage(file, folder) {
+        // ============================================
+        // UPDATED: UPLOAD IMAGE (deletes old file first)
+        // ============================================
+        async function uploadImage(file, folder, settingKey) {
             const timestamp = Date.now();
             const fileExt = file.name.split('.').pop();
             const fileName = `${timestamp}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
             const filePath = `${folder}/${fileName}`;
 
-            const { data, error } = await supabase.storage
+            // 1. Try to delete the old file if it exists
+            const oldUrl = currentSettings[settingKey];
+            if (oldUrl) {
+                // Extract path from public URL (e.g., "hero/123_image.jpg")
+                const urlParts = oldUrl.split('/public/');
+                if (urlParts.length > 1) {
+                    const pathWithBucket = urlParts[1];
+                    const firstSlash = pathWithBucket.indexOf('/');
+                    if (firstSlash !== -1) {
+                        const bucket = pathWithBucket.substring(0, firstSlash);
+                        const oldFilePath = pathWithBucket.substring(firstSlash + 1);
+                        await supabase.storage.from(bucket).remove([oldFilePath]);
+                    }
+                }
+            }
+
+            // 2. Upload new file
+            const { error } = await supabase.storage
                 .from('site-assets')
                 .upload(filePath, file, { upsert: true });
 
+            let bucketUsed = 'site-assets';
+
             if (error) {
-                const { data: fallbackData, error: fallbackError } = await supabase.storage
+                const { error: fallbackError } = await supabase.storage
                     .from('membership-documents')
                     .upload(filePath, file, { upsert: true });
 
                 if (fallbackError) throw fallbackError;
-
-                const { data: urlData } = supabase.storage
-                    .from('membership-documents')
-                    .getPublicUrl(filePath);
-
-                return urlData.publicUrl;
+                bucketUsed = 'membership-documents';
             }
 
             const { data: urlData } = supabase.storage
-                .from('site-assets')
+                .from(bucketUsed)
                 .getPublicUrl(filePath);
+
+            // Save to local state so subsequent uploads can delete this one
+            currentSettings[settingKey] = urlData.publicUrl;
 
             return urlData.publicUrl;
         }
@@ -1270,7 +1291,7 @@
             const btn = document.getElementById('saveLogoBtn');
             const original = showLoading(btn, 'Uploading...');
             try {
-                const url = await uploadImage(pendingLogoFile, 'logos');
+                const url = await uploadImage(pendingLogoFile, 'logos', 'site_logo');
                 await saveSetting('site_logo', url);
                 document.getElementById('logoStatus').textContent = `Uploaded: ${pendingLogoFile.name}`;
                 showMessage('logoMessage', 'success', '✅ Logo uploaded and saved successfully!');
@@ -1329,7 +1350,7 @@
             const btn = document.getElementById('saveFaviconBtn');
             const original = showLoading(btn, 'Uploading...');
             try {
-                const url = await uploadImage(pendingFaviconFile, 'favicons');
+                const url = await uploadImage(pendingFaviconFile, 'favicons', 'site_favicon');
                 await saveSetting('site_favicon', url);
                 document.getElementById('faviconStatus').textContent = `Uploaded: ${pendingFaviconFile.name}`;
                 showMessage('faviconMessage', 'success', '✅ Favicon uploaded and saved successfully!');
@@ -1418,9 +1439,28 @@
             try {
                 for (let i = 0; i < SLIDESHOW_SLOTS; i++) {
                     if (pendingSlideFiles[i]) {
-                        const url = await uploadImage(pendingSlideFiles[i], 'hero-slideshow');
+                        // We use a unique key for each slot to manage deletions
+                        const settingKey = `hero_slideshow_${i}`;
+                        const url = await uploadImage(pendingSlideFiles[i], 'hero-slideshow', settingKey);
                         slideshowUrls[i] = url;
                         pendingSlideFiles[i] = null;
+                    } else if (!slideshowUrls[i]) {
+                        // If slot is empty, check if we need to delete an old file
+                        const settingKey = `hero_slideshow_${i}`;
+                        if (currentSettings[settingKey]) {
+                            const oldUrl = currentSettings[settingKey];
+                            const urlParts = oldUrl.split('/public/');
+                            if (urlParts.length > 1) {
+                                const pathWithBucket = urlParts[1];
+                                const firstSlash = pathWithBucket.indexOf('/');
+                                if (firstSlash !== -1) {
+                                    const bucket = pathWithBucket.substring(0, firstSlash);
+                                    const oldFilePath = pathWithBucket.substring(firstSlash + 1);
+                                    await supabase.storage.from(bucket).remove([oldFilePath]);
+                                }
+                            }
+                            currentSettings[settingKey] = '';
+                        }
                     }
                 }
 
@@ -1451,6 +1491,8 @@
                         if (Array.isArray(parsed)) {
                             for (let i = 0; i < SLIDESHOW_SLOTS; i++) {
                                 slideshowUrls[i] = parsed[i] || '';
+                                // Also store in currentSettings for deletion tracking
+                                currentSettings[`hero_slideshow_${i}`] = parsed[i] || '';
                             }
                         }
                     } catch (e) {
@@ -1491,7 +1533,7 @@
             const btn = document.getElementById('saveHeroImageBtn');
             const original = showLoading(btn, 'Uploading...');
             try {
-                const url = await uploadImage(pendingHeroImageFile, 'hero');
+                const url = await uploadImage(pendingHeroImageFile, 'hero', 'hero_image');
                 await saveSetting('hero_image', url);
                 showMessage('heroImageMessage', 'success', '✅ Hero image uploaded and saved successfully!');
                 pendingHeroImageFile = null;
@@ -1529,7 +1571,7 @@
             const btn = document.getElementById('saveAboutImageBtn');
             const original = showLoading(btn, 'Uploading...');
             try {
-                const url = await uploadImage(pendingAboutImageFile, 'about');
+                const url = await uploadImage(pendingAboutImageFile, 'about', 'about_image');
                 await saveSetting('about_image', url);
                 showMessage('aboutImageMessage', 'success', '✅ About image uploaded and saved successfully!');
                 pendingAboutImageFile = null;
@@ -1625,56 +1667,56 @@
                 const { data, error } = await supabase.from('site_settings').select('*');
                 if (error) throw error;
 
-                const settings = {};
-                (data || []).forEach(s => { settings[s.setting_key] = s.setting_value; });
+                (data || []).forEach(s => { currentSettings[s.setting_key] = s.setting_value; });
 
-                if (settings.site_name) document.getElementById('siteName').value = settings.site_name;
-                if (settings.site_short_name) document.getElementById('siteShortName').value = settings.site_short_name;
-                if (settings.site_tagline) document.getElementById('siteTagline').value = settings.site_tagline;
-                if (settings.site_description) document.getElementById('siteDescription').value = settings.site_description;
-                if (settings.contact_email) document.getElementById('contactEmail').value = settings.contact_email;
-                if (settings.contact_email_2) document.getElementById('contactEmail2').value = settings.contact_email_2;
-                if (settings.contact_phone) document.getElementById('contactPhone').value = settings.contact_phone;
-                if (settings.contact_phone_2) document.getElementById('contactPhone2').value = settings.contact_phone_2;
-                if (settings.contact_address) document.getElementById('contactAddress').value = settings.contact_address;
-                if (settings.office_hours) document.getElementById('officeHours').value = settings.office_hours;
-                if (settings.office_hours_weekend) document.getElementById('officeHoursWeekend').value = settings.office_hours_weekend;
-                if (settings.facebook_url) document.getElementById('facebookUrl').value = settings.facebook_url;
-                if (settings.twitter_url) document.getElementById('twitterUrl').value = settings.twitter_url;
-                if (settings.instagram_url) document.getElementById('instagramUrl').value = settings.instagram_url;
-                if (settings.youtube_url) document.getElementById('youtubeUrl').value = settings.youtube_url;
-                if (settings.linkedin_url) document.getElementById('linkedinUrl').value = settings.linkedin_url;
-                if (settings.whatsapp_url) document.getElementById('whatsappUrl').value = settings.whatsapp_url;
-                if (settings.hero_title) document.getElementById('heroTitle').value = settings.hero_title;
-                if (settings.hero_subtitle) document.getElementById('heroSubtitle').value = settings.hero_subtitle;
-                if (settings.hero_description) document.getElementById('heroDescription').value = settings.hero_description;
-                if (settings.hero_button1_text) document.getElementById('heroButton1Text').value = settings.hero_button1_text;
-                if (settings.hero_button1_link) document.getElementById('heroButton1Link').value = settings.hero_button1_link;
-                if (settings.hero_button2_text) document.getElementById('heroButton2Text').value = settings.hero_button2_text;
-                if (settings.hero_button2_link) document.getElementById('heroButton2Link').value = settings.hero_button2_link;
-                if (settings.welcome_title) document.getElementById('welcomeTitle').value = settings.welcome_title;
-                if (settings.welcome_message) document.getElementById('welcomeMessage').value = settings.welcome_message;
-                if (settings.join_preview_title) document.getElementById('joinPreviewTitle').value = settings.join_preview_title;
-                if (settings.join_preview_text) document.getElementById('joinPreviewText').value = settings.join_preview_text;
-                if (settings.footer_description) document.getElementById('footerDescription').value = settings.footer_description;
-                if (settings.copyright_text) document.getElementById('copyrightText').value = settings.copyright_text;
-                if (settings.copyright_year) document.getElementById('copyrightYear').value = settings.copyright_year;
-                if (settings.footer_credit) document.getElementById('footerCredit').value = settings.footer_credit;
-                if (settings.site_logo) {
-                    document.getElementById('logoDisplay').innerHTML = `<img src="${settings.site_logo}" alt="Logo">`;
+                if (currentSettings.site_name) document.getElementById('siteName').value = currentSettings.site_name;
+                if (currentSettings.site_short_name) document.getElementById('siteShortName').value = currentSettings.site_short_name;
+                if (currentSettings.site_tagline) document.getElementById('siteTagline').value = currentSettings.site_tagline;
+                if (currentSettings.site_description) document.getElementById('siteDescription').value = currentSettings.site_description;
+                if (currentSettings.contact_email) document.getElementById('contactEmail').value = currentSettings.contact_email;
+                if (currentSettings.contact_email_2) document.getElementById('contactEmail2').value = currentSettings.contact_email_2;
+                if (currentSettings.contact_phone) document.getElementById('contactPhone').value = currentSettings.contact_phone;
+                if (currentSettings.contact_phone_2) document.getElementById('contactPhone2').value = currentSettings.contact_phone_2;
+                if (currentSettings.contact_address) document.getElementById('contactAddress').value = currentSettings.contact_address;
+                if (currentSettings.office_hours) document.getElementById('officeHours').value = currentSettings.office_hours;
+                if (currentSettings.office_hours_weekend) document.getElementById('officeHoursWeekend').value = currentSettings.office_hours_weekend;
+                if (currentSettings.facebook_url) document.getElementById('facebookUrl').value = currentSettings.facebook_url;
+                if (currentSettings.twitter_url) document.getElementById('twitterUrl').value = currentSettings.twitter_url;
+                if (currentSettings.instagram_url) document.getElementById('instagramUrl').value = currentSettings.instagram_url;
+                if (currentSettings.youtube_url) document.getElementById('youtubeUrl').value = currentSettings.youtube_url;
+                if (currentSettings.linkedin_url) document.getElementById('linkedinUrl').value = currentSettings.linkedin_url;
+                if (currentSettings.whatsapp_url) document.getElementById('whatsappUrl').value = currentSettings.whatsapp_url;
+                if (currentSettings.hero_title) document.getElementById('heroTitle').value = currentSettings.hero_title;
+                if (currentSettings.hero_subtitle) document.getElementById('heroSubtitle').value = currentSettings.hero_subtitle;
+                if (currentSettings.hero_description) document.getElementById('heroDescription').value = currentSettings.hero_description;
+                if (currentSettings.hero_button1_text) document.getElementById('heroButton1Text').value = currentSettings.hero_button1_text;
+                if (currentSettings.hero_button1_link) document.getElementById('heroButton1Link').value = currentSettings.hero_button1_link;
+                if (currentSettings.hero_button2_text) document.getElementById('heroButton2Text').value = currentSettings.hero_button2_text;
+                if (currentSettings.hero_button2_link) document.getElementById('heroButton2Link').value = currentSettings.hero_button2_link;
+                if (currentSettings.welcome_title) document.getElementById('welcomeTitle').value = currentSettings.welcome_title;
+                if (currentSettings.welcome_message) document.getElementById('welcomeMessage').value = currentSettings.welcome_message;
+                if (currentSettings.join_preview_title) document.getElementById('joinPreviewTitle').value = currentSettings.join_preview_title;
+                if (currentSettings.join_preview_text) document.getElementById('joinPreviewText').value = currentSettings.join_preview_text;
+                if (currentSettings.footer_description) document.getElementById('footerDescription').value = currentSettings.footer_description;
+                if (currentSettings.copyright_text) document.getElementById('copyrightText').value = currentSettings.copyright_text;
+                if (currentSettings.copyright_year) document.getElementById('copyrightYear').value = currentSettings.copyright_year;
+                if (currentSettings.footer_credit) document.getElementById('footerCredit').value = currentSettings.footer_credit;
+                
+                if (currentSettings.site_logo) {
+                    document.getElementById('logoDisplay').innerHTML = `<img src="${currentSettings.site_logo}" alt="Logo">`;
                     document.getElementById('logoStatus').textContent = 'Custom logo uploaded';
                 }
-                if (settings.site_favicon) {
-                    document.getElementById('faviconDisplay').innerHTML = `<img src="${settings.site_favicon}" alt="Favicon" style="width: 100%; height: 100%; object-fit: contain;">`;
+                if (currentSettings.site_favicon) {
+                    document.getElementById('faviconDisplay').innerHTML = `<img src="${currentSettings.site_favicon}" alt="Favicon" style="width: 100%; height: 100%; object-fit: contain;">`;
                     document.getElementById('faviconStatus').textContent = 'Custom favicon uploaded';
                 }
-                if (settings.hero_image) {
+                if (currentSettings.hero_image) {
                     document.getElementById('heroImagePreviewContainer').style.display = 'block';
-                    document.getElementById('heroImagePreview').src = settings.hero_image;
+                    document.getElementById('heroImagePreview').src = currentSettings.hero_image;
                 }
-                if (settings.about_image) {
+                if (currentSettings.about_image) {
                     document.getElementById('aboutImagePreviewContainer').style.display = 'block';
-                    document.getElementById('aboutImagePreview').src = settings.about_image;
+                    document.getElementById('aboutImagePreview').src = currentSettings.about_image;
                 }
 
                 console.log('✅ Settings loaded');
