@@ -468,9 +468,6 @@
                     ? '<span class="badge badge-active">Active</span>' 
                     : '<span class="badge badge-inactive">Inactive</span>';
 
-                const toggleIcon = s.is_active === true ? 'fa-toggle-on' : 'fa-toggle-off';
-                const toggleColor = s.is_active === true ? '#28a745' : '#888';
-
                 return `
                     <tr>
                         <td><strong>${escapeHtml(s.reg_no)}</strong></td>
@@ -660,7 +657,7 @@
         });
 
         // ============================================
-        // VIEW ATTEMPTS LOGIC
+        // VIEW ATTEMPTS LOGIC (NOW WITH DATE)
         // ============================================
         async function viewAttempts(regNo, studentName) {
             document.getElementById('attemptsTitle').textContent = `Attempts: ${studentName}`;
