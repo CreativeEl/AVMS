@@ -582,7 +582,7 @@
                     <td>${formatDate(m.created_at)}</td>
                     <td>
                         <a class="btn-link" href="${m.file_url}" target="_blank" rel="noopener"><i class="fas fa-eye"></i> View</a>
-                        <button class="btn-delete" onclick="deleteMaterial(${m.id}, '${(m.file_url || '').split('/').pop().replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
+                        <button class="btn-delete" onclick="deleteMaterial(${m.id})"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `).join('');
@@ -703,23 +703,37 @@
         });
 
         // ============================================
-        // DELETE
+        // DELETE (UPDATED TO DELETE STORAGE FILE)
         // ============================================
-        async function deleteMaterial(id, fileName) {
-            if (!confirm('Delete this material? This will remove it from the student downloads page.')) return;
+        async function deleteMaterial(id) {
+            if (!confirm('Are you sure you want to delete this material? This will remove it from the student downloads page and delete the file from storage.')) return;
+
+            const material = allMaterials.find(m => m.id === id);
+            if (!material) return;
+
             try {
-                // Delete DB row first (safer for UX — file cleanup is best-effort)
+                // 1. Delete the file from Supabase Storage
+                if (material.file_url) {
+                    // Extract the path relative to the bucket
+                    // Example: https://[proj].supabase.co/storage/v1/object/public/materials/level-100/123_file.pdf
+                    // We need: level-100/123_file.pdf
+                    const urlParts = material.file_url.split('/materials/');
+                    if (urlParts.length > 1) {
+                        const filePath = urlParts[1];
+                        const { error: storageErr } = await supabase.storage
+                            .from('materials')
+                            .remove([filePath]);
+                            
+                        if (storageErr) console.warn('Storage deletion failed:', storageErr);
+                    }
+                }
+
+                // 2. Delete the database row
                 const { error } = await supabase.from('materials').delete().eq('id', id);
                 if (error) throw error;
 
-                // Best-effort: try to remove the file from storage
-                if (fileName) {
-                    // We don't know the exact level folder, so we can't reliably locate it here.
-                    // Skipping storage cleanup — orphan files are harmless.
-                }
-
                 loadMaterials();
-                alert('✅ Material deleted.');
+                alert('✅ Material and file deleted successfully!');
             } catch (error) {
                 console.error('Delete error:', error);
                 alert('❌ Delete failed: ' + error.message);
