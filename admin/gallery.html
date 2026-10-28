@@ -944,9 +944,9 @@
             }
         }
 
-        // DELETE PHOTO
+        // DELETE PHOTO (UPDATED TO DELETE STORAGE FILE)
         async function deletePhoto(photoId) {
-            if (!confirm('Are you sure you want to delete this photo?')) return;
+            if (!confirm('Are you sure you want to delete this photo? This will also delete the file from storage.')) return;
 
             try {
                 const { data: deletingPhoto } = await supabase
@@ -955,6 +955,24 @@
                     .eq('id', photoId)
                     .single();
 
+                // 1. Delete file from storage
+                if (deletingPhoto && deletingPhoto.image_url) {
+                    // Extract path from URL
+                    // Example: https://[proj].supabase.co/storage/v1/object/public/site-assets/albums/123/456.jpg
+                    // We need: albums/123/456.jpg
+                    const urlParts = deletingPhoto.image_url.split('/public/');
+                    if (urlParts.length > 1) {
+                        const pathWithBucket = urlParts[1];
+                        const firstSlash = pathWithBucket.indexOf('/');
+                        if (firstSlash !== -1) {
+                            const bucket = pathWithBucket.substring(0, firstSlash);
+                            const filePath = pathWithBucket.substring(firstSlash + 1);
+                            await supabase.storage.from(bucket).remove([filePath]);
+                        }
+                    }
+                }
+
+                // 2. Delete database row
                 const { error } = await supabase
                     .from('gallery_images')
                     .delete()
@@ -962,6 +980,7 @@
 
                 if (error) throw error;
 
+                // 3. Handle cover image
                 const { data: album } = await supabase
                     .from('gallery_albums')
                     .select('cover_image')
@@ -979,7 +998,7 @@
 
                 await loadPhotos(currentAlbumId);
                 await loadAlbums();
-                alert('✅ Photo deleted successfully!');
+                alert('✅ Photo and file deleted successfully!');
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
