@@ -15,59 +15,20 @@
         .btn-bulk { background: #C9A961; color: #1F4E3D; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s; }
         .btn-bulk:hover { background: #A88943; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,169,97,0.25); }
 
-        .info-box {
-            background: #FBF8EE;
-            color: #1F4E3D;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #C9A961;
-            font-size: 14px;
-        }
+        .info-box { background: #FBF8EE; color: #1F4E3D; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #C9A961; font-size: 14px; }
         .info-box i { margin-right: 8px; color: #C9A961; }
 
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .stat-mini {
-            background: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            border: 1px solid #f0ede0;
-            border-top: 3px solid #C9A961;
-            box-shadow: 0 1px 3px rgba(31,78,61,0.04);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.28s;
-        }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-mini { background: white; padding: 15px 20px; border-radius: 10px; border: 1px solid #f0ede0; border-top: 3px solid #C9A961; box-shadow: 0 1px 3px rgba(31,78,61,0.04); display: flex; align-items: center; gap: 15px; transition: all 0.28s; }
         .stat-mini:hover { box-shadow: 0 6px 20px rgba(31,78,61,0.08); transform: translateY(-2px); }
-        .stat-mini i {
-            font-size: 28px;
-            color: #2D6B54;
-        }
-        .stat-mini h3 {
-            font-family: Georgia, serif;
-            color: #1F4E3D;
-            font-size: 22px;
-            margin-bottom: 2px;
-            font-weight: 700;
-        }
-        .stat-mini p {
-            color: #888;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-weight: 600;
-        }
+        .stat-mini i { font-size: 28px; color: #2D6B54; }
+        .stat-mini h3 { font-family: Georgia, serif; color: #1F4E3D; font-size: 22px; margin-bottom: 2px; font-weight: 700; }
+        .stat-mini p { color: #888; font-size: 13px; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; }
 
         .table-container { background: white; border-radius: 12px; overflow-x: auto; border: 1px solid #f0ede0; box-shadow: 0 1px 3px rgba(31,78,61,0.04); }
-        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
         th { background: #FBF8EE; padding: 14px 15px; text-align: left; font-weight: 700; color: #1F4E3D; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #C9A961; }
-        td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; }
+        td { padding: 14px 15px; border-bottom: 1px solid #f0ede0; font-size: 14px; vertical-align: middle; }
         tr:hover { background: #FBF8EE; }
         tr:last-child td { border-bottom: none; }
 
@@ -75,22 +36,21 @@
         .badge-active { background: #d4edda; color: #155724; }
         .badge-inactive { background: #f8d7da; color: #721c24; }
 
-        .btn-edit { background: #2D6B54; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-edit { background: #2D6B54; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; display: inline-flex; align-items: center; gap: 4px; }
         .btn-edit:hover { background: #1F4E3D; }
         .btn-delete { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
         .btn-delete:hover { background: #c82333; }
-        .btn-toggle { background: #888; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; margin-right: 5px; transition: background 0.2s; }
-        .btn-toggle:hover { background: #666; }
+        .btn-view-attempts { background: #C9A961; color: #1F4E3D; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 700; transition: background 0.2s; margin-right: 5px; display: inline-flex; align-items: center; gap: 4px; }
+        .btn-view-attempts:hover { background: #A88943; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20,47,37,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 800px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
         .modal-content h2 { font-family: Georgia, serif; margin-bottom: 20px; color: #1F4E3D; padding-bottom: 10px; border-bottom: 2px solid #C9A961; font-weight: 700; }
         .modal-content .form-group { margin-bottom: 15px; }
         .modal-content label { display: block; font-weight: 600; margin-bottom: 6px; color: #1F4E3D; font-size: 13.5px; }
         .modal-content input, .modal-content select, .modal-content textarea { width: 100%; padding: 11px 14px; border: 1.5px solid #e3e0d2; border-radius: 8px; font-size: 14px; font-family: inherit; background: white; color: #1a1a1a; transition: all 0.2s; }
         .modal-content input:focus, .modal-content textarea:focus, .modal-content select:focus { outline: none; border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.15); }
-        .modal-content textarea { resize: vertical; min-height: 100px; font-family: monospace; }
         .modal-content small { display: block; color: #888; font-size: 12px; margin-top: 4px; }
 
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -117,53 +77,28 @@
         .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s ease-in-out infinite; margin-right: 8px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .bulk-info {
-            background: #FBF8EE;
-            color: #1F4E3D;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 13px;
-            border-left: 4px solid #C9A961;
-        }
-        .csv-example {
-            background: #1F4E3D;
-            color: #fff;
-            padding: 12px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 12px;
-            overflow-x: auto;
-            margin: 10px 0;
-            white-space: pre;
-        }
+        /* Attempts Table inside Modal */
+        .attempts-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        .attempts-table th { background: #FBF8EE; padding: 10px; text-align: left; font-weight: 700; color: #1F4E3D; border-bottom: 2px solid #C9A961; }
+        .attempts-table td { padding: 10px; border-bottom: 1px solid #f0ede0; }
+        .attempts-table tr:last-child td { border-bottom: none; }
+        .attempts-score { font-weight: 700; color: #1F4E3D; }
+        .attempts-score.pass { color: #28a745; }
+        .attempts-score.fail { color: #dc3545; }
 
         /* ===== THEME TOGGLE (bottom-right) ===== */
         .theme-toggle {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 1200;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid #C9A961;
-            background: #1F4E3D;
-            color: #C9A961;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            box-shadow: 0 6px 18px rgba(31,78,61,0.35);
+            position: fixed; bottom: 24px; right: 24px; z-index: 1200;
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 2px solid #C9A961; background: #1F4E3D; color: #C9A961;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; box-shadow: 0 6px 18px rgba(31,78,61,0.35);
             transition: transform 0.18s, background 0.18s, color 0.18s;
             -webkit-tap-highlight-color: transparent;
         }
         .theme-toggle:hover { background: #2D6B54; transform: scale(1.06); }
         .theme-toggle:active { transform: scale(0.94); }
-        @media (max-width: 768px) {
-            .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; }
-        }
+        @media (max-width: 768px) { .theme-toggle { bottom: 18px; right: 18px; width: 46px; height: 46px; } }
 
         /* ===== DARK MODE ===== */
         body.dark { background: #0F1F19; color: #E8E8E8; }
@@ -172,109 +107,58 @@
         body.dark .admin-header h1 { color: #C9A961; }
         body.dark .admin-user { color: #B8B8B8; }
         body.dark .admin-user i { color: #C9A961; }
-
         body.dark .info-box { background: #15271F; color: #E0E0E0; border-left-color: #C9A961; }
-        body.dark .bulk-info { background: #15271F; color: #E0E0E0; border-left-color: #C9A961; }
-
         body.dark .stat-mini { background: #15271F; border-color: #1F4E3D; border-top-color: #C9A961; }
         body.dark .stat-mini h3 { color: #C9A961; }
         body.dark .stat-mini p { color: #8A8A8A; }
         body.dark .stat-mini i { color: #C9A961; }
-
         body.dark .table-container { background: #15271F; border-color: #1F4E3D; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
         body.dark table th { background: #1A2E24; color: #C9A961; border-bottom-color: #C9A961; }
         body.dark table td { color: #E0E0E0; border-bottom-color: #1F4E3D; }
         body.dark table tr:hover { background: #1A2E24; }
         body.dark table tr:last-child td { border-bottom: none; }
-        body.dark table code { background: #1A2E24 !important; color: #C9A961 !important; border-color: #1F4E3D !important; }
-
         body.dark .modal-content { background: #15271F; color: #E8E8E8; }
         body.dark .modal-content h2 { color: #C9A961; border-bottom-color: #C9A961; }
         body.dark .modal-content label { color: #C9A961; }
-        body.dark .modal-content input,
-        body.dark .modal-content select,
-        body.dark .modal-content textarea { background: #0F1F19; color: #E8E8E8; border-color: #1F4E3D; }
-        body.dark .modal-content input:focus,
-        body.dark .modal-content select:focus,
-        body.dark .modal-content textarea:focus { border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.25); }
-        body.dark .modal-content small { color: #8A8A8A; }
-
+        body.dark .modal-content input, body.dark .modal-content select, body.dark .modal-content textarea { background: #0F1F19; color: #E8E8E8; border-color: #1F4E3D; }
+        body.dark .modal-content input:focus, body.dark .modal-content select:focus, body.dark .modal-content textarea:focus { border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.25); }
         body.dark .btn-cancel { color: #C9A961; border-color: #1F4E3D; }
         body.dark .btn-cancel:hover { background: #1A2E24; border-color: #C9A961; }
-
         body.dark .filter-btn { background: #15271F; color: #C9A961; border-color: #1F4E3D; }
         body.dark .filter-btn:hover { border-color: #C9A961; color: #fff; }
         body.dark .filter-btn.active { background: #C9A961; color: #0F1F19; border-color: #C9A961; }
-
         body.dark .search-box { background: #15271F; color: #E8E8E8; border-color: #1F4E3D; }
         body.dark .search-box::placeholder { color: #8A8A8A; }
         body.dark .search-box:focus { border-color: #C9A961; box-shadow: 0 0 0 3px rgba(201,169,97,0.2); }
-
         body.dark .empty-state { color: #8A8A8A; }
+        body.dark .attempts-table th { background: #1A2E24; color: #C9A961; border-bottom-color: #C9A961; }
+        body.dark .attempts-table td { border-bottom-color: #1F4E3D; color: #E0E0E0; }
+        body.dark .attempts-score { color: #E0E0E0; }
 
-        /* ===== AUTH GUARD — hide content until verified ===== */
+        /* ===== AUTH GUARD ===== */
         body:not(.authed) .admin-wrapper { display: none; }
         body.authed .auth-checking { display: none; }
-        .auth-checking {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #1F4E3D;
-            font-size: 16px;
-            font-weight: 600;
-            background: #FBF8EE;
-        }
+        .auth-checking { min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #1F4E3D; font-size: 16px; font-weight: 600; background: #FBF8EE; }
         body.dark .auth-checking { background: #0F1F19; color: #C9A961; }
 
-        /* ===== MOBILE SIDEBAR (HAMBURGER DRAWER) ===== */
-        .admin-hamburger,
-        .admin-overlay { display: none; }
+        /* ===== MOBILE SIDEBAR ===== */
+        .admin-hamburger, .admin-overlay { display: none; }
 
         @media (max-width: 768px) {
-            .admin-hamburger {
-                display: flex; align-items: center; justify-content: center;
-                position: fixed; top: 14px; left: 14px;
-                width: 44px; height: 44px; border-radius: 50%;
-                background: #1F4E3D; color: white;
-                border: 2px solid #C9A961; cursor: pointer;
-                z-index: 1100; font-size: 18px;
-                box-shadow: 0 4px 12px rgba(31,78,61,0.25);
-                transition: transform 0.18s, background 0.18s;
-                padding: 0; -webkit-tap-highlight-color: transparent;
-            }
+            .admin-hamburger { display: flex; align-items: center; justify-content: center; position: fixed; top: 14px; left: 14px; width: 44px; height: 44px; border-radius: 50%; background: #1F4E3D; color: white; border: 2px solid #C9A961; cursor: pointer; z-index: 1100; font-size: 18px; box-shadow: 0 4px 12px rgba(31,78,61,0.25); transition: transform 0.18s, background 0.18s; padding: 0; -webkit-tap-highlight-color: transparent; }
             .admin-hamburger:active { transform: scale(0.94); background: #2D6B54; }
-
-            .admin-overlay {
-                display: block; position: fixed; inset: 0;
-                background: rgba(20, 47, 37, 0.6);
-                backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
-                opacity: 0; pointer-events: none;
-                transition: opacity 0.28s; z-index: 1050;
-            }
+            .admin-overlay { display: block; position: fixed; inset: 0; background: rgba(20, 47, 37, 0.6); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity 0.28s; z-index: 1050; }
             .admin-overlay.open { opacity: 1; pointer-events: auto; }
-
-            .admin-sidebar {
-                width: 280px; max-width: 85vw;
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-                z-index: 1060;
-                box-shadow: 4px 0 20px rgba(0,0,0,0.2);
-            }
+            .admin-sidebar { width: 280px; max-width: 85vw; transform: translateX(-100%); transition: transform 0.3s ease; z-index: 1060; box-shadow: 4px 0 20px rgba(0,0,0,0.2); }
             .admin-sidebar.open { transform: translateX(0); }
-
             .admin-sidebar .sidebar-header h2 { display: block; font-size: 20px; }
-            .admin-sidebar .sidebar-nav a span,
-            .admin-sidebar .sidebar-footer a span { display: inline; }
+            .admin-sidebar .sidebar-nav a span, .admin-sidebar .sidebar-footer a span { display: inline; }
             .admin-sidebar .sidebar-section-label { display: block; }
-
             .admin-main { margin-left: 0; padding: 70px 18px 18px 18px; }
-
             body.admin-sidebar-locked { overflow: hidden; }
-
-            /* CBT students responsive rules */
             .form-row { grid-template-columns: 1fr; }
             .search-box { width: 100%; }
+            .btn-view-attempts { padding: 6px 8px; }
         }
     </style>
 </head>
@@ -289,11 +173,9 @@
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2><span class="avms-logo-circle" style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:#C9A961; color:#1F4E3D; font-family:Georgia,serif; font-weight:700; font-size:15px; overflow:hidden; vertical-align:middle; margin-right:8px; flex-shrink:0;">AV<img src="https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png" alt="AVMS Logo" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:3px;"></span>AVMS Admin</h2></div>
             <nav class="sidebar-nav">
-                <!-- ===== OVERVIEW ===== -->
                 <div class="sidebar-section-label">Overview</div>
                 <a href="dashboard.html"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
-                <!-- ===== CONTENT ===== -->
                 <div class="sidebar-section-label">Content</div>
                 <a href="leaders.html"><i class="fas fa-users"></i> <span>Leaders</span></a>
                 <a href="announcements.html"><i class="fas fa-bullhorn"></i> <span>Announcements</span></a>
@@ -306,25 +188,21 @@
                 <a href="students.html"><i class="fas fa-user-graduate"></i> <span>Students</span></a>
                 <a href="materials.html"><i class="fas fa-book-open"></i> <span>Materials</span></a>
 
-                <!-- ===== PAGES ===== -->
                 <div class="sidebar-section-label">Pages</div>
                 <a href="about.html"><i class="fas fa-book-open"></i> <span>About Page</span></a>
                 <a href="give.html"><i class="fas fa-hand-holding-heart"></i> <span>Give Page</span></a>
                 <a href="join-content.html"><i class="fas fa-user-plus"></i> <span>Join Page</span></a>
 
-                <!-- ===== CBT PORTAL ===== -->
                 <div class="sidebar-section-label">CBT Portal</div>
                 <a href="cbt-students.html" class="active"><i class="fas fa-user-graduate"></i> <span>CBT Students</span></a>
                 <a href="cbt-courses.html"><i class="fas fa-book"></i> <span>CBT Courses</span></a>
                 <a href="cbt-questions.html"><i class="fas fa-question-circle"></i> <span>CBT Questions</span></a>
 
-                <!-- ===== ENGAGEMENT ===== -->
                 <div class="sidebar-section-label">Engagement</div>
                 <a href="applications.html"><i class="fas fa-file-signature"></i> <span>Applications</span></a>
                 <a href="donations.html"><i class="fas fa-donate"></i> <span>Donations</span></a>
                 <a href="messages.html"><i class="fas fa-envelope"></i> <span>Messages</span></a>
 
-                <!-- ===== SYSTEM ===== -->
                 <div class="sidebar-section-label">System</div>
                 <a href="settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </nav>
@@ -347,10 +225,9 @@
                 Manage students who can access the CBT practice portal. Students log in with their <strong>Registration Number</strong> (username) and <strong>State of Origin</strong> (password, lowercase).
             </div>
 
-            <!-- Stats -->
             <div class="stats-row">
                 <div class="stat-mini">
-                    <i class="fas fa-user-graduate"></i>
+                    <i class="fas fa-users"></i>
                     <div>
                         <h3 id="statTotal">0</h3>
                         <p>Total Students</p>
@@ -372,7 +249,6 @@
                 </div>
             </div>
 
-            <!-- Actions Bar -->
             <div class="page-header">
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterStudents('all', this)">All</button>
@@ -386,7 +262,6 @@
                 </div>
             </div>
 
-            <!-- Table -->
             <div class="table-container">
                 <table>
                     <thead>
@@ -408,35 +283,31 @@
         </main>
     </div>
 
-    <!-- Add/Edit Student Modal -->
+    <!-- Add/Edit Modal -->
     <div class="modal" id="studentModal">
         <div class="modal-content">
-            <h2 id="modalTitle">Add Student</h2>
+            <h2 id="modalTitle">Add CBT Student</h2>
             <form id="studentForm">
                 <input type="hidden" id="editId" value="">
                 <div class="form-group">
                     <label for="regNo">Registration Number *</label>
-                    <input type="text" id="regNo" required placeholder="e.g., VET/2024/001">
-                    <small>This is the student's login username</small>
+                    <input type="text" id="regNo" required placeholder="e.g., U25VM1001">
+                    <small>Must be unique. This is their username.</small>
                 </div>
                 <div class="form-group">
-                    <label for="fullName">Full Name *</label>
-                    <input type="text" id="fullName" required placeholder="e.g., John Doe">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="e.g., Ahmed Musa">
                 </div>
                 <div class="form-group">
                     <label for="stateOfOrigin">State of Origin *</label>
-                    <input type="text" id="stateOfOrigin" required placeholder="e.g., kano" oninput="this.value = this.value.toLowerCase()">
-                    <small>This is the student's login password. Auto-converted to lowercase. e.g., kano, lagos, kaduna</small>
+                    <input type="text" id="stateOfOrigin" required placeholder="e.g., kaduna" oninput="this.value = this.value.toLowerCase()">
+                    <small>Lowercase. This is their password.</small>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="department">Department</label>
-                        <input type="text" id="department" value="Veterinary Medicine" placeholder="Veterinary Medicine">
-                    </div>
-                    <div class="form-group">
-                        <label for="level">Level</label>
-                        <select id="level">
-                            <option value="100" selected>100</option>
+                        <label for="classLevel">Level</label>
+                        <select id="classLevel">
+                            <option value="100">100</option>
                             <option value="200">200</option>
                             <option value="300">300</option>
                             <option value="400">400</option>
@@ -444,11 +315,15 @@
                             <option value="600">600</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <input type="text" id="department" value="Veterinary Medicine" placeholder="Veterinary Medicine">
+                    </div>
                 </div>
                 <div class="form-group">
                     <div class="checkbox-group">
                         <input type="checkbox" id="isActive" checked>
-                        <label for="isActive" style="margin: 0; cursor: pointer;">Active (student can log in)</label>
+                        <label for="isActive">Account is Active</label>
                     </div>
                 </div>
                 <div class="modal-actions">
@@ -462,20 +337,15 @@
     <!-- Bulk Upload Modal -->
     <div class="modal" id="bulkModal">
         <div class="modal-content">
-            <h2>Bulk Upload Students (CSV)</h2>
-            <div class="bulk-info">
-                <i class="fas fa-info-circle"></i> Paste your CSV below. <strong>One student per line.</strong> All fields separated by commas. State of origin will be auto-lowercased.
+            <h2>Bulk Upload CBT Students (CSV)</h2>
+            <div class="info-box" style="margin-bottom: 15px;">
+                <i class="fas fa-info-circle"></i>
+                Paste your CSV below. <strong>One student per line.</strong> Format: <code>reg_no,full_name,state_of_origin,level,department</code>
             </div>
-            <div class="csv-example">reg_no,full_name,state_of_origin,department,level
-VET/2024/001,John Doe,kano,Veterinary Medicine,100
-VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100</div>
             <form id="bulkForm">
                 <div class="form-group">
                     <label for="bulkData">CSV Data *</label>
-                    <textarea id="bulkData" required placeholder="reg_no,full_name,state_of_origin,department,level
-VET/2024/001,John Doe,kano,Veterinary Medicine,100
-VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;"></textarea>
-                    <small>Header row is optional. If present, it will be skipped automatically.</small>
+                    <textarea id="bulkData" required placeholder="U25VM1001,Ahmed Musa,kaduna,200,Veterinary Medicine&#10;U25VM1002,Fatima Bello,kano,200,Veterinary Medicine" style="min-height: 200px; font-family: monospace;"></textarea>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" onclick="closeBulkModal()">Cancel</button>
@@ -485,12 +355,23 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
         </div>
     </div>
 
+    <!-- View Attempts Modal -->
+    <div class="modal" id="attemptsModal">
+        <div class="modal-content">
+            <h2 id="attemptsTitle">Student Attempts</h2>
+            <div id="attemptsContent">
+                <p style="text-align: center; color: #888;">Loading attempts...</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAttemptsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="../js/config.js"></script>
     <script src="js/admin-guard.js"></script>
     <script>
-        // ============================================
-        // THEME TOGGLE (dark mode)
-        // ============================================
+        // THEME TOGGLE
         (function initTheme() {
             const saved = localStorage.getItem('avms-theme');
             if (saved === 'dark') {
@@ -508,37 +389,10 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
         });
 
-        // ============================================
-        // AUTH GUARD (real Supabase session, with legacy flag bridge)
-        // ============================================
-        (async function initAuth() {
-            const nameEl = document.getElementById('adminName');
-            try {
-                const { data } = await supabase.auth.getSession();
-                if (data && data.session) {
-                    document.body.classList.add('authed');
-                    if (nameEl) nameEl.textContent = (data.session.user?.email || 'Admin').split('@')[0];
-                    return;
-                }
-            } catch (e) { /* fall through to legacy bridge */ }
-
-            const legacy = localStorage.getItem('adminLoggedIn') || sessionStorage.getItem('adminLoggedIn');
-            if (legacy) {
-                document.body.classList.add('authed');
-                const email = localStorage.getItem('adminEmail') || sessionStorage.getItem('adminEmail');
-                if (nameEl) nameEl.textContent = email ? email.split('@')[0] : 'Admin';
-                return;
-            }
-
-            window.location.href = 'index.html';
-        })();
-
-        // ============================================
         // LOGOUT
-        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', async function(e) {
             e.preventDefault();
-            try { await supabase.auth.signOut(); } catch (err) { /* ignore */ }
+            try { await supabase.auth.signOut(); } catch (err) {}
             localStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('adminEmail');
             sessionStorage.removeItem('adminLoggedIn');
@@ -547,16 +401,18 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             window.location.href = 'index.html';
         });
 
-        // ============================================
         // STATE
-        // ============================================
         let allStudents = [];
         let currentFilter = 'all';
         let currentSearch = '';
 
-        // ============================================
+        // HELPERS
+        function escapeHtml(t) {
+            if (t === null || t === undefined) return '';
+            return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        }
+
         // LOAD STUDENTS
-        // ============================================
         async function loadStudents() {
             const tbody = document.getElementById('studentsTableBody');
             try {
@@ -572,72 +428,70 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
                 displayStudents();
             } catch (error) {
                 console.error('Error loading students:', error);
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error loading students: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Error loading roster: ${error.message}</td></tr>`;
             }
         }
 
-        // ============================================
-        // STATS
-        // ============================================
         function updateStats() {
             const total = allStudents.length;
-            const active = allStudents.filter(s => s.is_active).length;
+            const active = allStudents.filter(s => s.is_active === true).length;
             const inactive = total - active;
             document.getElementById('statTotal').textContent = total;
             document.getElementById('statActive').textContent = active;
             document.getElementById('statInactive').textContent = inactive;
         }
 
-        // ============================================
         // DISPLAY STUDENTS
-        // ============================================
         function displayStudents() {
             const tbody = document.getElementById('studentsTableBody');
             let filtered = allStudents;
 
-            if (currentFilter === 'active') {
-                filtered = filtered.filter(s => s.is_active);
-            } else if (currentFilter === 'inactive') {
-                filtered = filtered.filter(s => !s.is_active);
-            }
+            if (currentFilter === 'active') filtered = filtered.filter(s => s.is_active === true);
+            if (currentFilter === 'inactive') filtered = filtered.filter(s => s.is_active !== true);
 
             if (currentSearch) {
                 const search = currentSearch.toLowerCase();
                 filtered = filtered.filter(s =>
                     (s.reg_no || '').toLowerCase().includes(search) ||
                     (s.full_name || '').toLowerCase().includes(search) ||
-                    (s.state_of_origin || '').toLowerCase().includes(search) ||
-                    (s.department || '').toLowerCase().includes(search)
+                    (s.state_of_origin || '').toLowerCase().includes(search)
                 );
             }
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No students found. Click "Add Student" or "Bulk Upload" to get started.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="empty-state">No CBT students found. Click "Add Student" or "Bulk Upload" to get started.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(s => `
-                <tr>
-                    <td><strong>${s.reg_no}</strong></td>
-                    <td>${s.full_name}</td>
-                    <td><code style="background: #FBF8EE; padding: 3px 8px; border-radius: 4px; color: #2D6B54; font-size: 13px; border: 1px solid #f0ede0;">${s.state_of_origin}</code></td>
-                    <td>${s.department || '-'}</td>
-                    <td>${s.level || '-'}</td>
-                    <td><span class="badge ${s.is_active ? 'badge-active' : 'badge-inactive'}">${s.is_active ? 'Active' : 'Inactive'}</span></td>
-                    <td>
-                        <button class="btn-toggle" onclick="toggleActive(${s.id}, ${!s.is_active})" title="${s.is_active ? 'Deactivate' : 'Activate'}">
-                            <i class="fas fa-${s.is_active ? 'ban' : 'check'}"></i>
-                        </button>
-                        <button class="btn-edit" onclick="editStudent(${s.id})"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="btn-delete" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
+            tbody.innerHTML = filtered.map(s => {
+                const statusBadge = s.is_active === true 
+                    ? '<span class="badge badge-active">Active</span>' 
+                    : '<span class="badge badge-inactive">Inactive</span>';
+
+                const toggleIcon = s.is_active === true ? 'fa-toggle-on' : 'fa-toggle-off';
+                const toggleColor = s.is_active === true ? '#28a745' : '#888';
+
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(s.reg_no)}</strong></td>
+                        <td>${escapeHtml(s.full_name || '-')}</td>
+                        <td><code style="background: #FBF8EE; padding: 3px 8px; border-radius: 4px; color: #2D6B54; font-size: 13px; border: 1px solid #f0ede0;">${escapeHtml(s.state_of_origin)}</code></td>
+                        <td>${escapeHtml(s.department || 'Veterinary Medicine')}</td>
+                        <td>${s.level ? s.level + ' Level' : '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn-view-attempts" onclick="viewAttempts('${escapeHtml(s.reg_no)}', '${escapeHtml(s.full_name || s.reg_no)}')" title="View Test Attempts">
+                                <i class="fas fa-chart-bar"></i> Attempts
+                            </button>
+                            <button class="btn-edit" onclick="editStudent(${s.id})"><i class="fas fa-edit"></i></button>
+                            <button class="btn-delete" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
 
-        // ============================================
         // FILTER / SEARCH
-        // ============================================
         function filterStudents(filter, btn) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -650,15 +504,13 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             displayStudents();
         }
 
-        // ============================================
-        // MODAL: ADD / EDIT
-        // ============================================
+        // MODAL FUNCTIONS
         function openAddModal() {
-            document.getElementById('modalTitle').textContent = 'Add Student';
+            document.getElementById('modalTitle').textContent = 'Add CBT Student';
             document.getElementById('editId').value = '';
             document.getElementById('studentForm').reset();
             document.getElementById('department').value = 'Veterinary Medicine';
-            document.getElementById('level').value = '100';
+            document.getElementById('classLevel').value = '100';
             document.getElementById('isActive').checked = true;
             document.getElementById('studentModal').classList.add('show');
         }
@@ -666,14 +518,14 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
         function editStudent(id) {
             const s = allStudents.find(s => s.id === id);
             if (!s) return;
-            document.getElementById('modalTitle').textContent = 'Edit Student';
+            document.getElementById('modalTitle').textContent = 'Edit CBT Student';
             document.getElementById('editId').value = id;
             document.getElementById('regNo').value = s.reg_no || '';
             document.getElementById('fullName').value = s.full_name || '';
             document.getElementById('stateOfOrigin').value = s.state_of_origin || '';
+            document.getElementById('classLevel').value = s.level || '100';
             document.getElementById('department').value = s.department || 'Veterinary Medicine';
-            document.getElementById('level').value = s.level || '100';
-            document.getElementById('isActive').checked = s.is_active !== false;
+            document.getElementById('isActive').checked = s.is_active === true;
             document.getElementById('studentModal').classList.add('show');
         }
 
@@ -681,9 +533,7 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             document.getElementById('studentModal').classList.remove('show');
         }
 
-        // ============================================
         // SAVE STUDENT
-        // ============================================
         document.getElementById('studentForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const id = document.getElementById('editId').value;
@@ -695,10 +545,10 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
 
             const data = {
                 reg_no: document.getElementById('regNo').value.trim(),
-                full_name: document.getElementById('fullName').value.trim(),
+                full_name: document.getElementById('fullName').value.trim() || null,
                 state_of_origin: document.getElementById('stateOfOrigin').value.trim().toLowerCase(),
+                level: parseInt(document.getElementById('classLevel').value) || null,
                 department: document.getElementById('department').value.trim() || 'Veterinary Medicine',
-                level: document.getElementById('level').value,
                 is_active: document.getElementById('isActive').checked
             };
 
@@ -709,8 +559,12 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
                 } else {
                     result = await supabase.from('cbt_students').insert([data]);
                 }
-                if (result.error) throw result.error;
-
+                if (result.error) {
+                    if (result.error.message.includes('duplicate') || result.error.code === '23505') {
+                        throw new Error('This Registration Number already exists in the CBT roster.');
+                    }
+                    throw result.error;
+                }
                 closeModal();
                 loadStudents();
                 alert(id ? '✅ Student updated successfully!' : '✅ Student added successfully!');
@@ -722,40 +576,20 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             }
         });
 
-        // ============================================
-        // TOGGLE ACTIVE
-        // ============================================
-        async function toggleActive(id, newState) {
-            try {
-                const { error } = await supabase
-                    .from('cbt_students')
-                    .update({ is_active: newState })
-                    .eq('id', id);
-                if (error) throw error;
-                loadStudents();
-            } catch (error) {
-                alert('❌ Error: ' + error.message);
-            }
-        }
-
-        // ============================================
         // DELETE STUDENT
-        // ============================================
         async function deleteStudent(id) {
-            if (!confirm('Are you sure you want to delete this student? This cannot be undone.')) return;
+            if (!confirm('Are you sure you want to delete this CBT student?')) return;
             try {
                 const { error } = await supabase.from('cbt_students').delete().eq('id', id);
                 if (error) throw error;
                 loadStudents();
-                alert('✅ Student deleted successfully!');
+                alert('✅ CBT Student deleted successfully!');
             } catch (error) {
                 alert('❌ Error: ' + error.message);
             }
         }
 
-        // ============================================
         // BULK UPLOAD
-        // ============================================
         function openBulkModal() {
             document.getElementById('bulkForm').reset();
             document.getElementById('bulkModal').classList.add('show');
@@ -769,25 +603,13 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             e.preventDefault();
             const btn = document.getElementById('bulkSaveBtn');
             const original = btn.innerHTML;
-
             const rawText = document.getElementById('bulkData').value.trim();
-            if (!rawText) {
-                alert('❌ Please paste CSV data.');
-                return;
-            }
+            
+            if (!rawText) return alert('❌ Please paste CSV data.');
 
             const lines = rawText.split('\n').map(l => l.trim()).filter(l => l);
-            if (lines.length === 0) {
-                alert('❌ No data found.');
-                return;
-            }
-
-            // Detect and skip header
             let startIndex = 0;
-            const firstLine = lines[0].toLowerCase();
-            if (firstLine.includes('reg_no') || firstLine.includes('registration')) {
-                startIndex = 1;
-            }
+            if (lines[0].toLowerCase().includes('reg_no')) startIndex = 1;
 
             const students = [];
             const errors = [];
@@ -795,41 +617,40 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
             for (let i = startIndex; i < lines.length; i++) {
                 const parts = lines[i].split(',').map(p => p.trim());
                 if (parts.length < 3) {
-                    errors.push(`Line ${i + 1}: Not enough fields (need at least reg_no, full_name, state_of_origin)`);
+                    errors.push(`Line ${i + 1}: Need at least reg_no, full_name, state_of_origin`);
                     continue;
                 }
-
-                const [reg_no, full_name, state_of_origin, department, level] = parts;
-                if (!reg_no || !full_name || !state_of_origin) {
-                    errors.push(`Line ${i + 1}: Missing required field`);
+                const [reg_no, full_name, state_of_origin, level, department] = parts;
+                if (!reg_no || !state_of_origin) {
+                    errors.push(`Line ${i + 1}: Missing reg_no or state_of_origin`);
                     continue;
                 }
-
                 students.push({
                     reg_no,
-                    full_name,
+                    full_name: full_name || null,
                     state_of_origin: state_of_origin.toLowerCase(),
+                    level: parseInt(level) || null,
                     department: department || 'Veterinary Medicine',
-                    level: level || '100',
                     is_active: true
                 });
             }
 
-            if (students.length === 0) {
-                alert('❌ No valid student records found.\n\n' + errors.join('\n'));
-                return;
-            }
+            if (students.length === 0) return alert('❌ No valid records found.\n\n' + errors.join('\n'));
 
             btn.disabled = true;
             btn.innerHTML = `<span class="spinner"></span> Uploading ${students.length}...`;
 
             try {
                 const { error } = await supabase.from('cbt_students').insert(students);
-                if (error) throw error;
-
+                if (error) {
+                    if (error.message.includes('duplicate') || error.code === '23505') {
+                        throw new Error('One or more Reg Nos already exist. Nothing was imported.');
+                    }
+                    throw error;
+                }
                 closeBulkModal();
                 loadStudents();
-                alert(`✅ Successfully uploaded ${students.length} students!${errors.length ? '\n\nSkipped:\n' + errors.join('\n') : ''}`);
+                alert(`✅ Successfully added ${students.length} CBT students!${errors.length ? '\n\nSkipped:\n' + errors.join('\n') : ''}`);
             } catch (error) {
                 alert('❌ Upload error: ' + error.message);
             } finally {
@@ -839,16 +660,107 @@ VET/2024/002,Jane Smith,lagos,Veterinary Medicine,100" style="min-height: 200px;
         });
 
         // ============================================
-        // INIT
+        // VIEW ATTEMPTS LOGIC
         // ============================================
-        loadStudents();
+        async function viewAttempts(regNo, studentName) {
+            document.getElementById('attemptsTitle').textContent = `Attempts: ${studentName}`;
+            const content = document.getElementById('attemptsContent');
+            content.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Fetching data...</p>';
+            document.getElementById('attemptsModal').classList.add('show');
 
-        // Close on outside click
+            try {
+                // Fetch attempts
+                const { data: attempts, error } = await supabase
+                    .from('cbt_attempts')
+                    .select('*')
+                    .eq('reg_no', regNo)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!attempts || attempts.length === 0) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-chart-bar" style="font-size: 40px; margin-bottom: 10px; color: #C9A961;"></i>
+                            <p>No test attempts found for this student.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Fetch course names to map course_id -> course name
+                const { data: courses } = await supabase.from('cbt_courses').select('id, code, name');
+                const courseMap = {};
+                (courses || []).forEach(c => { courseMap[c.id] = c; });
+
+                let html = `
+                    <table class="attempts-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Course</th>
+                                <th>Mode</th>
+                                <th>Score</th>
+                                <th>Time Taken</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                attempts.forEach(a => {
+                    const course = courseMap[a.course_id] || { code: 'Unknown', name: '' };
+                    const percentage = a.total_questions > 0 ? Math.round((a.score / a.total_questions) * 100) : 0;
+                    const isPass = percentage >= 50;
+                    const scoreClass = isPass ? 'pass' : 'fail';
+                    
+                    // Format time taken (seconds to minutes)
+                    let timeStr = '-';
+                    if (a.time_taken_seconds) {
+                        const mins = Math.floor(a.time_taken_seconds / 60);
+                        const secs = a.time_taken_seconds % 60;
+                        timeStr = `${mins}m ${secs}s`;
+                    }
+
+                    // Format date
+                    const dateStr = a.created_at ? new Date(a.created_at).toLocaleDateString() : '-';
+
+                    html += `
+                        <tr>
+                            <td>${dateStr}</td>
+                            <td><strong>${escapeHtml(course.code)}</strong><br><small style="color:#888;">${escapeHtml(course.name)}</small></td>
+                            <td><span class="badge ${a.mode === 'exam' ? 'badge-inactive' : 'badge-active'}">${a.mode}</span></td>
+                            <td class="attempts-score ${scoreClass}">
+                                ${a.score} / ${a.total_questions} (${percentage}%)
+                            </td>
+                            <td>${timeStr}</td>
+                        </tr>
+                    `;
+                });
+
+                html += `</tbody></table>`;
+                content.innerHTML = html;
+
+            } catch (err) {
+                console.error('Error loading attempts:', err);
+                content.innerHTML = `<p style="color: #dc3545; text-align: center; padding: 20px;">Error: ${err.message}</p>`;
+            }
+        }
+
+        function closeAttemptsModal() {
+            document.getElementById('attemptsModal').classList.remove('show');
+        }
+
+        // INIT
+        loadStudents();
+        
         document.getElementById('studentModal').addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
         document.getElementById('bulkModal').addEventListener('click', function(e) {
             if (e.target === this) closeBulkModal();
+        });
+        document.getElementById('attemptsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeAttemptsModal();
         });
     </script>
     <script src="js/admin-sidebar.js"></script>
