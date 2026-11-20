@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* EXACT SAME CSS AS YOUR ORIGINAL FILE */
         .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         .btn-add { background: #2D6B54; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.28s; }
         .btn-add:hover { background: #1F4E3D; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(31,78,61,0.2); }
@@ -27,8 +28,11 @@
         tr:last-child td { border-bottom: none; }
         .badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-level { background: #1F4E3D; color: #C9A961; font-family: monospace; letter-spacing: 1px; }
+        .badge-code { background: #FBF8EE; color: #2D6B54; border: 1px solid #e3e0d2; font-family: monospace; }
         .btn-link { background: #2D6B54; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 12px; font-weight: 600; transition: background 0.2s; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
         .btn-link:hover { background: #1F4E3D; }
+        .btn-delete { background: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: 600; transition: background 0.2s; }
+        .btn-delete:hover { background: #c82333; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(20,47,37,0.6); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
         .modal.show { display: flex; }
         .modal-content { background: white; padding: 30px; border-radius: 12px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
@@ -55,8 +59,6 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .theme-toggle { position: fixed; bottom: 24px; right: 24px; z-index: 1200; width: 48px; height: 48px; border-radius: 50%; border: 2px solid #C9A961; background: #1F4E3D; color: #C9A961; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 6px 18px rgba(31,78,61,0.35); transition: transform 0.18s, background 0.18s, color 0.18s; }
         .theme-toggle:hover { background: #2D6B54; transform: scale(1.06); }
-        
-        /* DARK MODE */
         body.dark { background: #0F1F19; color: #E8E8E8; }
         body.dark .admin-main { background: #0F1F19; }
         body.dark .admin-header { border-bottom-color: #1F4E3D; }
@@ -73,6 +75,7 @@
         body.dark table td { color: #E0E0E0; border-bottom-color: #1F4E3D; }
         body.dark table tr:hover { background: #1A2E24; }
         body.dark table tr:last-child td { border-bottom: none; }
+        body.dark .badge-code { background: #1A2E24; color: #C9A961; border-color: #1F4E3D; }
         body.dark .modal-content { background: #15271F; color: #E8E8E8; }
         body.dark .modal-content h2 { color: #C9A961; border-bottom-color: #C9A961; }
         body.dark .modal-content label { color: #C9A961; }
@@ -110,7 +113,6 @@
     <div class="auth-checking">🔐 Verifying session...</div>
 
     <div class="admin-wrapper">
-        <!-- Sidebar remains exactly the same -->
         <aside class="admin-sidebar">
             <div class="sidebar-header"><h2><span class="avms-logo-circle" style="position:relative; display:inline-flex; align-items:center; justify-content:center; width:38px; height:38px; border-radius:50%; background:#C9A961; color:#1F4E3D; font-family:Georgia,serif; font-weight:700; font-size:15px; overflow:hidden; vertical-align:middle; margin-right:8px; flex-shrink:0;">AV<img src="https://tlkqzhudnpdnbxaltwbs.supabase.co/storage/v1/object/public/site-assets/logos/1791717381267_AVMS_logo-removebg-preview.png" alt="AVMS Logo" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; padding:3px;"></span>AVMS Admin</h2></div>
             <nav class="sidebar-nav">
@@ -176,6 +178,14 @@
                     <i class="fas fa-layer-group"></i>
                     <div><h3 id="stat300">0</h3><p>300 Level</p></div>
                 </div>
+                <div class="stat-mini">
+                    <i class="fas fa-layer-group"></i>
+                    <div><h3 id="stat400">0</h3><p>400 Level</p></div>
+                </div>
+                <div class="stat-mini">
+                    <i class="fas fa-layer-group"></i>
+                    <div><h3 id="stat500">0</h3><p>500 Level</p></div>
+                </div>
             </div>
 
             <div class="page-header">
@@ -186,6 +196,7 @@
                     <button class="filter-btn" onclick="filterLevel(300, this)">300</button>
                     <button class="filter-btn" onclick="filterLevel(400, this)">400</button>
                     <button class="filter-btn" onclick="filterLevel(500, this)">500</button>
+                    <button class="filter-btn" onclick="filterLevel(600, this)">600</button>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search level..." oninput="searchMaterials()">
@@ -211,7 +222,6 @@
         </main>
     </div>
 
-    <!-- Add/Edit Link Modal -->
     <div class="modal" id="uploadModal">
         <div class="modal-content">
             <h2>Add Level Link</h2>
@@ -243,7 +253,6 @@
     <script src="../js/config.js"></script>
     <script src="js/admin-guard.js"></script>
     <script>
-        // THEME TOGGLE
         (function initTheme() {
             const saved = localStorage.getItem('avms-theme');
             if (saved === 'dark') {
@@ -260,7 +269,6 @@
             icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
         });
 
-        // AUTH GUARD
         (async function initAuth() {
             const nameEl = document.getElementById('adminName');
             try {
@@ -281,7 +289,6 @@
             window.location.href = 'index.html';
         })();
 
-        // LOGOUT
         document.getElementById('logoutBtn').addEventListener('click', async function(e) {
             e.preventDefault();
             try { await supabase.auth.signOut(); } catch (err) { }
@@ -293,7 +300,6 @@
             window.location.href = 'index.html';
         });
 
-        // STATE
         let allMaterials = [];
         let currentFilter = 'all';
         let currentSearch = '';
@@ -303,7 +309,6 @@
             return new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
-        // LOAD MATERIALS
         async function loadMaterials() {
             const tbody = document.getElementById('materialsTableBody');
             try {
@@ -325,9 +330,11 @@
 
         function updateStats() {
             document.getElementById('statTotal').textContent = allMaterials.length;
-            document.getElementById('stat100').textContent = allMaterials.filter(m => m.level === '100').length;
-            document.getElementById('stat200').textContent = allMaterials.filter(m => m.level === '200').length;
-            document.getElementById('stat300').textContent = allMaterials.filter(m => m.level === '300').length;
+            document.getElementById('stat100').textContent = allMaterials.filter(m => String(m.level) === '100').length;
+            document.getElementById('stat200').textContent = allMaterials.filter(m => String(m.level) === '200').length;
+            document.getElementById('stat300').textContent = allMaterials.filter(m => String(m.level) === '300').length;
+            document.getElementById('stat400').textContent = allMaterials.filter(m => String(m.level) === '400').length;
+            document.getElementById('stat500').textContent = allMaterials.filter(m => String(m.level) === '500').length;
         }
 
         function displayMaterials() {
@@ -340,7 +347,7 @@
 
             if (currentSearch) {
                 const s = currentSearch.toLowerCase();
-                filtered = filtered.filter(m => (m.level || '').includes(s) || (m.title || '').toLowerCase().includes(s));
+                filtered = filtered.filter(m => String(m.level).includes(s));
             }
 
             if (filtered.length === 0) {
@@ -373,7 +380,6 @@
             displayMaterials();
         }
 
-        // MODAL
         function openUploadModal() {
             document.getElementById('uploadForm').reset();
             document.getElementById('uploadModal').classList.add('show');
@@ -383,7 +389,6 @@
             document.getElementById('uploadModal').classList.remove('show');
         }
 
-        // SAVE LINK (Upsert logic)
         document.getElementById('uploadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('saveBtn');
@@ -396,8 +401,6 @@
             btn.innerHTML = '<span class="spinner"></span> Saving...';
 
             try {
-                // We use upsert here. It inserts if level doesn't exist, updates if it does.
-                // This requires the 'level' column to be set as UNIQUE in Supabase (which we did in the SQL).
                 const { error } = await supabase
                     .from('materials')
                     .upsert([{
@@ -421,7 +424,6 @@
             }
         });
 
-        // DELETE
         async function deleteMaterial(id) {
             if (!confirm('Are you sure you want to remove this level link?')) return;
             try {
@@ -435,7 +437,6 @@
             }
         }
 
-        // INIT
         loadMaterials();
         document.getElementById('uploadModal').addEventListener('click', function(e) {
             if (e.target === this) closeUploadModal();
