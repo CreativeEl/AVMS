@@ -825,8 +825,8 @@
         // --- YOUR GOOGLE DRIVE API KEY ---
         const GOOGLE_API_KEY = 'AIzaSyB-p4X89dLP40UBfFiH-zhm1nvlnRPuKZQ';
         
-        // State for folder navigation
-        let currentFolderId = null;
+        // --- BREADCRUMB STATE ---
+        // Array of objects: { id: 'folderId', name: 'Folder Name' }
         let folderHistory = [];
 
         function extractFolderId(url) {
@@ -914,10 +914,9 @@
                         return;
                     }
 
-                    // 2. Start the folder navigation at the root level
-                    currentFolderId = folderId;
-                    folderHistory = []; 
-                    fetchFolderContents(currentFolderId);
+                    // 2. Start the breadcrumb navigation at the root level
+                    folderHistory = [{ id: folderId, name: `${currentStudent.class_level}L Materials` }];
+                    fetchFolderContents(folderId);
 
                 } catch (err) {
                     console.warn('Materials load error:', err);
@@ -927,7 +926,7 @@
                 mBox.innerHTML = `<div class="empty-card"><i class="fas fa-book-open"></i>No materials — your level isn't set.</div>`;
             }
 
-            // Load General Downloads (Keep exactly as it was)
+            // Load General Downloads
             try {
                 const { data, error } = await supabase
                     .from('documents').select('*')
@@ -952,12 +951,31 @@
             }
         }
 
-        // --- NEW FUNCTION TO FETCH FOLDER CONTENTS ---
+        // --- UPDATED FUNCTION TO RENDER BREADCRUMBS AND FETCH FILES ---
         async function fetchFolderContents(folderId) {
             const mBox = document.getElementById('materialsList');
             const countEl = document.getElementById('materialsCount');
 
-            mBox.innerHTML = `<div class="loader-card"><div class="loader-spinner"></div>Loading folder...</div>`;
+            // 1. Generate Breadcrumb HTML
+            let breadcrumbHtml = `<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 13px; font-weight: 600; color: var(--text-muted);">
+                <i class="fas fa-house" style="color: var(--gold);"></i>`;
+            
+            folderHistory.forEach((folder, index) => {
+                const isLast = index === folderHistory.length - 1;
+                if (isLast) {
+                    // Current folder (Not clickable)
+                    breadcrumbHtml += `<span style="color: var(--text);">${escapeHtml(folder.name)}</span>`;
+                } else {
+                    // Previous folders (Clickable)
+                    breadcrumbHtml += `
+                        <span style="color: var(--border);">/</span>
+                        <a href="javascript:void(0)" onclick="navigateBreadcrumb(${index})" style="color: var(--green-deep); text-decoration: underline; cursor: pointer;">${escapeHtml(folder.name)}</a>
+                    `;
+                }
+            });
+            breadcrumbHtml += `</div>`;
+
+            mBox.innerHTML = breadcrumbHtml + `<div class="loader-card"><div class="loader-spinner"></div>Loading folder...</div>`;
 
             const apiUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType,size,webViewLink,webContentLink)&pageSize=1000`;
             
@@ -966,31 +984,19 @@
                 const driveData = await response.json();
 
                 if (driveData.error) {
-                    mBox.innerHTML = `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Error loading files. (Check API Key)</div>`;
+                    mBox.innerHTML = breadcrumbHtml + `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Error loading files. (Check API Key)</div>`;
                     return;
                 }
 
                 const files = driveData.files || [];
                 if (countEl) countEl.textContent = files.length + ' items';
 
-                // Render Back Button if we are inside a subfolder
-                let backBtnHtml = '';
-                if (folderHistory.length > 0) {
-                    backBtnHtml = `
-                        <div style="margin-bottom: 15px;">
-                            <button onclick="goBackFolder()" style="background: var(--surface-2); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--text); font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-arrow-left"></i> Back
-                            </button>
-                        </div>
-                    `;
-                }
-
                 if (files.length === 0) {
-                    mBox.innerHTML = backBtnHtml + `<div class="empty-card"><i class="fas fa-folder-open"></i>This folder is empty.</div>`;
+                    mBox.innerHTML = breadcrumbHtml + `<div class="empty-card"><i class="fas fa-folder-open"></i>This folder is empty.</div>`;
                     return;
                 }
 
-                mBox.innerHTML = backBtnHtml + `
+                mBox.innerHTML = breadcrumbHtml + `
                     <div style="margin-bottom: 15px;">
                         <input type="text" id="searchFiles" placeholder="🔍 Search by name..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); outline: none;">
                     </div>
@@ -1010,16 +1016,23 @@
 
             } catch (err) {
                 console.warn(err);
-                mBox.innerHTML = `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Network error.</div>`;
+                mBox.innerHTML = breadcrumbHtml + `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Network error.</div>`;
             }
         }
 
-        function goBackFolder() {
-            if (folderHistory.length > 0) {
-                const prevFolder = folderHistory.pop();
-                currentFolderId = prevFolder;
-                fetchFolderContents(currentFolderId);
-            }
+        // --- NAVIGATE VIA BREADCRUMBS ---
+        function navigateBreadcrumb(index) {
+            // If they click the current folder, do nothing
+            if (index === folderHistory.length - 1) return;
+
+            // Remove everything after the clicked index
+            folderHistory = folderHistory.slice(0, index + 1);
+            
+            // Get the ID of the folder they clicked
+            const targetFolderId = folderHistory[index].id;
+            
+            // Fetch the contents of that folder
+            fetchFolderContents(targetFolderId);
         }
 
         function renderFileCard(file) {
@@ -1043,10 +1056,9 @@
                 sizeStr = mb > 0.1 ? `${mb} MB` : `${(file.size / 1024).toFixed(0)} KB`;
             }
 
-            // If it's a folder, we open it internally. If it's a file, we download/view it.
             if (isFolder) {
                 return `
-                    <a class="material-item" href="javascript:void(0)" onclick="openSubFolder('${file.id}')">
+                    <a class="material-item" href="javascript:void(0)" onclick="openSubFolder('${file.id}', '${escapeHtml(file.name).replace(/'/g, "\\'")}')">
                         <div class="m-icon" style="color: ${color};"><i class="fas ${icon}"></i></div>
                         <div class="m-body">
                             <div class="m-title">${escapeHtml(file.name)}</div>
@@ -1070,10 +1082,10 @@
             }
         }
 
-        function openSubFolder(folderId) {
-            folderHistory.push(currentFolderId);
-            currentFolderId = folderId;
-            fetchFolderContents(currentFolderId);
+        // --- PUSH NEW FOLDER TO HISTORY ---
+        function openSubFolder(folderId, folderName) {
+            folderHistory.push({ id: folderId, name: folderName });
+            fetchFolderContents(folderId);
         }
     </script>
 
