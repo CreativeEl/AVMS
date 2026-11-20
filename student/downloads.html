@@ -822,6 +822,15 @@
         }
 
         let currentStudent = null;
+        // --- YOUR GOOGLE DRIVE API KEY ---
+        const GOOGLE_API_KEY = 'AIzaSyB-p4X89dLP40UBfFiH-zhm1nvlnRPuKZQ';
+
+        // Helper to extract Folder ID from a Google Drive link
+        function extractFolderId(url) {
+            if (!url) return null;
+            const match = url.match(/folders\/([a-zA-Z0-9_-]+)/);
+            return match ? match[1] : null;
+        }
 
         (async function init() {
             if (typeof supabase === 'undefined' || !supabase) {
@@ -876,25 +885,6 @@
         document.getElementById('sidebarLogout').addEventListener('click', doLogout);
         document.getElementById('mHeroLogout').addEventListener('click', doLogout);
 
-        // --- NEW GOOGLE DRIVE HELPER FUNCTION ---
-        function getDriveDownloadLink(url) {
-            if (!url) return '#';
-            
-            // Check if it's already a direct link
-            if (url.includes('uc?export=download')) return url;
-            
-            // Extract the File ID using Regex
-            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-            
-            if (match && match[1]) {
-                const fileId = match[1];
-                return `https://drive.google.com/uc?export=download&id=${fileId}`;
-            }
-            
-            // If it's a generic link, just return it
-            return url;
-        }
-
         async function loadMaterialsAndDownloads() {
             const mBox = document.getElementById('materialsList');
             const dBox = document.getElementById('downloadsList');
@@ -902,27 +892,69 @@
 
             if (currentStudent && currentStudent.class_level) {
                 try {
+                    // 1. Fetch the Google Drive folder link from Supabase
                     const { data, error } = await supabase
-                        .from('materials').select('*')
-                        .eq('level', currentStudent.class_level)
-                        .order('created_at', { ascending: false });
+                        .from('materials')
+                        .select('*')
+                        .eq('level', String(currentStudent.class_level))
+                        .maybeSingle();
+                    
                     if (error) throw error;
-                    if (!data || data.length === 0) {
-                        mBox.innerHTML = `<div class="empty-card"><i class="fas fa-book-open"></i>No materials uploaded for your level yet. Check back soon.</div>`;
-                        if (countEl) countEl.textContent = '';
-                    } else {
-                        if (countEl) countEl.textContent = data.length + ' file' + (data.length === 1 ? '' : 's');
-                        mBox.innerHTML = `<div class="materials-list">${data.map(m => `
-                            <a class="material-item" href="${escapeHtml(getDriveDownloadLink(m.file_url) || '#')}" target="_blank" rel="noopener">
-                                <div class="m-icon"><i class="fas fa-file-arrow-down"></i></div>
-                                <div class="m-body">
-                                    <div class="m-title">${escapeHtml(m.title || 'Material')}${m.course_code ? ' · ' + escapeHtml(m.course_code) : ''}</div>
-                                    <div class="m-sub">${escapeHtml(m.description || '')}</div>
-                                </div>
-                                <div class="m-meta">${m.file_size_kb ? m.file_size_kb + ' KB' : 'DOWNLOAD'}</div>
-                            </a>
-                        `).join('')}</div>`;
+                    if (!data || !data.file_url) {
+                        mBox.innerHTML = `<div class="empty-card"><i class="fas fa-folder-open"></i>No materials folder linked for your level yet.</div>`;
+                        return;
                     }
+
+                    const folderId = extractFolderId(data.file_url);
+                    if (!folderId) {
+                        mBox.innerHTML = `<div class="empty-card"><i class="fas fa-exclamation-triangle"></i>Invalid folder link in database.</div>`;
+                        return;
+                    }
+
+                    // 2. Show loading state
+                    mBox.innerHTML = `<div class="loader-card"><div class="loader-spinner"></div>Fetching files from Google Drive...</div>`;
+
+                    // 3. Call Google Drive API
+                    const apiUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType,size,webViewLink,webContentLink)&pageSize=1000`;
+                    
+                    const response = await fetch(apiUrl);
+                    const driveData = await response.json();
+
+                    if (driveData.error) {
+                        console.error(driveData.error);
+                        mBox.innerHTML = `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Error loading files. (API Key issue)</div>`;
+                        return;
+                    }
+
+                    const files = driveData.files || [];
+                    
+                    if (files.length === 0) {
+                        mBox.innerHTML = `<div class="empty-card"><i class="fas fa-folder-open"></i>The folder is currently empty.</div>`;
+                        return;
+                    }
+
+                    if (countEl) countEl.textContent = files.length + ' files';
+
+                    // 4. Render Search Bar and File List
+                    mBox.innerHTML = `
+                        <div style="margin-bottom: 15px;">
+                            <input type="text" id="searchFiles" placeholder="🔍 Search materials by name..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); outline: none;">
+                        </div>
+                        <div class="materials-list" id="driveFilesList">
+                            ${files.map(file => renderFileCard(file)).join('')}
+                        </div>
+                    `;
+
+                    // 5. Add search functionality
+                    document.getElementById('searchFiles').addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        const cards = document.querySelectorAll('#driveFilesList .material-item');
+                        cards.forEach(card => {
+                            const title = card.querySelector('.m-title').textContent.toLowerCase();
+                            card.style.display = title.includes(term) ? 'flex' : 'none';
+                        });
+                    });
+
                 } catch (err) {
                     console.warn('Materials load error:', err);
                     mBox.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load materials.</div>`;
@@ -931,6 +963,7 @@
                 mBox.innerHTML = `<div class="empty-card"><i class="fas fa-book-open"></i>No materials — your level isn't set.</div>`;
             }
 
+            // Load General Downloads (Keep exactly as it was)
             try {
                 const { data, error } = await supabase
                     .from('documents').select('*')
@@ -953,6 +986,37 @@
             } catch (err) {
                 dBox.innerHTML = `<div class="empty-card"><i class="fas fa-circle-exclamation"></i>Couldn't load downloads.</div>`;
             }
+        }
+
+        // Helper to render individual file cards
+        function renderFileCard(file) {
+            let icon = 'fa-file';
+            let color = 'var(--text-muted)';
+            if (file.mimeType.includes('pdf')) { icon = 'fa-file-pdf'; color = '#e74c3c'; }
+            else if (file.mimeType.includes('document')) { icon = 'fa-file-word'; color = '#2980b9'; }
+            else if (file.mimeType.includes('spreadsheet')) { icon = 'fa-file-excel'; color = '#27ae60'; }
+            else if (file.mimeType.includes('presentation')) { icon = 'fa-file-powerpoint'; color = '#e67e22'; }
+            else if (file.mimeType.includes('image')) { icon = 'fa-file-image'; color = '#9b59b6'; }
+
+            let sizeStr = 'FILE';
+            if (file.size) {
+                const mb = (file.size / (1024 * 1024)).toFixed(1);
+                sizeStr = mb > 0.1 ? `${mb} MB` : `${(file.size / 1024).toFixed(0)} KB`;
+            }
+
+            // Fallback to webViewLink if webContentLink isn't available (e.g. Docs/Sheets)
+            const downloadLink = file.webContentLink || file.webViewLink;
+
+            return `
+                <a class="material-item" href="${downloadLink}" target="_blank" rel="noopener">
+                    <div class="m-icon" style="color: ${color};"><i class="fas ${icon}"></i></div>
+                    <div class="m-body">
+                        <div class="m-title">${escapeHtml(file.name)}</div>
+                        <div class="m-sub">${file.mimeType.split('/').pop().toUpperCase()}</div>
+                    </div>
+                    <div class="m-meta">DOWNLOAD</div>
+                </a>
+            `;
         }
     </script>
 
