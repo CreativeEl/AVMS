@@ -119,7 +119,6 @@
             gap: 12px;
         }
         
-        /* UPDATED SIDEBAR LOGO */
         .sidebar-logo {
             width: 40px; height: 40px;
             border-radius: 50%;
@@ -243,7 +242,6 @@
             display: flex; align-items: center; gap: 12px; min-width: 0;
         }
         
-        /* UPDATED MOBILE AVATAR */
         .mobile-hero-avatar {
             width: 44px; height: 44px;
             border-radius: 50%;
@@ -360,7 +358,6 @@
         html.dark .topbar-user-info .n { color: var(--gold); }
         .topbar-user-info .r { font-size: 11px; color: var(--text-muted); }
         
-        /* UPDATED TOPBAR AVATAR */
         .topbar-avatar {
             width: 40px; height: 40px;
             border-radius: 50%;
@@ -879,6 +876,25 @@
         document.getElementById('sidebarLogout').addEventListener('click', doLogout);
         document.getElementById('mHeroLogout').addEventListener('click', doLogout);
 
+        // --- NEW GOOGLE DRIVE HELPER FUNCTION ---
+        function getDriveDownloadLink(url) {
+            if (!url) return '#';
+            
+            // Check if it's already a direct link
+            if (url.includes('uc?export=download')) return url;
+            
+            // Extract the File ID using Regex
+            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            
+            if (match && match[1]) {
+                const fileId = match[1];
+                return `https://drive.google.com/uc?export=download&id=${fileId}`;
+            }
+            
+            // If it's a generic link, just return it
+            return url;
+        }
+
         async function loadMaterialsAndDownloads() {
             const mBox = document.getElementById('materialsList');
             const dBox = document.getElementById('downloadsList');
@@ -897,13 +913,13 @@
                     } else {
                         if (countEl) countEl.textContent = data.length + ' file' + (data.length === 1 ? '' : 's');
                         mBox.innerHTML = `<div class="materials-list">${data.map(m => `
-                            <a class="material-item" href="${escapeHtml(m.file_url || '#')}" target="_blank" rel="noopener">
+                            <a class="material-item" href="${escapeHtml(getDriveDownloadLink(m.file_url) || '#')}" target="_blank" rel="noopener">
                                 <div class="m-icon"><i class="fas fa-file-arrow-down"></i></div>
                                 <div class="m-body">
                                     <div class="m-title">${escapeHtml(m.title || 'Material')}${m.course_code ? ' · ' + escapeHtml(m.course_code) : ''}</div>
                                     <div class="m-sub">${escapeHtml(m.description || '')}</div>
                                 </div>
-                                <div class="m-meta">${m.file_size_kb ? m.file_size_kb + ' KB' : 'OPEN'}</div>
+                                <div class="m-meta">${m.file_size_kb ? m.file_size_kb + ' KB' : 'DOWNLOAD'}</div>
                             </a>
                         `).join('')}</div>`;
                     }
