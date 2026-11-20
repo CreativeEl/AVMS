@@ -824,8 +824,11 @@
         let currentStudent = null;
         // --- YOUR GOOGLE DRIVE API KEY ---
         const GOOGLE_API_KEY = 'AIzaSyB-p4X89dLP40UBfFiH-zhm1nvlnRPuKZQ';
+        
+        // State for folder navigation
+        let currentFolderId = null;
+        let folderHistory = [];
 
-        // Helper to extract Folder ID from a Google Drive link
         function extractFolderId(url) {
             if (!url) return null;
             const match = url.match(/folders\/([a-zA-Z0-9_-]+)/);
@@ -892,7 +895,7 @@
 
             if (currentStudent && currentStudent.class_level) {
                 try {
-                    // 1. Fetch the Google Drive folder link from Supabase
+                    // 1. Fetch the root Google Drive folder link from Supabase
                     const { data, error } = await supabase
                         .from('materials')
                         .select('*')
@@ -911,49 +914,10 @@
                         return;
                     }
 
-                    // 2. Show loading state
-                    mBox.innerHTML = `<div class="loader-card"><div class="loader-spinner"></div>Fetching files from Google Drive...</div>`;
-
-                    // 3. Call Google Drive API
-                    const apiUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType,size,webViewLink,webContentLink)&pageSize=1000`;
-                    
-                    const response = await fetch(apiUrl);
-                    const driveData = await response.json();
-
-                    if (driveData.error) {
-                        console.error(driveData.error);
-                        mBox.innerHTML = `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Error loading files. (API Key issue)</div>`;
-                        return;
-                    }
-
-                    const files = driveData.files || [];
-                    
-                    if (files.length === 0) {
-                        mBox.innerHTML = `<div class="empty-card"><i class="fas fa-folder-open"></i>The folder is currently empty.</div>`;
-                        return;
-                    }
-
-                    if (countEl) countEl.textContent = files.length + ' files';
-
-                    // 4. Render Search Bar and File List
-                    mBox.innerHTML = `
-                        <div style="margin-bottom: 15px;">
-                            <input type="text" id="searchFiles" placeholder="🔍 Search materials by name..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); outline: none;">
-                        </div>
-                        <div class="materials-list" id="driveFilesList">
-                            ${files.map(file => renderFileCard(file)).join('')}
-                        </div>
-                    `;
-
-                    // 5. Add search functionality
-                    document.getElementById('searchFiles').addEventListener('input', (e) => {
-                        const term = e.target.value.toLowerCase();
-                        const cards = document.querySelectorAll('#driveFilesList .material-item');
-                        cards.forEach(card => {
-                            const title = card.querySelector('.m-title').textContent.toLowerCase();
-                            card.style.display = title.includes(term) ? 'flex' : 'none';
-                        });
-                    });
+                    // 2. Start the folder navigation at the root level
+                    currentFolderId = folderId;
+                    folderHistory = []; 
+                    fetchFolderContents(currentFolderId);
 
                 } catch (err) {
                     console.warn('Materials load error:', err);
@@ -988,35 +952,128 @@
             }
         }
 
-        // Helper to render individual file cards
+        // --- NEW FUNCTION TO FETCH FOLDER CONTENTS ---
+        async function fetchFolderContents(folderId) {
+            const mBox = document.getElementById('materialsList');
+            const countEl = document.getElementById('materialsCount');
+
+            mBox.innerHTML = `<div class="loader-card"><div class="loader-spinner"></div>Loading folder...</div>`;
+
+            const apiUrl = `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${GOOGLE_API_KEY}&fields=files(id,name,mimeType,size,webViewLink,webContentLink)&pageSize=1000`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                const driveData = await response.json();
+
+                if (driveData.error) {
+                    mBox.innerHTML = `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Error loading files. (Check API Key)</div>`;
+                    return;
+                }
+
+                const files = driveData.files || [];
+                if (countEl) countEl.textContent = files.length + ' items';
+
+                // Render Back Button if we are inside a subfolder
+                let backBtnHtml = '';
+                if (folderHistory.length > 0) {
+                    backBtnHtml = `
+                        <div style="margin-bottom: 15px;">
+                            <button onclick="goBackFolder()" style="background: var(--surface-2); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; cursor: pointer; color: var(--text); font-weight: 600; display: inline-flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                        </div>
+                    `;
+                }
+
+                if (files.length === 0) {
+                    mBox.innerHTML = backBtnHtml + `<div class="empty-card"><i class="fas fa-folder-open"></i>This folder is empty.</div>`;
+                    return;
+                }
+
+                mBox.innerHTML = backBtnHtml + `
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" id="searchFiles" placeholder="🔍 Search by name..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); outline: none;">
+                    </div>
+                    <div class="materials-list" id="driveFilesList">
+                        ${files.map(file => renderFileCard(file)).join('')}
+                    </div>
+                `;
+
+                document.getElementById('searchFiles').addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    const cards = document.querySelectorAll('#driveFilesList .material-item');
+                    cards.forEach(card => {
+                        const title = card.querySelector('.m-title').textContent.toLowerCase();
+                        card.style.display = title.includes(term) ? 'flex' : 'none';
+                    });
+                });
+
+            } catch (err) {
+                console.warn(err);
+                mBox.innerHTML = `<div class="empty-card"><i class="fas fa-exclamation-circle"></i>Network error.</div>`;
+            }
+        }
+
+        function goBackFolder() {
+            if (folderHistory.length > 0) {
+                const prevFolder = folderHistory.pop();
+                currentFolderId = prevFolder;
+                fetchFolderContents(currentFolderId);
+            }
+        }
+
         function renderFileCard(file) {
+            const isFolder = file.mimeType === 'application/vnd.google-apps.folder';
+            
             let icon = 'fa-file';
             let color = 'var(--text-muted)';
-            if (file.mimeType.includes('pdf')) { icon = 'fa-file-pdf'; color = '#e74c3c'; }
+            
+            if (isFolder) {
+                icon = 'fa-folder';
+                color = '#C9A961'; // Gold color for folders
+            } else if (file.mimeType.includes('pdf')) { icon = 'fa-file-pdf'; color = '#e74c3c'; }
             else if (file.mimeType.includes('document')) { icon = 'fa-file-word'; color = '#2980b9'; }
             else if (file.mimeType.includes('spreadsheet')) { icon = 'fa-file-excel'; color = '#27ae60'; }
             else if (file.mimeType.includes('presentation')) { icon = 'fa-file-powerpoint'; color = '#e67e22'; }
             else if (file.mimeType.includes('image')) { icon = 'fa-file-image'; color = '#9b59b6'; }
 
-            let sizeStr = 'FILE';
-            if (file.size) {
+            let sizeStr = isFolder ? 'FOLDER' : 'FILE';
+            if (file.size && !isFolder) {
                 const mb = (file.size / (1024 * 1024)).toFixed(1);
                 sizeStr = mb > 0.1 ? `${mb} MB` : `${(file.size / 1024).toFixed(0)} KB`;
             }
 
-            // Fallback to webViewLink if webContentLink isn't available (e.g. Docs/Sheets)
-            const downloadLink = file.webContentLink || file.webViewLink;
+            // If it's a folder, we open it internally. If it's a file, we download/view it.
+            if (isFolder) {
+                return `
+                    <a class="material-item" href="javascript:void(0)" onclick="openSubFolder('${file.id}')">
+                        <div class="m-icon" style="color: ${color};"><i class="fas ${icon}"></i></div>
+                        <div class="m-body">
+                            <div class="m-title">${escapeHtml(file.name)}</div>
+                            <div class="m-sub">Folder</div>
+                        </div>
+                        <div class="m-meta">OPEN <i class="fas fa-chevron-right" style="font-size: 10px; margin-left: 4px;"></i></div>
+                    </a>
+                `;
+            } else {
+                const downloadLink = file.webContentLink || file.webViewLink;
+                return `
+                    <a class="material-item" href="${downloadLink}" target="_blank" rel="noopener">
+                        <div class="m-icon" style="color: ${color};"><i class="fas ${icon}"></i></div>
+                        <div class="m-body">
+                            <div class="m-title">${escapeHtml(file.name)}</div>
+                            <div class="m-sub">${file.mimeType.split('/').pop().toUpperCase()}</div>
+                        </div>
+                        <div class="m-meta">DOWNLOAD</div>
+                    </a>
+                `;
+            }
+        }
 
-            return `
-                <a class="material-item" href="${downloadLink}" target="_blank" rel="noopener">
-                    <div class="m-icon" style="color: ${color};"><i class="fas ${icon}"></i></div>
-                    <div class="m-body">
-                        <div class="m-title">${escapeHtml(file.name)}</div>
-                        <div class="m-sub">${file.mimeType.split('/').pop().toUpperCase()}</div>
-                    </div>
-                    <div class="m-meta">DOWNLOAD</div>
-                </a>
-            `;
+        function openSubFolder(folderId) {
+            folderHistory.push(currentFolderId);
+            currentFolderId = folderId;
+            fetchFolderContents(currentFolderId);
         }
     </script>
 
